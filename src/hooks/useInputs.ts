@@ -10,8 +10,8 @@ export const useInputs = (initialDate: Date, finalDate: Date) => {
   const loadData = () => {
     (async () => {
       setIsLoading(true);
-      const data = getAllLogsByDate(initialDate, finalDate, true);
-      setInputs(await data);
+      const data = await getAllLogsByDate(initialDate, finalDate, true);
+      setInputs(data);
       setIsLoading(false);
     })();
   };

@@ -21,7 +21,6 @@ export const UpdateProductScreen = ({
     (async () => {
       const product = await getProductById(id);
       setProductState(product);
-      console.log(product, 'product');
       setIsLoading(false);
     })();
   }, [id]);

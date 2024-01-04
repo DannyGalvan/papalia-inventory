@@ -5,6 +5,7 @@ import {ReadInputScreenProps} from '../../interfaces/IInputNavigation';
 import {LogHeader} from '../../database/models/LogHeader';
 import {getLogById} from '../../database/repository/LogHeaderRepository';
 import {LogForm} from '../../components/form/LogForm';
+import {INPUT_DATA} from '../../config/constants';
 
 export const ReadInputScreen = ({route, navigation}: ReadInputScreenProps) => {
   const {id} = route.params;
@@ -30,6 +31,7 @@ export const ReadInputScreen = ({route, navigation}: ReadInputScreenProps) => {
           initialForm={logState}
           onSubmit={null}
           navigate={navigation}
+          selectData={INPUT_DATA}
         />
       )}
     </View>

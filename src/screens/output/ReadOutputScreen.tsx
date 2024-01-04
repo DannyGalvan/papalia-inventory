@@ -4,6 +4,7 @@ import {LogForm} from '../../components/form/LogForm';
 import {appStyles} from '../../styles/globalStyles';
 import {getLogById} from '../../database/repository/LogHeaderRepository';
 import {LogHeader} from '../../database/models/LogHeader';
+import {OUPUT_DATA} from '../../config/constants';
 
 export const ReadOutputScreen = ({route, navigation}) => {
   const {id} = route.params;
@@ -29,6 +30,7 @@ export const ReadOutputScreen = ({route, navigation}) => {
           initialForm={logState}
           onSubmit={null}
           navigate={navigation}
+          selectData={OUPUT_DATA}
         />
       )}
     </View>

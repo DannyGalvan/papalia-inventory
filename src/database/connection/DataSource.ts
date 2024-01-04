@@ -8,7 +8,7 @@ export const dataSource = new DataSource({
   database: 'quicksqlitetest-typeorm.db',
   entities: [Product, LogHeader, LogDetail],
   location: '.',
-  logging: ['error', 'query'],
+  logging: [],
   synchronize: true,
   type: 'react-native',
   driver: typeORMDriver,
