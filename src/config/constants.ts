@@ -1,3 +1,6 @@
+export const NAME_BD = 'quicksqlitetest-typeorm.db';
+export const KEY_DIR_IMAGES = 'dir_images';
+
 export const OUTPUT_TYPES = {
   no_seleccionado: 0,
   Venta: 1,

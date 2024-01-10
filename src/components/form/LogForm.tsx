@@ -1,7 +1,15 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {LogHeader} from '../../database/models/LogHeader';
 import {Response} from '../../database/models/response/Response';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  DimensionValue,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {InputForm} from '../input/InputForm';
 import {appColors, appStyles} from '../../styles/globalStyles';
 import {TouchableButton} from '../button/TouchableButton';
@@ -55,6 +63,8 @@ export const LogForm = ({
   } = useLogDetails();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const noImage = require('../../assets/sin_imagen.png');
+  const dropdown = useRef<SelectDropdown>(null);
 
   const handleSearch = async (text: string) => {
     const data = await searchProductsByCodeOrName(text);
@@ -86,6 +96,22 @@ export const LogForm = ({
 
   const backToList = () => {
     navigate.goBack();
+  };
+
+  const handleSelect = (selectedItem: Product) => {
+    addDetail(
+      {
+        id: generateRandomId(),
+        product: selectedItem,
+        name: selectedItem.name,
+        quantity: 1,
+        price: selectedItem.price,
+        total: selectedItem.price,
+        productCode: selectedItem.code,
+        logHeaderId: null,
+      },
+      handleChange,
+    );
   };
 
   return (
@@ -129,27 +155,51 @@ export const LogForm = ({
         <View style={styles.selectContainer}>
           <Text style={appStyles.textDark}>Productos Busqueda</Text>
           <SelectDropdown
+            ref={dropdown}
             data={products}
-            onSelect={(selectedItem: Product) => {
-              addDetail(
-                {
-                  id: generateRandomId(),
-                  product: selectedItem,
-                  name: selectedItem.name,
-                  quantity: 1,
-                  price: selectedItem.price,
-                  total: selectedItem.price,
-                  productCode: selectedItem.code,
-                  logHeaderId: null,
-                },
-                handleChange,
-              );
-            }}
+            onSelect={handleSelect}
             rowTextForSelection={(item: Product) => {
               return item.name;
             }}
             buttonTextAfterSelection={(selectedItem: Product) => {
               return selectedItem.name;
+            }}
+            rowStyle={styles.itemSearchContainer}
+            renderCustomizedRowChild={(item: Product) => {
+              return (
+                <TouchableOpacity
+                  style={[
+                    appStyles.flexRow,
+                    appStyles.alignCenter,
+                    appStyles.justifyBetween,
+                  ]}
+                  onPress={() => {
+                    handleSelect(item);
+                    dropdown.current.closeDropdown();
+                  }}>
+                  <Image
+                    style={styles.image}
+                    source={
+                      item.image
+                        ? {
+                            uri: item.image,
+                          }
+                        : noImage
+                    }
+                  />
+                  <Text
+                    style={[
+                      appStyles.textDark,
+                      styles.itemSearchText,
+                      styles.fontSize,
+                    ]}>
+                    {item.name}
+                  </Text>
+                  <Text style={[appStyles.textDark, styles.fontSize]}>
+                    Q{item.price.toFixed(2)}
+                  </Text>
+                </TouchableOpacity>
+              );
             }}
             buttonStyle={[styles.input, styles.select]}
             disabled={isReadonly}
@@ -261,5 +311,21 @@ const styles = StyleSheet.create({
   listContainer: {
     marginVertical: 10,
     height: 250,
+  },
+  itemSearchContainer: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    ...appStyles.screen,
+  },
+  itemSearchText: {
+    width: '60%',
+  },
+  fontSize: {
+    fontSize: 12,
+  },
+  image: {
+    width: '20%' as DimensionValue,
+    height: 45,
+    resizeMode: 'contain',
   },
 });

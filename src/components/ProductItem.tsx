@@ -1,21 +1,39 @@
-import React from 'react';
-import {DimensionValue, Text, TouchableOpacity, View} from 'react-native';
+import React, {useCallback} from 'react';
+import {
+  DimensionValue,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {appStyles} from '../styles/globalStyles';
 import {Product} from '../database/models/Product';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {ProductStackParamList} from '../interfaces/IProductNavigation';
 
 export const ProductItem = ({product}: {product: Product}) => {
+  const noImage = require('../assets/sin_imagen.png');
   const {navigate} = useNavigation<NavigationProp<ProductStackParamList>>();
+
+  const nonExistentProduct = product.stock === 0;
+
+  const containerStyle = [
+    appStyles.flexColumn,
+    !nonExistentProduct ? appStyles.bgPrimary : appStyles.bgDanger,
+    styles.container,
+    appStyles.justifyCenter,
+  ];
+
+  const onPress = useCallback(() => {
+    navigate('EditProduct', {id: product.code});
+  }, [navigate, product.code]);
+
   return (
     <TouchableOpacity
-      style={[
-        appStyles.flexColumn,
-        appStyles.bgPrimary,
-        styles.container,
-        appStyles.justifyCenter,
-      ]}
-      onPress={() => navigate('EditProduct', {id: product.code})}>
+      style={containerStyle}
+      activeOpacity={0.7}
+      onPress={onPress}>
       <View style={[appStyles.flexRow, appStyles.justifyBetween]}>
         <View style={styles.code}>
           <Text
@@ -63,12 +81,22 @@ export const ProductItem = ({product}: {product: Product}) => {
             {product.description}
           </Text>
         </View>
+        <Image
+          style={styles.image}
+          source={
+            product.image
+              ? {
+                  uri: product.image,
+                }
+              : noImage
+          }
+        />
       </View>
     </TouchableOpacity>
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
     marginHorizontal: 5,
     marginVertical: 10,
@@ -87,4 +115,10 @@ const styles = {
     width: '100%' as DimensionValue,
     marginVertical: 10,
   },
-};
+  image: {
+    width: '100%' as DimensionValue,
+    height: 200,
+    marginVertical: 10,
+    resizeMode: 'contain',
+  },
+});

@@ -1,6 +1,6 @@
 import React from 'react';
 import {appColors, appStyles} from '../styles/globalStyles';
-import {StyleSheet, Text, View} from 'react-native';
+import {DimensionValue, Image, StyleSheet, Text, View} from 'react-native';
 import {TouchableButton} from './button/TouchableButton';
 import {LogDetail} from '../database/models/LogDetail';
 
@@ -19,52 +19,62 @@ export const DetailsItem = ({
   index,
   readonly,
 }: Props) => {
+  const noImage = require('../assets/sin_imagen.png');
   return (
-    <View
-      style={[
-        appStyles.flexRow,
-        appStyles.justifyBetween,
-        appStyles.bgGray,
-        styles.container,
-      ]}>
-      <Text style={[appStyles.textDark, appStyles.subTitle]}>
-        {detail.product.name}
-      </Text>
-      <View style={[appStyles.flexRow, appStyles.alignCenter]}>
-        {!readonly && (
-          <TouchableButton
-            onPress={() => {
-              detail.quantity = detail.quantity + 1;
-              detail.total = detail.quantity * detail.price;
-              updateDetail(detail, index);
-            }}
-            icon="add"
-            iconColor={appColors.white}
-            textStyle={[appStyles.subTitle]}
-            styles={styles.button}
-            iconSize={20}
-          />
-        )}
-        <Text style={[appStyles.textDark, appStyles.subTitle, styles.quantity]}>
-          {detail.quantity}
+    <View style={[appStyles.bgGray, styles.container]}>
+      <View
+        style={[appStyles.flexRow, appStyles.justifyBetween, styles.details]}>
+        <Text
+          style={[appStyles.textDark, appStyles.subTitle, styles.itemControls]}>
+          {detail.product.name} - Q{detail.product.price.toFixed(2)}
         </Text>
-        {!readonly && (
-          <TouchableButton
-            onPress={() => {
-              if (detail.quantity > 1) {
-                detail.quantity = detail.quantity - 1;
+        <View style={[appStyles.flexRow, appStyles.alignCenter]}>
+          {!readonly && (
+            <TouchableButton
+              onPress={() => {
+                detail.quantity = detail.quantity + 1;
                 detail.total = detail.quantity * detail.price;
                 updateDetail(detail, index);
-              }
-            }}
-            icon="remove"
-            iconColor={appColors.white}
-            textStyle={[appStyles.subTitle]}
-            styles={styles.button}
-            iconSize={20}
-          />
-        )}
+              }}
+              icon="add"
+              iconColor={appColors.white}
+              textStyle={[appStyles.subTitle]}
+              styles={styles.button}
+              iconSize={20}
+            />
+          )}
+          <Text
+            style={[appStyles.textDark, appStyles.subTitle, styles.quantity]}>
+            {detail.quantity}
+          </Text>
+          {!readonly && (
+            <TouchableButton
+              onPress={() => {
+                if (detail.quantity > 1) {
+                  detail.quantity = detail.quantity - 1;
+                  detail.total = detail.quantity * detail.price;
+                  updateDetail(detail, index);
+                }
+              }}
+              icon="remove"
+              iconColor={appColors.white}
+              textStyle={[appStyles.subTitle]}
+              styles={styles.button}
+              iconSize={20}
+            />
+          )}
+        </View>
       </View>
+      <Image
+        style={styles.image}
+        source={
+          detail.product.image
+            ? {
+                uri: detail.product.image,
+              }
+            : noImage
+        }
+      />
       {!readonly && (
         <TouchableButton
           onPress={() => removeDetail(detail.id)}
@@ -87,10 +97,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     marginVertical: 10,
+    paddingVertical: 15,
+  },
+  details: {
+    marginVertical: 10,
   },
   bf: {
     position: 'absolute',
-    right: 0,
+    right: 5,
     top: 0,
     width: 25,
   },
@@ -109,5 +123,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 5,
     paddingVertical: 3,
+  },
+  itemControls: {
+    width: '50%',
+  },
+  image: {
+    width: '100%' as DimensionValue,
+    height: 175,
+    resizeMode: 'contain',
   },
 });

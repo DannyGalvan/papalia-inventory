@@ -3,10 +3,12 @@ import {DataSource} from 'typeorm';
 import {Product} from '../models/Product';
 import {LogHeader} from '../models/LogHeader';
 import {LogDetail} from '../models/LogDetail';
+import {NAME_BD} from '../../config/constants';
+import {Configuration} from '../models/Configuration';
 
 export const dataSource = new DataSource({
-  database: 'quicksqlitetest-typeorm.db',
-  entities: [Product, LogHeader, LogDetail],
+  database: NAME_BD,
+  entities: [Product, LogHeader, LogDetail, Configuration],
   location: '.',
   logging: [],
   synchronize: true,

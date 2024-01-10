@@ -19,6 +19,7 @@ const initialForm = ProductRepository.create({
   description: '',
   price: 0.0,
   stock: 0,
+  image: '',
 });
 
 export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
@@ -29,6 +30,8 @@ export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
 
     if (response.success) {
       navigation.navigate('ListProduct');
+    } else {
+      Alert.alert('Error al crear el producto', response.message);
     }
 
     return response;
@@ -47,7 +50,20 @@ export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
       const ws = wb.Sheets[wsname];
       const data = utils.sheet_to_json<Product>(ws);
 
-      await Promise.all(data.map(item => createProduct(item)));
+      for (const product of data) {
+        const result = await createProduct(product);
+
+        if (!result.success) {
+          Alert.alert(
+            'Error al cargar el archivo',
+            `No se pudo cargar el producto ${product.name} ${result.message}`,
+          );
+
+          setIsLoading(false);
+          return;
+        }
+      }
+
       setIsLoading(false);
 
       Alert.alert(

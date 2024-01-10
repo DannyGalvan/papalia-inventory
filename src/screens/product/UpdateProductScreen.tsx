@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {appStyles} from '../../styles/globalStyles';
 import {ProductForm} from '../../components/form/ProductForm';
 import {ProductEditScreenProps} from '../../interfaces/IProductNavigation';
@@ -30,14 +30,16 @@ export const UpdateProductScreen = ({
 
     if (response.success) {
       navigation.navigate('ListProduct');
+    } else {
+      Alert.alert('Error al actualizar el producto', response.message);
     }
 
     return response;
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
+    <View style={[styles.container, appStyles.screen]}>
+      <ScrollView>
         <Text
           style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
           Actualizar Producto
@@ -45,14 +47,14 @@ export const UpdateProductScreen = ({
         {!isLoading && (
           <ProductForm initialForm={productState} onSubmit={onSubmit} update />
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    marginTop: 20,
+    paddingTop: 20,
   },
 });

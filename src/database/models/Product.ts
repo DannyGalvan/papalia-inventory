@@ -8,6 +8,11 @@ export class Product {
   @Column('varchar') description: string;
   @Column('decimal') price: number;
   @Column('integer') stock: number;
+  @Column('varchar', {
+    nullable: false,
+    default: '',
+  })
+  image: string;
   @OneToMany(() => LogDetail, logDetail => logDetail.product, {cascade: true})
   logDetails: LogDetail[];
 }

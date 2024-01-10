@@ -8,9 +8,9 @@
 import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {dataSource} from './src/database/connection/DataSource';
-import PrincipalStack from './src/stacks/PrincipalStack';
 import {ActivityIndicator, Text, View} from 'react-native';
 import {appStyles} from './src/styles/globalStyles';
+import AppStartStack from './src/stacks/AppStartStack';
 
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +50,7 @@ function App(): React.JSX.Element {
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       ) : (
-        <PrincipalStack />
+        <AppStartStack />
       )}
     </NavigationContainer>
   );

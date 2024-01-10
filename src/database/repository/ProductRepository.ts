@@ -98,6 +98,7 @@ export const updateProduct = async (product: Product) => {
       product.description ?? productExists.description;
     productExists.price = product.price ?? productExists.price;
     productExists.stock = product.stock ?? productExists.stock;
+    productExists.image = product.image ?? productExists.image;
 
     await ProductRepository.update(product.code, productExists);
 

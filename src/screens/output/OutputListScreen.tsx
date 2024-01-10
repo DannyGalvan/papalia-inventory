@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import uuid from 'react-native-uuid';
 import {Alert, FlatList, StyleSheet, Text, View} from 'react-native';
 import {appColors, appStyles} from '../../styles/globalStyles';
 import {OutputListScreenProps} from '../../interfaces/IOutputNavigation';
@@ -27,7 +28,7 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
       const wb = utils.book_new();
       utils.book_append_sheet(wb, ws, 'Salidas');
       const wbout = write(wb, {type: 'binary', bookType: 'xlsx'});
-      const fileSave = `${DownloadDirectoryPath}/Salidas.xlsx`;
+      const fileSave = `${DownloadDirectoryPath}/Salidas_${uuid.v4()}.xlsx`;
       await writeFile(fileSave, wbout, 'ascii');
       Alert.alert('Archivo guardado en descargas', fileSave);
       setIsLoadingDownload(false);

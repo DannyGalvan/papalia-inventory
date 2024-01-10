@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, Text} from 'react-native';
+import {Text, View} from 'react-native';
 import {appStyles} from '../../styles/globalStyles';
 import {CreateInputScreenProps} from '../../interfaces/IInputNavigation';
 import {LogForm} from '../../components/form/LogForm';
@@ -25,7 +25,7 @@ export const CreateInputScreen = ({}: CreateInputScreenProps) => {
   };
 
   return (
-    <ScrollView>
+    <View>
       <Text style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
         Crear entrada de producto
       </Text>
@@ -35,6 +35,6 @@ export const CreateInputScreen = ({}: CreateInputScreenProps) => {
         onSubmit={sendForm}
         selectData={INPUT_DATA}
       />
-    </ScrollView>
+    </View>
   );
 };

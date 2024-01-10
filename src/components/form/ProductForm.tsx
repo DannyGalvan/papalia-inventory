@@ -1,11 +1,12 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {InputForm} from '../input/InputForm';
 import {appColors, appStyles} from '../../styles/globalStyles';
 import {TouchableButton} from '../button/TouchableButton';
 import {Product} from '../../database/models/Product';
 import {useForm} from '../../hooks/useForm';
 import {Response} from '../../database/models/response/Response';
+import {useImages} from '../../hooks/useImages';
 
 interface Props {
   initialForm: Product;
@@ -34,11 +35,23 @@ const validateForm = (form: Product) => {
 };
 
 export const ProductForm = ({initialForm, onSubmit, update}: Props) => {
+  const {uploadImage} = useImages();
+  const noImage = require('../../assets/sin_imagen.png');
+
   const {form, errors, handleChange, handleSubmit, response} = useForm(
     initialForm,
     validateForm,
     onSubmit,
   );
+
+  const handleSelectImage = async () => {
+    uploadImage({
+      updateForm: handleChange,
+      nameImage: form.code,
+      afterImage: form.image,
+    });
+  };
+
   return (
     <View style={[appStyles.flexColumn, styles.container]}>
       <InputForm
@@ -50,6 +63,7 @@ export const ProductForm = ({initialForm, onSubmit, update}: Props) => {
         onChangeText={text => handleChange(text, 'code')}
         secureTextEntry={false}
         style={styles.input}
+        readonly={update}
       />
       <InputForm
         label="Nombre"
@@ -104,10 +118,24 @@ export const ProductForm = ({initialForm, onSubmit, update}: Props) => {
               appStyles.subTitle,
               appStyles.textCenter,
             ]}>
-            Stock actual: {form.stock}
+            Inventario en existencia actual: {form.stock}
           </Text>
         </View>
       )}
+      <TouchableOpacity
+        style={[appStyles.flexRow, appStyles.justifyCenter]}
+        onPress={handleSelectImage}>
+        <Image
+          style={styles.image}
+          source={
+            form.image
+              ? {
+                  uri: form.image,
+                }
+              : noImage
+          }
+        />
+      </TouchableOpacity>
       <View>
         <TouchableButton
           onPress={handleSubmit}
@@ -155,5 +183,15 @@ const styles = StyleSheet.create({
   },
   stock: {
     marginVertical: 20,
+  },
+  imageContainer: {
+    width: '100%',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginVertical: 10,
+    backgroundColor: appColors.gray,
+    resizeMode: 'contain',
   },
 });

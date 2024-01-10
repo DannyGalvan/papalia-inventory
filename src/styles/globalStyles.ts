@@ -4,11 +4,12 @@ export const appColors = {
   black: '#000',
   white: '#fff',
   gray: '#ccc',
-  primary: '#0d47a1',
+  primary: '#0688B1',
   danger: '#d32f2f',
   opacity: 'rgba(255,255,255,0.5)',
   success: '#4caf50',
   warning: '#ffc107',
+  secondary: '#DF680B',
 };
 
 export const appStyles = StyleSheet.create({
@@ -20,6 +21,7 @@ export const appStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     paddingVertical: 10,
+    fontStyle: 'italic',
   },
   subTitle: {
     fontSize: 16,
@@ -27,6 +29,9 @@ export const appStyles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
+  },
+  textItalic: {
+    fontStyle: 'italic',
   },
   textCenter: {
     textAlign: 'center',
@@ -42,6 +47,9 @@ export const appStyles = StyleSheet.create({
   },
   textWhite: {
     color: appColors.white,
+  },
+  textWarning: {
+    color: appColors.warning,
   },
   justifyCenter: {
     justifyContent: 'center',
@@ -69,6 +77,9 @@ export const appStyles = StyleSheet.create({
   },
   bgDanger: {
     backgroundColor: appColors.danger,
+  },
+  bgWaring: {
+    backgroundColor: appColors.warning,
   },
   inputDark: {
     height: 40,

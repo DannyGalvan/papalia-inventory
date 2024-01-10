@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useMemo} from 'react';
+import uuid from 'react-native-uuid';
 import {Alert, FlatList, Text, View} from 'react-native';
 import {DownloadDirectoryPath, writeFile} from '@dr.pogodin/react-native-fs';
 import {appColors, appStyles} from '../../styles/globalStyles';
@@ -9,12 +10,13 @@ import {Fab} from '../../components/button/Fab';
 import {ProductListScreenProps} from '../../interfaces/IProductNavigation';
 import {getFullProducts} from '../../database/repository/ProductRepository';
 import {utils, write} from 'xlsx';
+import {Product} from '../../database/models/Product';
 
 export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
   const {products, total, loadData, isLoading, searchProducts} = useProducts();
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
 
-  const downloadFile = async () => {
+  const downloadFile = useCallback(async () => {
     try {
       setIsLoadingDownload(true);
       const data = await getFullProducts();
@@ -22,7 +24,7 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
       const wb = utils.book_new();
       utils.book_append_sheet(wb, ws, 'Productos');
       const wbout = write(wb, {type: 'binary', bookType: 'xlsx'});
-      const fileSave = `${DownloadDirectoryPath}/Productos.xlsx`;
+      const fileSave = `${DownloadDirectoryPath}/Productos_${uuid.v4()}.xlsx`;
       await writeFile(fileSave, wbout, 'ascii');
       Alert.alert('Archivo guardado en descargas', fileSave);
       setIsLoadingDownload(false);
@@ -30,7 +32,11 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
       Alert.alert('Error al descargar el archivo', e.message);
       setIsLoadingDownload(false);
     }
-  };
+  }, []);
+
+  const memoizedProductItem = useMemo(() => {
+    return ({item}: {item: Product}) => <ProductItem product={item} />;
+  }, []);
 
   return (
     <View style={[appStyles.screen]}>
@@ -47,7 +53,7 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
       <FlatList
         style={[styles.list]}
         data={products}
-        renderItem={({item}) => <ProductItem product={item} />}
+        renderItem={memoizedProductItem}
         refreshing={isLoading}
         onRefresh={loadData}
         keyExtractor={item => item.code}

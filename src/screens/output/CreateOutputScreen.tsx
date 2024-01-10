@@ -26,7 +26,7 @@ export const CreateOutputScreen = () => {
   return (
     <View>
       <Text style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
-        Crear entrada de producto
+        Crear salida de producto
       </Text>
       <LogForm
         initialForm={initialForm}
