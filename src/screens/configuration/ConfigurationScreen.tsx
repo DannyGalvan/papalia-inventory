@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {TouchableButton} from '../../components/button/TouchableButton';
-import {InputForm} from '../../components/input/InputForm';
-import {useDownloadBd} from '../../hooks/useDownloadBd';
-import {useImages} from '../../hooks/useImages';
+import React, { useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { appColors, appStyles } from '../../styles/globalStyles';
+import { TouchableButton } from '../../components/button/TouchableButton';
+import { InputForm } from '../../components/input/InputForm';
+import { useDownloadBd } from '../../hooks/useDownloadBd';
+import { useImages } from '../../hooks/useImages';
 
 export const ConfigurationScreen = () => {
-  const {save} = useDownloadBd();
-  const {dirImages, changeDirImages, isLoading} = useImages();
+  const { save } = useDownloadBd();
+  const { dirImages, changeDirImages, isLoading } = useImages();
   const [textInput, setTextInput] = useState(dirImages);
 
   const handleChangeText = (text: string) => {

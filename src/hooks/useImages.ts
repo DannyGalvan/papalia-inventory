@@ -1,7 +1,7 @@
-import {useContext} from 'react';
-import {ProductContext} from '../context/ProductContext';
+import { useContext } from 'react';
+import { ProductContext } from '../context/ProductContext';
 import Picker from 'react-native-document-picker';
-import {Alert, PermissionsAndroid} from 'react-native';
+import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import {
   PicturesDirectoryPath,
   copyFile,
@@ -10,9 +10,11 @@ import {
   unlink,
 } from '@dr.pogodin/react-native-fs';
 import uuid from 'react-native-uuid';
+import { useStoragePermissions } from './useStoragePermissions';
 
 export const useImages = () => {
-  const {dirImages, changeDirImages, isLoading, setIsLoading} =
+  const { checkStoragePermissions } = useStoragePermissions();
+  const { dirImages, changeDirImages, isLoading, setIsLoading } =
     useContext(ProductContext);
 
   const uploadImage = async ({
@@ -35,14 +37,12 @@ export const useImages = () => {
         return;
       }
 
-      const permissionExternal = await PermissionsAndroid.request(
-        'android.permission.READ_EXTERNAL_STORAGE',
-      );
+      const granted = await checkStoragePermissions();
 
-      if (permissionExternal !== 'granted') {
+      if (!granted) {
         Alert.alert(
           'Error',
-          'No se otorgaron permisos para acceder al almacenamiento',
+          'No se han dado permisos para manipular la información',
         );
         return;
       }
@@ -55,18 +55,6 @@ export const useImages = () => {
 
       const exist = await exists(saveDir);
 
-      const permission = await PermissionsAndroid.request(
-        'android.permission.WRITE_EXTERNAL_STORAGE',
-      );
-
-      if (permission !== 'granted') {
-        Alert.alert(
-          'Error',
-          'No se otorgaron permisos para acceder al almacenamiento',
-        );
-        return;
-      }
-
       if (!exist) {
         await mkdir(saveDir, {
           NSURLIsExcludedFromBackupKey: true,
@@ -74,9 +62,8 @@ export const useImages = () => {
         });
       }
 
-      const path = `${saveDir}/${nameImage}_${uuid.v4()}.${
-        res.type.split('/')[1]
-      }`;
+      const path = `${saveDir}/${nameImage}_${uuid.v4()}.${res.type.split('/')[1]
+        }`;
 
       const existsPath = await exists(afterImage);
 
