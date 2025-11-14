@@ -1,18 +1,19 @@
 import React from 'react';
-import {TouchableButton} from '../components/button/TouchableButton';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { TouchableButton } from '../components/button/TouchableButton';
+import {
+  createNativeStackNavigator,
+  NativeStackHeaderBackProps,
+  NativeStackHeaderItemProps,
+} from '@react-navigation/native-stack';
 import PrincipalStack from './PrincipalStack';
-import {appColors, appStyles} from '../styles/globalStyles';
-import {HeaderButtonProps} from '@react-navigation/native-stack/lib/typescript/src/types';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AppStackParamList} from '../interfaces/IAppStartNavitgation';
-import {Image, StyleSheet} from 'react-native';
-import {ConfigurationScreen} from '../screens/configuration/ConfigurationScreen';
-import {ProductProvider} from '../context/ProductContext';
+import { appColors, appStyles } from '../styles/globalStyles';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AppStackParamList } from '../interfaces/IAppStartNavitgation';
+import { Image, StyleSheet } from 'react-native';
+import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
+import { ProductProvider } from '../context/ProductContext';
 
-const Stack = createNativeStackNavigator<AppStackParamList>();
-
-const HeaderRight = ({}: HeaderButtonProps) => {
+const HeaderRight = ({}: NativeStackHeaderItemProps) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
 
   const handleConfigurationPress = () => {
@@ -30,11 +31,13 @@ const HeaderRight = ({}: HeaderButtonProps) => {
   );
 };
 
-const HeaderLeft = ({}: HeaderButtonProps) => {
+const HeaderLeft = ({}: NativeStackHeaderBackProps) => {
   return (
     <Image source={require('../assets/papalia.png')} style={styles.logo} />
   );
 };
+
+const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStartStack = () => {
   return (
@@ -43,7 +46,10 @@ const AppStartStack = () => {
         screenOptions={{
           headerTitleStyle: [appStyles.textWarning, appStyles.title],
           headerStyle: [appStyles.bgWhite],
-        }}>
+        }}
+        id={undefined}
+        initialRouteName="Home"
+      >
         <Stack.Screen
           name="Home"
           component={PrincipalStack}

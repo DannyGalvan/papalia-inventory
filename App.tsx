@@ -5,11 +5,11 @@
  * @format
  */
 
-import React, {useEffect, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {dataSource} from './src/database/connection/DataSource';
-import {ActivityIndicator, Text, View} from 'react-native';
-import {appStyles} from './src/styles/globalStyles';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { dataSource } from './src/database/connection/DataSource';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { appStyles } from './src/styles/globalStyles';
 import AppStartStack from './src/stacks/AppStartStack';
 
 function App(): React.JSX.Element {
@@ -42,9 +42,11 @@ function App(): React.JSX.Element {
             appStyles.flexColumn,
             appStyles.justifyCenter,
             appStyles.alignCenter,
-          ]}>
+          ]}
+        >
           <Text
-            style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
+            style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}
+          >
             Iniciando La Applicacion Porfavor Espere...
           </Text>
           <ActivityIndicator size="large" color="#0000ff" />

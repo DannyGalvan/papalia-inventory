@@ -1,6 +1,6 @@
 import React from 'react';
-import {Text, StyleSheet, TextInput, View, KeyboardType} from 'react-native';
-import {appColors, appStyles} from '../../styles/globalStyles';
+import { Text, StyleSheet, TextInput, View, KeyboardType } from 'react-native';
+import { appColors, appStyles } from '../../styles/globalStyles';
 
 interface Props {
   label: string;
@@ -46,7 +46,7 @@ export const InputForm = ({
         keyboardType={keyboardType ?? 'default'}
         style={[
           styles.input,
-          colorInput ? colorInput : global.inputDark,
+          colorInput ? colorInput : appStyles.inputDark,
           style,
         ]}
         placeholder={placeholder}

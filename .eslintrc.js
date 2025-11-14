@@ -1,12 +1,27 @@
 module.exports = {
   root: true,
-  extends: '@react-native',
+  extends: [
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
+    'prettier',
+    'prettier/react',
+    'prettier/@typescript-eslint',
+    '@react-native',
+    'plugin:prettier/recommended',
+  ],
+  plugins: ['react', 'react-hooks', '@typescript-eslint', 'prettier'],
   rules: {
-    'prettier/prettier': [
-      'error',
-      {
-        endOfLine: 'auto',
-      },
-    ],
+    'prettier/prettier': ['error'],
+    'spaced-comment': ['error', 'always', { markers: ['/'] }],
+    'import/prefer-default-export': 'off',
+    'class-methods-use-this': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-expressions': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { ProductContext } from '../context/ProductContext';
-import Picker from 'react-native-document-picker';
-import { Alert, PermissionsAndroid, Platform } from 'react-native';
+import { pick, types } from '@react-native-documents/picker';
+import { Alert } from 'react-native';
 import {
   PicturesDirectoryPath,
   copyFile,
@@ -47,8 +47,8 @@ export const useImages = () => {
         return;
       }
 
-      const res = await Picker.pickSingle({
-        type: [Picker.types.images],
+      const res = await pick({
+        type: [types.images],
       });
 
       const saveDir = `${PicturesDirectoryPath}/${dirImages}`;
@@ -62,8 +62,9 @@ export const useImages = () => {
         });
       }
 
-      const path = `${saveDir}/${nameImage}_${uuid.v4()}.${res.type.split('/')[1]
-        }`;
+      const path = `${saveDir}/${nameImage}_${uuid.v4()}.${
+        res[0].type.split('/')[1]
+      }`;
 
       const existsPath = await exists(afterImage);
 
@@ -71,7 +72,7 @@ export const useImages = () => {
         await unlink(afterImage);
       }
 
-      await copyFile(res.uri, path);
+      await copyFile(res[0].uri, path);
 
       const pathSaveDb = `file://${path}`;
 
@@ -81,11 +82,7 @@ export const useImages = () => {
 
       Alert.alert('Exito', 'Imagen subida correctamente');
     } catch (error) {
-      if (Picker.isCancel(error)) {
-        Alert.alert('Se Cancelo la subida del archivo', error.message);
-      } else {
-        Alert.alert('Error al subir el archivo', error.message);
-      }
+      Alert.alert('Error al subir el archivo', error.message);
       setIsLoading(false);
     }
   };

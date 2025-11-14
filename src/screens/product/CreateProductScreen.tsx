@@ -1,17 +1,17 @@
-import React, {useState} from 'react';
-import Picker from 'react-native-document-picker';
-import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {ProductForm} from '../../components/form/ProductForm';
-import {ProductCreateScreenProps} from '../../interfaces/IProductNavigation';
+import React, { useState } from 'react';
+import { pick, types } from '@react-native-documents/picker';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { appColors, appStyles } from '../../styles/globalStyles';
+import { ProductForm } from '../../components/form/ProductForm';
+import { ProductCreateScreenProps } from '../../interfaces/IProductNavigation';
 import {
   ProductRepository,
   createProduct,
 } from '../../database/repository/ProductRepository';
-import {Product} from '../../database/models/Product';
-import {Fab} from '../../components/button/Fab';
-import {readFile} from '@dr.pogodin/react-native-fs';
-import {read, utils} from 'xlsx';
+import { Product } from '../../database/models/Product';
+import { Fab } from '../../components/button/Fab';
+import { readFile } from '@dr.pogodin/react-native-fs';
+import { read, utils } from 'xlsx';
 
 const initialForm = ProductRepository.create({
   code: '',
@@ -22,7 +22,9 @@ const initialForm = ProductRepository.create({
   image: '',
 });
 
-export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
+export const CreateProductScreen = ({
+  navigation,
+}: ProductCreateScreenProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (product: Product) => {
@@ -40,12 +42,14 @@ export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
   const uploadFile = async () => {
     try {
       setIsLoading(true);
-      const res = await Picker.pickSingle({
-        type: [Picker.types.xls, Picker.types.xlsx],
+      const response = await pick({
+        type: [types.xls, types.xlsx],
       });
 
+      const res = response[0];
+
       const file = await readFile(res.uri, 'ascii');
-      const wb = read(file, {type: 'binary'});
+      const wb = read(file, { type: 'binary' });
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       const data = utils.sheet_to_json<Product>(ws);
@@ -71,11 +75,7 @@ export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
         `Se cargaron ${data.length} productos, lista actualizada`,
       );
     } catch (error) {
-      if (Picker.isCancel(error)) {
-        Alert.alert('Se Cancelo la subida del archivo', error.message);
-      } else {
-        Alert.alert('Error al subir el archivo', error.message);
-      }
+      Alert.alert('Error al subir el archivo', error.message);
       setIsLoading(false);
     }
   };
@@ -85,7 +85,8 @@ export const CreateProductScreen = ({navigation}: ProductCreateScreenProps) => {
       <ScrollView style={styles.container}>
         <View>
           <Text
-            style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
+            style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}
+          >
             Crear Nuevo Producto
           </Text>
           <ProductForm initialForm={initialForm} onSubmit={onSubmit} />

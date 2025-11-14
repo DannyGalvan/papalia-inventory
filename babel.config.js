@@ -6,10 +6,10 @@ module.exports = {
       'module-resolver',
       {
         alias: {
-          'react-native-sqlite-storage': 'react-native-quick-sqlite',
+          'react-native-sqlite-storage': 'react-native-nitro-sqlite',
         },
       },
     ],
-    ['@babel/plugin-proposal-decorators', {legacy: true}],
+    ['@babel/plugin-proposal-decorators', { legacy: true }],
   ],
 };

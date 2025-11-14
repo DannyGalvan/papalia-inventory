@@ -1,6 +1,4 @@
-import React, {useRef, useState} from 'react';
-import {LogHeader} from '../../database/models/LogHeader';
-import {Response} from '../../database/models/response/Response';
+import React, { useRef, useState } from 'react';
 import {
   DimensionValue,
   Image,
@@ -10,17 +8,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {InputForm} from '../input/InputForm';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {TouchableButton} from '../button/TouchableButton';
-import {useForm} from '../../hooks/useForm';
 import SelectDropdown from 'react-native-select-dropdown';
-import {Product} from '../../database/models/Product';
-import {searchProductsByCodeOrName} from '../../database/repository/ProductRepository';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useLogDetails} from '../../hooks/useLogDetails';
-import {DetailsItem} from '../DetailsItem';
-import {LogDetailRepository} from '../../database/repository/LogDetailRepository';
+import { LogHeader } from '../../database/models/LogHeader';
+import { Product } from '../../database/models/Product';
+import { Response } from '../../database/models/response/Response';
+import { LogDetailRepository } from '../../database/repository/LogDetailRepository';
+import { searchProductsByCodeOrName } from '../../database/repository/ProductRepository';
+import { useForm } from '../../hooks/useForm';
+import { useLogDetails } from '../../hooks/useLogDetails';
+import { appColors, appStyles } from '../../styles/globalStyles';
+import { DetailsItem } from '../DetailsItem';
+import { TouchableButton } from '../button/TouchableButton';
+import { InputForm } from '../input/InputForm';
 
 interface Props {
   initialForm: LogHeader;
@@ -115,14 +115,14 @@ export const LogForm = ({
   };
 
   return (
-    <ScrollView style={[appStyles.flexColumn, styles.container]}>
+    <ScrollView style={[appStyles.flexColumn, styles.container, styles.mButton]}>
       <View style={styles.selectContainer}>
         <Text style={appStyles.textDark}>Tipo de entrada</Text>
         <SelectDropdown
           data={selectData}
           defaultValue={selectData?.find(item => item.id === form.type)}
           onSelect={selectedItem => {
-            handleChange(selectedItem.id, 'type');
+            handleChange(selectedItem.id, 'type'); 
           }}
           rowTextForSelection={item => {
             return item.value;
@@ -279,6 +279,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
   },
+  mButton: {
+    marginBottom: 10,
+  },
   input: {
     borderBottomWidth: 1,
     color: appColors.black,
@@ -293,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   textArea: {
-    height: 100,
+    height: 80,
     textAlignVertical: 'top',
     borderWidth: 1,
     marginTop: 10,
@@ -310,7 +313,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginVertical: 10,
-    height: 250,
+    height: 200,
   },
   itemSearchContainer: {
     paddingHorizontal: 5,

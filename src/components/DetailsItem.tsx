@@ -1,8 +1,8 @@
 import React from 'react';
-import {appColors, appStyles} from '../styles/globalStyles';
-import {DimensionValue, Image, StyleSheet, Text, View} from 'react-native';
-import {TouchableButton} from './button/TouchableButton';
-import {LogDetail} from '../database/models/LogDetail';
+import { DimensionValue, Image, StyleSheet, Text, View } from 'react-native';
+import { LogDetail } from '../database/models/LogDetail';
+import { appColors, appStyles } from '../styles/globalStyles';
+import { TouchableButton } from './button/TouchableButton';
 
 interface Props {
   detail: LogDetail;
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%' as DimensionValue,
-    height: 175,
+    height: 100,
     resizeMode: 'contain',
   },
 });
