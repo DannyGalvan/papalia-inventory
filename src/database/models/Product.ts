@@ -1,7 +1,7 @@
-import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';
-import {LogDetail} from './LogDetail';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { LogDetail } from './LogDetail';
 
-@Entity()
+@Entity('product')
 export class Product {
   @PrimaryColumn('varchar') code: string;
   @Column('varchar') name: string;
@@ -13,6 +13,6 @@ export class Product {
     default: '',
   })
   image: string;
-  @OneToMany(() => LogDetail, logDetail => logDetail.product, {cascade: true})
+  @OneToMany(() => LogDetail, logDetail => logDetail.product)
   logDetails: LogDetail[];
 }

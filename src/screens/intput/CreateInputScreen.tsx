@@ -1,15 +1,15 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import {appStyles} from '../../styles/globalStyles';
-import {CreateInputScreenProps} from '../../interfaces/IInputNavigation';
-import {LogForm} from '../../components/form/LogForm';
+import { Text, View } from 'react-native';
+import { appStyles } from '../../styles/globalStyles';
+import { CreateInputScreenProps } from '../../interfaces/IInputNavigation';
+import { LogForm } from '../../components/form/LogForm';
 import {
   LogHeaderRepository,
   createLog,
 } from '../../database/repository/LogHeaderRepository';
-import {INPUT_DATA, INPUT_TYPES} from '../../config/constants';
-import {LogHeader} from '../../database/models/LogHeader';
-import {dateNowCreate} from '../../utils/dateTime';
+import { INPUT_DATA, INPUT_TYPES } from '../../config/constants';
+import { LogHeader } from '../../database/models/LogHeader';
+import { dateNowCreate } from '../../utils/dateTime';
 
 const initialForm = LogHeaderRepository.create({
   commets: '',

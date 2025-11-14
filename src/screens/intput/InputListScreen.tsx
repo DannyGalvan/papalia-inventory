@@ -1,24 +1,24 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import uuid from 'react-native-uuid';
-import {Alert, FlatList, StyleSheet, Text, View} from 'react-native';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {InputListScreenProps} from '../../interfaces/IInputNavigation';
-import {Fab} from '../../components/button/Fab';
-import {useInputs} from '../../hooks/useInputs';
-import {dateNow} from '../../utils/dateTime';
-import {InputDate} from '../../components/input/InputDate';
-import {LogItems} from '../../components/LogItems';
-import {getAllInputLogs} from '../../database/repository/LogHeaderRepository';
-import {utils, write} from 'xlsx';
-import {DownloadDirectoryPath, writeFile} from '@dr.pogodin/react-native-fs';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
+import { appColors, appStyles } from '../../styles/globalStyles';
+import { InputListScreenProps } from '../../interfaces/IInputNavigation';
+import { Fab } from '../../components/button/Fab';
+import { useInputs } from '../../hooks/useInputs';
+import { dateNow } from '../../utils/dateTime';
+import { InputDate } from '../../components/input/InputDate';
+import { LogItems } from '../../components/LogItems';
+import { getAllInputLogs } from '../../database/repository/LogHeaderRepository';
+import { utils, write } from 'xlsx';
+import { DownloadDirectoryPath, writeFile } from '@dr.pogodin/react-native-fs';
 
-const {fechaFin, fechaInicio} = dateNow();
+const { fechaFin, fechaInicio } = dateNow();
 
-export const InputListScreen = ({navigation}: InputListScreenProps) => {
+export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   const [initialDate, setInitialDate] = useState(fechaInicio);
   const [finalDate, setFinalDate] = useState(fechaFin);
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
-  const {inputs, isLoading, loadData} = useInputs(initialDate, finalDate);
+  const { inputs, isLoading, loadData } = useInputs(initialDate, finalDate);
 
   const downloadFile = async () => {
     try {
@@ -27,7 +27,7 @@ export const InputListScreen = ({navigation}: InputListScreenProps) => {
       const ws = utils.json_to_sheet(data);
       const wb = utils.book_new();
       utils.book_append_sheet(wb, ws, 'Entradas');
-      const wbout = write(wb, {type: 'binary', bookType: 'xlsx'});
+      const wbout = write(wb, { type: 'binary', bookType: 'xlsx' });
       const fileSave = `${DownloadDirectoryPath}/Ingresos_${uuid.v4()}.xlsx`;
       await writeFile(fileSave, wbout, 'ascii');
       Alert.alert('Archivo guardado en descargas', fileSave);
@@ -61,11 +61,11 @@ export const InputListScreen = ({navigation}: InputListScreenProps) => {
       <FlatList
         style={[styles.list]}
         data={inputs}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <LogItems
             logHeader={item}
             navigation={(id: number) => {
-              navigation.navigate('ReadInput', {id});
+              navigation.navigate('ReadInput', { id });
             }}
           />
         )}

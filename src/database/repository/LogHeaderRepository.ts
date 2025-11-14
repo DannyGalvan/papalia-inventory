@@ -1,15 +1,16 @@
-import {Between} from 'typeorm';
+import { Between } from 'typeorm';
 import {
   ALL_IN_OUT_ENUM,
   ALL_IN_OUT_TYPES,
   INPUT_ENUM,
 } from '../../config/constants';
-import {dataSource} from '../connection/DataSource';
-import {LogHeader} from '../models/LogHeader';
-import {Response} from '../models/response/Response';
-import {getProductById, updateProduct} from './ProductRepository';
-import {LogDetailResponse} from '../models/response/LogDetailResponse';
-import {DashboardResponse} from '../models/response/DashboardResponse';
+import { dataSource } from '../connection/DataSource';
+import { LogHeader } from '../models/LogHeader';
+import { Response } from '../models/response/Response';
+import { getProductById, updateProduct } from './ProductRepository';
+import { LogDetailResponse } from '../models/response/LogDetailResponse';
+import { DashboardResponse } from '../models/response/DashboardResponse';
+import { LogDetailRepository } from './LogDetailRepository';
 
 export const LogHeaderRepository = dataSource.getRepository(LogHeader);
 
@@ -23,7 +24,7 @@ export const getAllLogsByDate = async (
       createdAt: Between(initialDate, finalDate),
       isInput: isInput,
     },
-    order: {id: 'DESC'},
+    order: { id: 'DESC' },
   });
 };
 
@@ -32,13 +33,13 @@ export const getDashboardInputs = async () => {
     where: {
       isInput: true,
     },
-    order: {id: 'DESC'},
+    order: { id: 'DESC' },
     relations: ['logDetails', 'logDetails.product'],
   });
 
   const inputDetails: DashboardResponse[] = [];
 
-  const DetailResponse: {[tipo: string]: LogHeader[]} = logs.reduce(
+  const DetailResponse: { [tipo: string]: LogHeader[] } = logs.reduce(
     (acc, item) => {
       // Usa el tipo como clave para agrupar
       if (!acc[ALL_IN_OUT_ENUM[item.type]]) {
@@ -72,7 +73,7 @@ export const getAllInputLogs = async () => {
     where: {
       isInput: true,
     },
-    order: {id: 'DESC'},
+    order: { id: 'DESC' },
     relations: ['logDetails'],
   });
 
@@ -105,13 +106,13 @@ export const getDashboardOutputs = async () => {
     where: {
       isInput: false,
     },
-    order: {id: 'DESC'},
+    order: { id: 'DESC' },
     relations: ['logDetails', 'logDetails.product'],
   });
 
   const outputDetails: DashboardResponse[] = [];
 
-  const DetailResponse: {[tipo: string]: LogHeader[]} = logs.reduce(
+  const DetailResponse: { [tipo: string]: LogHeader[] } = logs.reduce(
     (acc, item) => {
       // Usa el tipo como clave para agrupar
       if (!acc[ALL_IN_OUT_ENUM[item.type]]) {
@@ -145,7 +146,7 @@ export const getAllOutputLogs = async () => {
     where: {
       isInput: false,
     },
-    order: {id: 'DESC'},
+    order: { id: 'DESC' },
     relations: ['logDetails'],
   });
 
@@ -175,12 +176,14 @@ export const getAllOutputLogs = async () => {
 
 export const getLogById = async (id: number) => {
   try {
-    return await LogHeaderRepository.findOne({
+    const log = await LogHeaderRepository.findOne({
       where: {
         id,
       },
       relations: ['logDetails', 'logDetails.product'],
     });
+    console.log('log found', log);
+    return log;
   } catch (error) {
     console.log(error);
     const log = new LogHeader();
@@ -200,6 +203,15 @@ export const createLog = async (log: LogHeader) => {
     const logHeader = LogHeaderRepository.create(log);
 
     const logCreated = await LogHeaderRepository.save(logHeader);
+
+    const details = log.logDetails.map(detail => {
+      {
+        detail.logHeaderId = logCreated.id;
+        return detail;
+      }
+    });
+
+    await LogDetailRepository.save(details);
 
     if (logCreated.isInput) {
       const products = logCreated.logDetails.map(d => d);

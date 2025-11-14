@@ -20,6 +20,7 @@ function App(): React.JSX.Element {
       try {
         if (!dataSource.isInitialized) {
           await dataSource.initialize();
+          console.log('Data Source has been initialized!');
         }
       } catch (error) {
         console.log('error', error);
@@ -30,8 +31,6 @@ function App(): React.JSX.Element {
 
     connect();
   }, [isLoading]);
-
-  console.log('isLoading', isLoading && !dataSource.isInitialized);
 
   return (
     <NavigationContainer>

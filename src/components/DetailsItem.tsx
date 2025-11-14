@@ -23,10 +23,12 @@ export const DetailsItem = ({
   return (
     <View style={[appStyles.bgGray, styles.container]}>
       <View
-        style={[appStyles.flexRow, appStyles.justifyBetween, styles.details]}>
+        style={[appStyles.flexRow, appStyles.justifyBetween, styles.details]}
+      >
         <Text
-          style={[appStyles.textDark, appStyles.subTitle, styles.itemControls]}>
-          {detail.product.name} - Q{detail.product.price.toFixed(2)}
+          style={[appStyles.textDark, appStyles.subTitle, styles.itemControls]}
+        >
+          {detail.product.name} - Q{detail.product.price}
         </Text>
         <View style={[appStyles.flexRow, appStyles.alignCenter]}>
           {!readonly && (
@@ -44,7 +46,8 @@ export const DetailsItem = ({
             />
           )}
           <Text
-            style={[appStyles.textDark, appStyles.subTitle, styles.quantity]}>
+            style={[appStyles.textDark, appStyles.subTitle, styles.quantity]}
+          >
             {detail.quantity}
           </Text>
           {!readonly && (

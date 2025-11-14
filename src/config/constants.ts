@@ -1,4 +1,4 @@
-export const NAME_BD = 'quicksqlitetest-typeorm.db';
+export const NAME_BD = 'papalia_inventory.sqlite';
 export const KEY_DIR_IMAGES = 'dir_images';
 
 export const OUTPUT_TYPES = {
@@ -22,13 +22,13 @@ export const OUTPUT_ENUM = {
 };
 
 export const OUPUT_DATA = [
-  {id: OUTPUT_TYPES.no_seleccionado, value: 'Seleccione una opción'},
-  {id: OUTPUT_TYPES.Venta, value: 'Venta'},
-  {id: OUTPUT_TYPES.extraordinaria, value: 'Extraordinaria'},
-  {id: OUTPUT_TYPES.regalo_jefes, value: 'Regalo para jefes'},
-  {id: OUTPUT_TYPES.regalo_trabajadores, value: 'Regalo para trabajadores'},
-  {id: OUTPUT_TYPES.regalo_clientes, value: 'Regalo para clientes'},
-  {id: OUTPUT_TYPES.regalo_proveedores, value: 'Regalo para proveedores'},
+  { id: OUTPUT_TYPES.no_seleccionado, value: 'Seleccione una opción' },
+  { id: OUTPUT_TYPES.Venta, value: 'Venta' },
+  { id: OUTPUT_TYPES.extraordinaria, value: 'Extraordinaria' },
+  { id: OUTPUT_TYPES.regalo_jefes, value: 'Regalo para jefes' },
+  { id: OUTPUT_TYPES.regalo_trabajadores, value: 'Regalo para trabajadores' },
+  { id: OUTPUT_TYPES.regalo_clientes, value: 'Regalo para clientes' },
+  { id: OUTPUT_TYPES.regalo_proveedores, value: 'Regalo para proveedores' },
 ];
 
 export const INPUT_TYPES = {
@@ -40,11 +40,11 @@ export const INPUT_TYPES = {
 };
 
 export const INPUT_DATA = [
-  {id: INPUT_TYPES.no_seleccionado, value: 'Seleccione una opción'},
-  {id: INPUT_TYPES.compra_inventario, value: 'Compra de inventario'},
-  {id: INPUT_TYPES.devolucion, value: 'Devolución'},
-  {id: INPUT_TYPES.compra_extraordinaria, value: 'Compra extraordinaria'},
-  {id: INPUT_TYPES.otros_conceptos, value: 'Otros conceptos'},
+  { id: INPUT_TYPES.no_seleccionado, value: 'Seleccione una opción' },
+  { id: INPUT_TYPES.compra_inventario, value: 'Compra de inventario' },
+  { id: INPUT_TYPES.devolucion, value: 'Devolución' },
+  { id: INPUT_TYPES.compra_extraordinaria, value: 'Compra extraordinaria' },
+  { id: INPUT_TYPES.otros_conceptos, value: 'Otros conceptos' },
 ];
 
 export const INPUT_ENUM = {

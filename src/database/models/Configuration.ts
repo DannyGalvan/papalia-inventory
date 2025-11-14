@@ -1,6 +1,6 @@
-import {Column, Entity, PrimaryColumn} from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('configuration')
 export class Configuration {
   @PrimaryColumn('varchar') key: string;
   @Column('varchar') value: string;

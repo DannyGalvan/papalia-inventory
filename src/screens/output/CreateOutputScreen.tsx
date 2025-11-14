@@ -1,14 +1,14 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import { Text, View } from 'react-native';
 import {
   LogHeaderRepository,
   createLog,
 } from '../../database/repository/LogHeaderRepository';
-import {OUPUT_DATA, OUTPUT_TYPES} from '../../config/constants';
-import {appStyles} from '../../styles/globalStyles';
-import {LogForm} from '../../components/form/LogForm';
-import {LogHeader} from '../../database/models/LogHeader';
-import {dateNowCreate} from '../../utils/dateTime';
+import { OUPUT_DATA, OUTPUT_TYPES } from '../../config/constants';
+import { appStyles } from '../../styles/globalStyles';
+import { LogForm } from '../../components/form/LogForm';
+import { LogHeader } from '../../database/models/LogHeader';
+import { dateNowCreate } from '../../utils/dateTime';
 
 const initialForm = LogHeaderRepository.create({
   commets: '',

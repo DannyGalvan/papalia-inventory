@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {LogForm} from '../../components/form/LogForm';
-import {appStyles} from '../../styles/globalStyles';
-import {getLogById} from '../../database/repository/LogHeaderRepository';
-import {LogHeader} from '../../database/models/LogHeader';
-import {OUPUT_DATA} from '../../config/constants';
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import { LogForm } from '../../components/form/LogForm';
+import { appStyles } from '../../styles/globalStyles';
+import { getLogById } from '../../database/repository/LogHeaderRepository';
+import { LogHeader } from '../../database/models/LogHeader';
+import { OUPUT_DATA } from '../../config/constants';
 
-export const ReadOutputScreen = ({route, navigation}) => {
-  const {id} = route.params;
+export const ReadOutputScreen = ({ route, navigation }) => {
+  const { id } = route.params;
   const [logState, setLogState] = useState<LogHeader>(new LogHeader());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 

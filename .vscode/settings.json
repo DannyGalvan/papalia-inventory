@@ -1,4 +1,46 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": true
+            },
+            "previewLimit": 50,
+            "server": "18.190.149.220",
+            "port": 1433,
+            "driver": "MSSQL",
+            "name": "It Global",
+            "group": "It Global",
+            "database": "Empresa_Usuarios",
+            "username": "comprasweb",
+            "password": "SzQ#Ts84oyMA"
+        },
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "previewLimit": 50,
+            "server": "ep-late-art-a4riv8ip.us-east-1.aws.neon.tech",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Optimizacion Rutas",
+            "group": "UMG",
+            "database": "optimizacion_rutas",
+            "username": "students_owner",
+            "password": "NWPEkp0IVQd7"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Lite",
+            "group": "Lite",
+            "database": "C:\\Users\\cgalv\\Downloads\\papalia_inventory.db"
+        }
+    ]
 }
