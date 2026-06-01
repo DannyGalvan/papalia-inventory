@@ -8,6 +8,7 @@ export type AppStackParamList = {
   CategoryCatalog: undefined;
   SupplierCatalog: undefined;
   UnitOfMeasureCatalog: undefined;
+  TimezoneCatalog: undefined;
 };
 
 export type PermissionsScreenProps = NativeStackScreenProps<AppStackParamList, 'Permissions'>;
@@ -17,3 +18,4 @@ export type MovementTypeCatalogScreenProps = NativeStackScreenProps<AppStackPara
 export type CategoryCatalogScreenProps = NativeStackScreenProps<AppStackParamList, 'CategoryCatalog'>;
 export type SupplierCatalogScreenProps = NativeStackScreenProps<AppStackParamList, 'SupplierCatalog'>;
 export type UnitOfMeasureCatalogScreenProps = NativeStackScreenProps<AppStackParamList, 'UnitOfMeasureCatalog'>;
+export type TimezoneCatalogScreenProps = NativeStackScreenProps<AppStackParamList, 'TimezoneCatalog'>;

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ALL_IN_OUT_ENUM } from '../config/constants';
+import { useTimezone } from '../context/TimezoneContext';
 import { LogHeader } from '../database/models/LogHeader';
 import { MovementType } from '../database/models/MovementType';
 import { useTheme } from '../hooks/useTheme';
@@ -12,15 +13,9 @@ interface Props {
   typeCatalog?: MovementType[];
 }
 
-const formatDate = (date: Date | string): string => {
-  const d = date instanceof Date ? date : new Date(date);
-  if (isNaN(d.getTime())) {return '—';}
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}  ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
 export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
   const {theme} = useTheme();
+  const {formatDateTime} = useTimezone();
   const typeLabel = typeCatalog
     ? typeCatalog.find(t => t.id === logHeader.type)?.name ?? `Tipo ${logHeader.type}`
     : ALL_IN_OUT_ENUM[logHeader.type as keyof typeof ALL_IN_OUT_ENUM] ?? `Tipo ${logHeader.type}`;
@@ -59,7 +54,7 @@ export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
       <View style={styles.metaRow}>
         <Icon name="calendar-outline" size={13} color={theme.colors.textSecondary} />
         <Text style={[styles.metaText, {color: theme.colors.textSecondary}]}>
-          {formatDate(logHeader.createdAt)}
+          {formatDateTime(logHeader.createdAt)}
         </Text>
       </View>
 

@@ -1,20 +1,20 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { DashboardItem } from '../../components/DashboardItem';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { InputDate } from '../../components/input/InputDate';
 import { DashboardResponse } from '../../database/models/response/DashboardResponse';
+import { useTimezone } from '../../context/TimezoneContext';
 import { getDashboardInputs } from '../../database/repository/LogHeaderRepository';
 import { useTheme } from '../../hooks/useTheme';
-import { dateNow } from '../../utils/dateTime';
-
-const {fechaFin, fechaInicio} = dateNow();
 
 export const DashboardInputScreen = () => {
   const {theme} = useTheme();
-  const [initialDate, setInitialDate] = useState(fechaInicio);
-  const [finalDate, setFinalDate] = useState(fechaFin);
+  const {getTodayBounds} = useTimezone();
+  const todayBounds = useMemo(() => getTodayBounds(), [getTodayBounds]);
+  const [initialDate, setInitialDate] = useState(todayBounds.fechaInicio);
+  const [finalDate, setFinalDate] = useState(todayBounds.fechaFin);
   const [response, setResponse] = useState<DashboardResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const isLoadingRef = useRef(false);

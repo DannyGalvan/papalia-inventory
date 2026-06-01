@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import { ErrorBoundary } from './src/components/feedback/ErrorBoundary';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { TimezoneProvider } from './src/context/TimezoneContext';
 import { dataSource } from './src/database/connection/DataSource';
 import { useTheme } from './src/hooks/useTheme';
 import { logService } from './src/services/LogService';
@@ -118,7 +119,9 @@ function App(): React.JSX.Element {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AppContent />
+        <TimezoneProvider>
+          <AppContent />
+        </TimezoneProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

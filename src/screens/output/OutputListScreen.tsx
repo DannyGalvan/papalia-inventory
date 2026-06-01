@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
 import { Fab } from '../../components/button/Fab';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { Toast } from '../../components/feedback/Toast';
 import { InputDate } from '../../components/input/InputDate';
 import { LogItems } from '../../components/LogItems';
+import { useTimezone } from '../../context/TimezoneContext';
 import { MovementType } from '../../database/models/MovementType';
 import { LogHeaderRepository } from '../../database/repository/LogHeaderRepository';
 import { getAllMovementTypes } from '../../database/repository/MovementTypeRepository';
@@ -12,14 +13,13 @@ import { useOutputs } from '../../hooks/useOutputs';
 import { useTheme } from '../../hooks/useTheme';
 import { OutputListScreenProps } from '../../interfaces/IOutputNavigation';
 import { excelService } from '../../services/ExcelService';
-import { dateNow } from '../../utils/dateTime';
-
-const {fechaFin, fechaInicio} = dateNow();
 
 export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
   const { theme } = useTheme();
-  const [initialDate, setInitialDate] = useState(fechaInicio);
-  const [finalDate, setFinalDate] = useState(fechaFin);
+  const {getTodayBounds} = useTimezone();
+  const todayBounds = useMemo(() => getTodayBounds(), [getTodayBounds]);
+  const [initialDate, setInitialDate] = useState(todayBounds.fechaInicio);
+  const [finalDate, setFinalDate] = useState(todayBounds.fechaFin);
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
   const [typeCatalog, setTypeCatalog] = useState<MovementType[]>([]);
   const {outputs, isLoading, loadData} = useOutputs(initialDate, finalDate);

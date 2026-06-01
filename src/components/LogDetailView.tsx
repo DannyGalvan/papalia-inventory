@@ -12,6 +12,7 @@ import {
   DEFAULT_CURRENCY_SYMBOL,
   KEY_CURRENCY_SYMBOL,
 } from '../config/constants';
+import { useTimezone } from '../context/TimezoneContext';
 import { LogHeader } from '../database/models/LogHeader';
 import { MovementType } from '../database/models/MovementType';
 import { getConfigurationByKey } from '../database/repository/ConfigurationRepository';
@@ -23,13 +24,6 @@ interface Props {
   log: LogHeader;
 }
 
-const formatDate = (date: Date | string): string => {
-  const d = date instanceof Date ? date : new Date(date);
-  if (isNaN(d.getTime())) {return '—';}
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}   ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
 const resolveTypeName = (typeId: number, catalog: MovementType[]): string => {
   const found = catalog.find(t => t.id === typeId);
   return found?.name ?? `Tipo ${typeId}`;
@@ -37,6 +31,7 @@ const resolveTypeName = (typeId: number, catalog: MovementType[]): string => {
 
 export const LogDetailView = ({log}: Props) => {
   const {theme} = useTheme();
+  const {formatDateTime} = useTimezone();
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const [typeCatalog, setTypeCatalog] = useState<MovementType[]>([]);
   const noImage = require('../assets/sin_imagen.png');
@@ -83,7 +78,7 @@ export const LogDetailView = ({log}: Props) => {
           <Icon name="calendar-outline" size={16} color={theme.colors.textSecondary} />
           <Text style={[styles.infoLabel, {color: theme.colors.textSecondary}]}>Fecha</Text>
           <Text style={[styles.infoValue, {color: theme.colors.text}]}>
-            {formatDate(log.createdAt)}
+            {formatDateTime(log.createdAt)}
           </Text>
         </View>
 

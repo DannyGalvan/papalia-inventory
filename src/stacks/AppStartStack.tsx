@@ -8,6 +8,7 @@ import { AppStackParamList } from '../interfaces/IAppStartNavigation';
 import { CategoryCatalogScreen } from '../screens/catalog/CategoryCatalogScreen';
 import { MovementTypeCatalogScreen } from '../screens/catalog/MovementTypeCatalogScreen';
 import { SupplierCatalogScreen } from '../screens/catalog/SupplierCatalogScreen';
+import { TimezoneCatalogScreen } from '../screens/catalog/TimezoneCatalogScreen';
 import { UnitOfMeasureCatalogScreen } from '../screens/catalog/UnitOfMeasureCatalogScreen';
 import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
 import { PermissionsScreen } from '../screens/permissions/PermissionsScreen';
@@ -69,6 +70,11 @@ const AppStartStack = () => {
           name="UnitOfMeasureCatalog"
           options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
           component={UnitOfMeasureCatalogScreen}
+        />
+        <Stack.Screen
+          name="TimezoneCatalog"
+          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          component={TimezoneCatalogScreen}
         />
       </Stack.Navigator>
     </ProductProvider>

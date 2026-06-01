@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { version as appVersion } from '../../../package.json';
 import { TouchableButton } from '../../components/button/TouchableButton';
@@ -22,7 +23,10 @@ import {
   KEY_CURRENCY_SYMBOL,
   KEY_LOW_STOCK_THRESHOLD,
 } from '../../config/constants';
+import { useTimezone } from '../../context/TimezoneContext';
 import { getConfigurationByKey, upsertConfiguration } from '../../database/repository/ConfigurationRepository';
+import { Timezone } from '../../database/models/Timezone';
+import { getActiveTimezones } from '../../database/repository/TimezoneRepository';
 import { useDownloadBd } from '../../hooks/useDownloadBd';
 import { useImages } from '../../hooks/useImages';
 import { useTheme } from '../../hooks/useTheme';
@@ -38,8 +42,11 @@ const EMPTY_TOAST: ToastState = {visible: false, message: '', type: 'success'};
 
 export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   const {theme} = useTheme();
+  const {ianaTimezone, setTimezone} = useTimezone();
   const {save, downloadResult, clearResult} = useDownloadBd();
   const {dirImages, changeDirImages, isLoading} = useImages();
+  const [activeTimezones, setActiveTimezones] = useState<Timezone[]>([]);
+  const [timezoneToast, setTimezoneToast] = useState<ToastState>(EMPTY_TOAST);
 
   // Image folder
   const [folderInput, setFolderInput] = useState(dirImages ?? '');
@@ -68,14 +75,16 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   useEffect(() => {
     (async () => {
       setSettingsLoading(true);
-      const [currencyConfig, thresholdConfig, companyConfig] = await Promise.all([
+      const [currencyConfig, thresholdConfig, companyConfig, tzs] = await Promise.all([
         getConfigurationByKey(KEY_CURRENCY_SYMBOL),
         getConfigurationByKey(KEY_LOW_STOCK_THRESHOLD),
         getConfigurationByKey(KEY_COMPANY_NAME),
+        getActiveTimezones(),
       ]);
       if (currencyConfig?.value) {setCurrencyInput(currencyConfig.value);}
       if (thresholdConfig?.value) {setThresholdInput(thresholdConfig.value);}
       if (companyConfig?.value) {setCompanyInput(companyConfig.value);}
+      setActiveTimezones(tzs);
       setSettingsLoading(false);
     })();
   }, []);
@@ -316,6 +325,52 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
           </>
         )}
 
+        {/* ── Zona horaria ── */}
+        <View style={[styles.section, {borderColor: theme.colors.border}]}>
+          <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            Zona horaria
+          </Text>
+          <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+            Afecta cómo se muestran y filtran las fechas en toda la app.
+          </Text>
+          {activeTimezones.length > 0 && (
+            <SelectDropdown
+              data={activeTimezones}
+              defaultValue={activeTimezones.find(tz => tz.ianaName === ianaTimezone) ?? activeTimezones[0]}
+              onSelect={async (item: Timezone) => {
+                await setTimezone(item.ianaName);
+                setTimezoneToast({visible: true, message: `Zona horaria cambiada a ${item.displayName}`, type: 'success'});
+              }}
+              rowTextForSelection={(item: Timezone) => `${item.displayName}  ${item.utcOffset}`}
+              buttonTextAfterSelection={(item: Timezone) => `${item.displayName}  ${item.utcOffset}`}
+              buttonStyle={[styles.dropdownBtn, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
+              buttonTextStyle={{color: theme.colors.text, fontSize: 13, textAlign: 'left'}}
+              dropdownStyle={{backgroundColor: theme.colors.surface}}
+              rowStyle={{backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}}
+              rowTextStyle={{color: theme.colors.text, fontSize: 13}}
+              selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
+              selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
+              dropdownOverlayColor="transparent"
+              search
+              searchPlaceHolder="Buscar zona..."
+              searchPlaceHolderColor={theme.colors.textSecondary}
+              searchInputStyle={{backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 8}}
+              searchInputTxtStyle={{color: theme.colors.text}}
+              renderDropdownIcon={() => <Icon name="chevron-down" size={14} color={theme.colors.textSecondary} />}
+            />
+          )}
+          <TouchableOpacity
+            style={[styles.tzCatalogLink, {borderColor: theme.colors.border}]}
+            onPress={() => navigation.navigate('TimezoneCatalog')}
+            accessibilityRole="button">
+            <Icon name="globe-outline" size={16} color={theme.colors.primary} />
+            <Text style={[styles.tzCatalogLinkText, {color: theme.colors.primary, fontSize: theme.typography.caption.fontSize}]}>
+              Gestionar zonas disponibles
+            </Text>
+            <Icon name="chevron-forward" size={14} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
         {/* ── Catálogos ── */}
         <Text style={[styles.catalogSectionTitle, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
           CATÁLOGOS
@@ -410,6 +465,8 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
         onDismiss={() => setThresholdToast(EMPTY_TOAST)} />
       <Toast message={companyToast.message} type={companyToast.type} visible={companyToast.visible}
         onDismiss={() => setCompanyToast(EMPTY_TOAST)} />
+      <Toast message={timezoneToast.message} type={timezoneToast.type} visible={timezoneToast.visible}
+        onDismiss={() => setTimezoneToast(EMPTY_TOAST)} />
     </KeyboardAvoidingView>
   );
 };
@@ -478,4 +535,21 @@ const styles = StyleSheet.create({
     marginTop: 24,
     textAlign: 'center',
   },
+  dropdownBtn: {
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 44,
+    marginBottom: 8,
+  },
+  tzCatalogLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 4,
+  },
+  tzCatalogLinkText: {flex: 1, fontWeight: '500'},
 });
