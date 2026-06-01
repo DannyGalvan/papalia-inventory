@@ -24,9 +24,14 @@ const ProductItemInner = ({product, isVisible = true, currencySymbol = 'Q'}: Pro
   const {navigate} = useNavigation<NavigationProp<ProductStackParamList>>();
   const {theme} = useTheme();
 
-  const nonExistentProduct = product.stock === 0;
+  const safeStock = typeof product.stock === 'number' ? product.stock : 0;
+  const safePrice = typeof product.price === 'number' ? product.price : 0;
+  const nonExistentProduct = safeStock === 0;
   const statusColor = nonExistentProduct ? theme.colors.stockDepleted : theme.colors.stockAvailable;
-  const unitAbbrev = product.unitOfMeasure?.abbreviation ?? 'uds';
+  const rawAbbrev = product.unitOfMeasure?.abbreviation;
+  const unitAbbrev = typeof rawAbbrev === 'string' ? rawAbbrev : 'uds';
+  const safeCategory = product.category && typeof (product.category as any).id === 'number' ? product.category : null;
+  const safeSupplier = product.supplier && typeof (product.supplier as any).id === 'number' ? product.supplier : null;
 
   const onPress = useCallback(() => {
     navigate('EditProduct', {id: product.code});
@@ -43,7 +48,7 @@ const ProductItemInner = ({product, isVisible = true, currencySymbol = 'Q'}: Pro
       onPress={onPress}
       accessible
       accessibilityRole="button"
-      accessibilityLabel={`Producto ${product.name}, código ${product.code}, precio ${currencySymbol}${product.price}, ${product.stock} ${unitAbbrev} en inventario`}
+      accessibilityLabel={`Producto ${product.name}, código ${product.code}, precio ${currencySymbol}${safePrice.toFixed(2)}, ${safeStock} ${unitAbbrev} en inventario`}
       accessibilityHint={nonExistentProduct ? 'Sin stock. Toca para editar.' : 'Toca para editar.'}>
 
       {/* Header: name + stock badge */}
@@ -57,17 +62,17 @@ const ProductItemInner = ({product, isVisible = true, currencySymbol = 'Q'}: Pro
           </Text>
         </View>
         <View style={[styles.badge, {backgroundColor: statusColor}]}>
-          <Text style={styles.badgeText}>{product.stock}</Text>
+          <Text style={styles.badgeText}>{safeStock}</Text>
           <Text style={styles.badgeUnit}>{unitAbbrev}</Text>
         </View>
       </View>
 
       {/* Category chip */}
-      {product.category && (
+      {safeCategory && (
         <View style={styles.categoryRow}>
-          <View style={[styles.categoryDot, {backgroundColor: product.category.color}]} />
+          <View style={[styles.categoryDot, {backgroundColor: safeCategory.color}]} />
           <Text style={[styles.categoryLabel, {color: theme.colors.textSecondary}]}>
-            {product.category.name}
+            {safeCategory.name}
           </Text>
         </View>
       )}
@@ -82,16 +87,16 @@ const ProductItemInner = ({product, isVisible = true, currencySymbol = 'Q'}: Pro
       {/* Footer: price */}
       <View style={styles.footer}>
         <Text style={[styles.price, {color: theme.colors.primary}]}>
-          {currencySymbol} {Number(product.price).toFixed(2)}
+          {currencySymbol} {safePrice.toFixed(2)}
         </Text>
         {nonExistentProduct && (
           <Text style={[styles.depletedLabel, {color: theme.colors.stockDepleted}]}>
             Sin stock
           </Text>
         )}
-        {product.supplier && (
+        {safeSupplier && (
           <Text style={[styles.supplierLabel, {color: theme.colors.textSecondary}]} numberOfLines={1}>
-            {product.supplier.name}
+            {safeSupplier.name}
           </Text>
         )}
       </View>

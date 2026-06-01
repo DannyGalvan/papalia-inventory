@@ -1,8 +1,7 @@
-import { addHours, format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import { useTimezone } from '../../context/TimezoneContext';
 import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
@@ -14,10 +13,9 @@ interface Props {
 
 export const InputDate = ({date, setDate, label, isFinal}: Props) => {
   const {theme} = useTheme();
+  const {formatDate} = useTimezone();
   const [open, setOpen] = useState(false);
-  const formattedDate = format(addHours(date, 6), 'dd MMMM yyyy : HH:mm', {
-    locale: es,
-  });
+  const formattedDate = formatDate(date);
 
   return (
     <View>
@@ -46,16 +44,18 @@ export const InputDate = ({date, setDate, label, isFinal}: Props) => {
         <DatePicker
           modal
           open={open}
-          date={new Date(addHours(date, 6))}
+          date={date}
           mode="date"
           onConfirm={data => {
             setOpen(false);
-            isFinal ? data.setHours(17, 59, 59, 59) : data.setHours(-6, 0, 0, 0);
+            if (isFinal) {
+              data.setHours(23, 59, 59, 999);
+            } else {
+              data.setHours(0, 0, 0, 0);
+            }
             setDate(data);
           }}
-          onCancel={() => {
-            setOpen(false);
-          }}
+          onCancel={() => setOpen(false)}
           title="Selecciona una fecha"
           cancelText="Cancelar"
           confirmText="Ok"

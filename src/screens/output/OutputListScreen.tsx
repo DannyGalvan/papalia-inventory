@@ -41,7 +41,7 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
     try {
       setIsLoadingDownload(true);
       const logs = await LogHeaderRepository.find({
-        where: {isInput: false},
+        where: {isInput: 0 as any},
         order: {id: 'DESC'},
         relations: ['logDetails'],
       });

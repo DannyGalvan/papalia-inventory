@@ -95,7 +95,9 @@ function partsInTz(date: Date, ianaName: string) {
 
 function buildFormatDate(iana: string) {
   return (date: Date | string | null | undefined): string => {
-    if (!date) { return '—'; }
+    if (date == null) { return '—'; }
+    // Guard against {isNitroSQLiteNull: true} or other non-Date objects from DB
+    if (typeof date !== 'string' && !(date instanceof Date)) { return '—'; }
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) { return '—'; }
     const p = partsInTz(d, iana);
@@ -105,7 +107,9 @@ function buildFormatDate(iana: string) {
 
 function buildFormatDateTime(iana: string) {
   return (date: Date | string | null | undefined): string => {
-    if (!date) { return '—'; }
+    if (date == null) { return '—'; }
+    // Guard against {isNitroSQLiteNull: true} or other non-Date objects from DB
+    if (typeof date !== 'string' && !(date instanceof Date)) { return '—'; }
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) { return '—'; }
     const p = partsInTz(d, iana);

@@ -59,7 +59,7 @@ export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
       </View>
 
       {/* Comments preview */}
-      {!!logHeader.comments && (
+      {typeof logHeader.comments === 'string' && logHeader.comments.length > 0 && (
         <Text
           style={[styles.comment, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}
           numberOfLines={1}>

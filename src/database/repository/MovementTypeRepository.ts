@@ -6,8 +6,10 @@ export const MovementTypeRepository = dataSource.getRepository(MovementType);
 
 export const getMovementTypes = async (isInput: boolean): Promise<MovementType[]> => {
   try {
+    // Use explicit 1/0 — nitro-sqlite on Android maps boolean true → 'true' string,
+    // which SQLite casts to 0, causing true to match nothing while false matches rows with isInput=0.
     return await MovementTypeRepository.find({
-      where: {isInput, isActive: true},
+      where: {isInput: (isInput ? 1 : 0) as any, isActive: 1 as any},
       order: {name: 'ASC'},
     });
   } catch (error) {
