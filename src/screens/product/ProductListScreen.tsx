@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -18,9 +18,11 @@ import { Toast } from '../../components/feedback/Toast';
 import { InputSearch } from '../../components/input/InputSearch';
 import { ProductItem } from '../../components/product/ProductItem';
 import { Product } from '../../database/models/Product';
+import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { getFullProducts } from '../../database/repository/ProductRepository';
 import { PRODUCT_LIST_PERFORMANCE_PROPS, useProducts } from '../../hooks/useProducts';
 import { useTheme } from '../../hooks/useTheme';
+import { DEFAULT_CURRENCY_SYMBOL, KEY_CURRENCY_SYMBOL } from '../../config/constants';
 import { ProductListScreenProps } from '../../interfaces/IProductNavigation';
 import { excelService } from '../../services/ExcelService';
 
@@ -35,6 +37,13 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
   const {products, total, loadData, isLoading, isLoadingMore, hasMore, loadMore, searchProducts, error, clearError} =
     useProducts();
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
+  const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
+
+  useEffect(() => {
+    getConfigurationByKey(KEY_CURRENCY_SYMBOL).then(config => {
+      if (config?.value) { setCurrencySymbol(config.value); }
+    });
+  }, []);
   const [showReports, setShowReports] = useState(false);
   const [toast, setToast] = useState<ToastState>({
     visible: false,
@@ -100,9 +109,9 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
 
   const renderProductItem = useCallback(
     ({item}: {item: Product}) => (
-      <ProductItem product={item} isVisible={visibleItems.has(item.code)} />
+      <ProductItem product={item} isVisible={visibleItems.has(item.code)} currencySymbol={currencySymbol} />
     ),
-    [visibleItems],
+    [visibleItems, currencySymbol],
   );
 
   /** Footer loading indicator shown when loading more paginated items. */

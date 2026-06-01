@@ -1,11 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
 import { Fab } from '../../components/button/Fab';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { Toast } from '../../components/feedback/Toast';
 import { InputDate } from '../../components/input/InputDate';
 import { LogItems } from '../../components/LogItems';
+import { MovementType } from '../../database/models/MovementType';
 import { LogHeaderRepository } from '../../database/repository/LogHeaderRepository';
+import { getAllMovementTypes } from '../../database/repository/MovementTypeRepository';
 import { useInputs } from '../../hooks/useInputs';
 import { useTheme } from '../../hooks/useTheme';
 import { InputListScreenProps } from '../../interfaces/IInputNavigation';
@@ -19,7 +21,12 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   const [initialDate, setInitialDate] = useState(fechaInicio);
   const [finalDate, setFinalDate] = useState(fechaFin);
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
+  const [typeCatalog, setTypeCatalog] = useState<MovementType[]>([]);
   const { inputs, isLoading, loadData } = useInputs(initialDate, finalDate);
+
+  useEffect(() => {
+    getAllMovementTypes().then(setTypeCatalog);
+  }, []);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
@@ -106,6 +113,7 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
         renderItem={({ item }) => (
           <LogItems
             logHeader={item}
+            typeCatalog={typeCatalog}
             navigation={(id: number) => {
               navigation.navigate('ReadInput', { id });
             }}

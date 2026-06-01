@@ -11,17 +11,20 @@ import {
 import { checkStockForProduct } from '../../utils/stockValidator';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { DEFAULT_CURRENCY_SYMBOL, KEY_CURRENCY_SYMBOL } from '../../config/constants';
 import { LogHeader } from '../../database/models/LogHeader';
 import { MovementType } from '../../database/models/MovementType';
 import { Product } from '../../database/models/Product';
 import { Response } from '../../database/models/response/Response';
 import { LogDetailRepository } from '../../database/repository/LogDetailRepository';
+import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { getMovementTypes } from '../../database/repository/MovementTypeRepository';
 import { searchProductsByCodeOrName } from '../../database/repository/ProductRepository';
 import { useForm } from '../../hooks/useForm';
 import { useLogDetails } from '../../hooks/useLogDetails';
 import { useTheme } from '../../hooks/useTheme';
 import { validateLogForm } from '../../utils/validateLogForm';
+import { formatCurrency } from '../../utils/formatCurrency';
 import { DetailsItem } from '../DetailsItem';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
@@ -58,6 +61,7 @@ export const LogForm = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [movementTypes, setMovementTypes] = useState<MovementType[]>([NO_SELECTION]);
   const [stockWarnings, setStockWarnings] = useState<Record<number, string>>({});
+  const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const isOutput = !initialForm.isInput;
   const noImage = require('../../assets/sin_imagen.png');
   const dropdown = useRef<SelectDropdown>(null);
@@ -67,6 +71,12 @@ export const LogForm = ({
       setMovementTypes([NO_SELECTION, ...dbTypes]);
     });
   }, [initialForm.isInput]);
+
+  useEffect(() => {
+    getConfigurationByKey(KEY_CURRENCY_SYMBOL).then(config => {
+      if (config?.value) { setCurrencySymbol(config.value); }
+    });
+  }, []);
 
   const handleSearch = async (text: string) => {
     const data = await searchProductsByCodeOrName(text);
@@ -239,7 +249,7 @@ export const LogForm = ({
                     {item.name}
                   </Text>
                   <Text style={[styles.fontSize, { color: theme.colors.text }]}>
-                    Q{item.price.toFixed(2)}
+                    {formatCurrency(item.price, currencySymbol)}
                   </Text>
                 </TouchableOpacity>
               );

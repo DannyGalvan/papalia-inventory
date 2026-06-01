@@ -3,11 +3,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ALL_IN_OUT_ENUM } from '../config/constants';
 import { LogHeader } from '../database/models/LogHeader';
+import { MovementType } from '../database/models/MovementType';
 import { useTheme } from '../hooks/useTheme';
 
 interface Props {
   logHeader: LogHeader;
   navigation: (id: number) => void;
+  typeCatalog?: MovementType[];
 }
 
 const formatDate = (date: Date | string): string => {
@@ -17,9 +19,11 @@ const formatDate = (date: Date | string): string => {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}  ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-export const LogItems = ({logHeader, navigation}: Props) => {
+export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
   const {theme} = useTheme();
-  const typeLabel = ALL_IN_OUT_ENUM[logHeader.type as keyof typeof ALL_IN_OUT_ENUM] ?? `Tipo ${logHeader.type}`;
+  const typeLabel = typeCatalog
+    ? typeCatalog.find(t => t.id === logHeader.type)?.name ?? `Tipo ${logHeader.type}`
+    : ALL_IN_OUT_ENUM[logHeader.type as keyof typeof ALL_IN_OUT_ENUM] ?? `Tipo ${logHeader.type}`;
   const isInput = logHeader.isInput;
   const badgeColor = isInput ? theme.colors.success : theme.colors.error;
   const badgeIcon = isInput ? 'arrow-down-circle' : 'arrow-up-circle';

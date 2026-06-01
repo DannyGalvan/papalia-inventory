@@ -10,7 +10,17 @@ import { DashboardResponse } from '../models/response/DashboardResponse';
 import { LogDetailResponse } from '../models/response/LogDetailResponse';
 import { Response } from '../models/response/Response';
 import { LogDetailRepository } from './LogDetailRepository';
+import { getAllMovementTypes } from './MovementTypeRepository';
 import { getProductById, updateProduct } from './ProductRepository';
+
+const buildTypeNameMap = async (): Promise<Record<number, string>> => {
+  const map: Record<number, string> = {...ALL_IN_OUT_ENUM} as Record<number, string>;
+  try {
+    const dbTypes = await getAllMovementTypes();
+    dbTypes.forEach(t => { map[t.id] = t.name; });
+  } catch {}
+  return map;
+};
 
 export const LogHeaderRepository = dataSource.getRepository(LogHeader);
 
@@ -29,36 +39,33 @@ export const getAllLogsByDate = async (
 };
 
 export const getDashboardInputs = async (initialDate?: Date, finalDate?: Date) => {
-  const logs = await LogHeaderRepository.find({
-    where: {
-      isInput: true,
-      ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
-    },
-    order: { id: 'DESC' },
-    relations: ['logDetails', 'logDetails.product'],
-  });
+  const [logs, typeNameMap] = await Promise.all([
+    LogHeaderRepository.find({
+      where: {
+        isInput: true,
+        ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
+      },
+      order: { id: 'DESC' },
+      relations: ['logDetails', 'logDetails.product'],
+    }),
+    buildTypeNameMap(),
+  ]);
 
   const inputDetails: DashboardResponse[] = [];
 
-  const DetailResponse: { [tipo: string]: LogHeader[] } = logs.reduce(
+  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce(
     (acc, item) => {
-      // Usa el tipo como clave para agrupar
-      if (!acc[ALL_IN_OUT_ENUM[item.type]]) {
-        acc[ALL_IN_OUT_ENUM[item.type]] = [];
-      }
-
-      // Agrega el elemento al grupo correspondiente
-      acc[ALL_IN_OUT_ENUM[item.type]].push(item);
-
+      const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
+      if (!acc[typeName]) { acc[typeName] = []; }
+      acc[typeName].push(item);
       return acc;
     },
     {},
   );
 
-  for (const key in DetailResponse) {
-    const element = DetailResponse[key];
+  for (const key in grouped) {
+    const element = grouped[key];
     const total = element.map(e => e.logDetails).flat();
-
     inputDetails.push({
       tipo: key,
       cantidad: total.reduce((acc, item) => acc + item.quantity, 0),
@@ -103,36 +110,33 @@ export const getAllInputLogs = async () => {
 };
 
 export const getDashboardOutputs = async (initialDate?: Date, finalDate?: Date) => {
-  const logs = await LogHeaderRepository.find({
-    where: {
-      isInput: false,
-      ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
-    },
-    order: { id: 'DESC' },
-    relations: ['logDetails', 'logDetails.product'],
-  });
+  const [logs, typeNameMap] = await Promise.all([
+    LogHeaderRepository.find({
+      where: {
+        isInput: false,
+        ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
+      },
+      order: { id: 'DESC' },
+      relations: ['logDetails', 'logDetails.product'],
+    }),
+    buildTypeNameMap(),
+  ]);
 
   const outputDetails: DashboardResponse[] = [];
 
-  const DetailResponse: { [tipo: string]: LogHeader[] } = logs.reduce(
+  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce(
     (acc, item) => {
-      // Usa el tipo como clave para agrupar
-      if (!acc[ALL_IN_OUT_ENUM[item.type]]) {
-        acc[ALL_IN_OUT_ENUM[item.type]] = [];
-      }
-
-      // Agrega el elemento al grupo correspondiente
-      acc[ALL_IN_OUT_ENUM[item.type]].push(item);
-
+      const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
+      if (!acc[typeName]) { acc[typeName] = []; }
+      acc[typeName].push(item);
       return acc;
     },
     {},
   );
 
-  for (const key in DetailResponse) {
-    const element = DetailResponse[key];
+  for (const key in grouped) {
+    const element = grouped[key];
     const total = element.map(e => e.logDetails).flat();
-
     outputDetails.push({
       tipo: key,
       cantidad: total.reduce((acc, item) => acc + item.quantity, 0),

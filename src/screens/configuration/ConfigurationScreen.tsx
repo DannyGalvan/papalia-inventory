@@ -316,7 +316,62 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
           </>
         )}
 
-        {/* ── Catálogo de tipos de movimiento ── */}
+        {/* ── Catálogos ── */}
+        <Text style={[styles.catalogSectionTitle, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+          CATÁLOGOS
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          onPress={() => navigation.navigate('CategoryCatalog')}
+          accessibilityRole="button"
+          accessibilityLabel="Gestionar categorías de productos">
+          <Icon name="pricetags-outline" size={22} color={theme.colors.primary} />
+          <View style={styles.catalogBtnText}>
+            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+              Categorías
+            </Text>
+            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              Organiza tus productos por categoría.
+            </Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          onPress={() => navigation.navigate('SupplierCatalog')}
+          accessibilityRole="button"
+          accessibilityLabel="Gestionar proveedores">
+          <Icon name="business-outline" size={22} color={theme.colors.primary} />
+          <View style={styles.catalogBtnText}>
+            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+              Proveedores
+            </Text>
+            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              Registra y gestiona tus proveedores.
+            </Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          onPress={() => navigation.navigate('UnitOfMeasureCatalog')}
+          accessibilityRole="button"
+          accessibilityLabel="Gestionar unidades de medida">
+          <Icon name="scale-outline" size={22} color={theme.colors.primary} />
+          <View style={styles.catalogBtnText}>
+            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+              Unidades de medida
+            </Text>
+            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              Define cómo se miden las cantidades (kg, L, uds…).
+            </Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
           onPress={() => navigation.navigate('MovementTypeCatalog')}
@@ -399,6 +454,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
+  },
+  catalogSectionTitle: {
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginTop: 16,
+    marginBottom: 4,
+    alignSelf: 'flex-start',
   },
   catalogBtn: {
     flexDirection: 'row',

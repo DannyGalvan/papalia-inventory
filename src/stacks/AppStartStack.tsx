@@ -5,8 +5,11 @@ import { HeaderRight } from '../components/navigation/HeaderRight';
 import { ProductProvider } from '../context/ProductContext';
 import { useTheme } from '../hooks/useTheme';
 import { AppStackParamList } from '../interfaces/IAppStartNavigation';
-import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
+import { CategoryCatalogScreen } from '../screens/catalog/CategoryCatalogScreen';
 import { MovementTypeCatalogScreen } from '../screens/catalog/MovementTypeCatalogScreen';
+import { SupplierCatalogScreen } from '../screens/catalog/SupplierCatalogScreen';
+import { UnitOfMeasureCatalogScreen } from '../screens/catalog/UnitOfMeasureCatalogScreen';
+import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
 import { PermissionsScreen } from '../screens/permissions/PermissionsScreen';
 import { appColors } from '../styles/globalStyles';
 import PrincipalStack from './PrincipalStack';
@@ -49,11 +52,23 @@ const AppStartStack = () => {
         />
         <Stack.Screen
           name="MovementTypeCatalog"
-          options={{
-            headerTitle: 'Regresar',
-            headerTintColor: appColors.warning,
-          }}
+          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
           component={MovementTypeCatalogScreen}
+        />
+        <Stack.Screen
+          name="CategoryCatalog"
+          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          component={CategoryCatalogScreen}
+        />
+        <Stack.Screen
+          name="SupplierCatalog"
+          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          component={SupplierCatalogScreen}
+        />
+        <Stack.Screen
+          name="UnitOfMeasureCatalog"
+          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          component={UnitOfMeasureCatalogScreen}
         />
       </Stack.Navigator>
     </ProductProvider>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text } from 'react-native';
 import { Toast } from '../../components/feedback/Toast';
 import { LogForm } from '../../components/form/LogForm';
-import { INPUT_DATA, INPUT_TYPES } from '../../config/constants';
+import { INPUT_TYPES } from '../../config/constants';
 import { LogHeader } from '../../database/models/LogHeader';
 import {
   LogHeaderRepository,

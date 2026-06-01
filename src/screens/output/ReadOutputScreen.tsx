@@ -4,8 +4,9 @@ import { LogDetailView } from '../../components/LogDetailView';
 import { LogHeader } from '../../database/models/LogHeader';
 import { getLogById } from '../../database/repository/LogHeaderRepository';
 import { useTheme } from '../../hooks/useTheme';
+import { ReadOutputScreenProps } from '../../interfaces/IOutputNavigation';
 
-export const ReadOutputScreen = ({route}) => {
+export const ReadOutputScreen = ({route}: ReadOutputScreenProps) => {
   const {theme} = useTheme();
   const {id} = route.params;
   const [log, setLog] = useState<LogHeader | null>(null);

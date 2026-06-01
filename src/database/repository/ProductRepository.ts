@@ -5,10 +5,13 @@ import { Response } from '../models/response/Response';
 
 export const ProductRepository = dataSource.getRepository(Product);
 
+const PRODUCT_RELATIONS = ['category', 'unitOfMeasure', 'supplier'];
+
 export const getAllProducts = async () => {
   try {
     return await ProductRepository.find({
       take: 50,
+      relations: PRODUCT_RELATIONS,
     });
   } catch (error) {
     console.log(error);
@@ -18,28 +21,18 @@ export const getAllProducts = async () => {
 
 export const getFullProducts = async () => {
   try {
-    return await ProductRepository.find();
+    return await ProductRepository.find({relations: PRODUCT_RELATIONS});
   } catch (error) {
     console.log(error);
     return [];
   }
 };
 
-/**
- * Fetch a single page of products using SQL `skip`/`take` so large inventories
- * can be loaded incrementally (Requirement 9.1).
- *
- * Unlike the other read helpers, this function intentionally rethrows on
- * failure so callers (e.g. `useProducts`) can apply the retry + sanitized
- * error handling pattern instead of silently receiving an empty list.
- *
- * @param skip Number of leading rows to skip (page * pageSize).
- * @param take Maximum number of rows to return (the page size).
- */
 export const getProductsPaged = async (skip: number, take: number) => {
   return await ProductRepository.find({
     skip: Math.max(0, skip),
     take: Math.max(0, take),
+    relations: PRODUCT_RELATIONS,
   });
 };
 
