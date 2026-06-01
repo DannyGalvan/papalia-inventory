@@ -1,6 +1,5 @@
-import {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
-import {Response} from '../database/models/response/Response';
+import { useEffect, useState } from 'react';
+import { Response } from '../database/models/response/Response';
 
 export const useForm = <T>(
   initialForm: T,
@@ -44,7 +43,11 @@ export const useForm = <T>(
 
           setResponse(result);
         } catch (ex: any) {
-          Alert.alert('Error', ex.toString());
+          setResponse({
+            success: false,
+            message: ex?.message || 'No se pudo completar la operación',
+            data: null as any,
+          });
         }
       } else {
         setResponse(null);
@@ -52,7 +55,11 @@ export const useForm = <T>(
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      Alert.alert('Error', error.toString());
+      setResponse({
+        success: false,
+        message: error?.message || 'No se pudo completar la operación',
+        data: null as any,
+      });
     }
   };
 

@@ -20,8 +20,13 @@ export const DetailsItem = ({
   readonly,
 }: Props) => {
   const noImage = require('../assets/sin_imagen.png');
+  const imageAccessibilityLabel = `Imagen del producto ${detail.product.name}`;
   return (
-    <View style={[appStyles.bgGray, styles.container]}>
+    <View
+      style={[appStyles.bgGray, styles.container]}
+      accessible={false}
+      accessibilityLabel={`Detalle de producto ${detail.product.name}, cantidad ${detail.quantity}, precio Q${detail.product.price}`}
+    >
       <View
         style={[appStyles.flexRow, appStyles.justifyBetween, styles.details]}
       >
@@ -43,6 +48,8 @@ export const DetailsItem = ({
               textStyle={[appStyles.subTitle]}
               styles={styles.button}
               iconSize={20}
+              accessibilityLabel={`Aumentar cantidad de ${detail.product.name}`}
+              accessibilityHint="Aumenta la cantidad en uno"
             />
           )}
           <Text
@@ -64,12 +71,17 @@ export const DetailsItem = ({
               textStyle={[appStyles.subTitle]}
               styles={styles.button}
               iconSize={20}
+              accessibilityLabel={`Disminuir cantidad de ${detail.product.name}`}
+              accessibilityHint="Disminuye la cantidad en uno"
             />
           )}
         </View>
       </View>
       <Image
         style={styles.image}
+        accessible={true}
+        accessibilityRole="image"
+        accessibilityLabel={imageAccessibilityLabel}
         source={
           detail.product.image
             ? {
@@ -86,6 +98,8 @@ export const DetailsItem = ({
           textStyle={[appStyles.subTitle]}
           styles={styles.bf}
           iconSize={20}
+          accessibilityLabel={`Eliminar ${detail.product.name} de la lista`}
+          accessibilityHint="Elimina este producto del movimiento"
         />
       )}
     </View>

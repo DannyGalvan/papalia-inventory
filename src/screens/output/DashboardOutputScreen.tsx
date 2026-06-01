@@ -1,44 +1,113 @@
-import React, {useCallback, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
-import {appStyles} from '../../styles/globalStyles';
-import {DashboardResponse} from '../../database/models/response/DashboardResponse';
-import {getDashboardOutputs} from '../../database/repository/LogHeaderRepository';
-import {useFocusEffect} from '@react-navigation/native';
-import {DashboardItem} from '../../components/DashboardItem';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useRef, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { DashboardItem } from '../../components/DashboardItem';
+import { EmptyState } from '../../components/feedback/EmptyState';
+import { InputDate } from '../../components/input/InputDate';
+import { DashboardResponse } from '../../database/models/response/DashboardResponse';
+import { getDashboardOutputs } from '../../database/repository/LogHeaderRepository';
+import { useTheme } from '../../hooks/useTheme';
+import { dateNow } from '../../utils/dateTime';
+
+const {fechaFin, fechaInicio} = dateNow();
 
 export const DashboardOutputScreen = () => {
+  const {theme} = useTheme();
+  const [initialDate, setInitialDate] = useState(fechaInicio);
+  const [finalDate, setFinalDate] = useState(fechaFin);
   const [response, setResponse] = useState<DashboardResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const isLoadingRef = useRef(false);
 
-  const loadData = () => {
-    (async () => {
-      setIsLoading(true);
-      const data = await getDashboardOutputs();
+  const loadData = useCallback(async () => {
+    if (isLoadingRef.current) {return;}
+    isLoadingRef.current = true;
+    setIsLoading(true);
+    try {
+      const data = await getDashboardOutputs(initialDate, finalDate);
       setResponse(data);
+    } catch (error) {
+      console.log('DashboardOutputScreen error:', error);
+    } finally {
+      isLoadingRef.current = false;
       setIsLoading(false);
-    })();
-  };
+    }
+  }, [initialDate, finalDate]);
 
-  useFocusEffect(useCallback(loadData, []));
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData]),
+  );
 
   return (
-    <View style={appStyles.screen}>
-      <Text style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
+    <View style={[styles.screen, {backgroundColor: theme.colors.background}]}>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+            lineHeight: theme.typography.h2.lineHeight,
+          },
+        ]}
+        accessibilityRole="header">
         Dashboard de salidas
       </Text>
+
+      <InputDate
+        date={initialDate}
+        setDate={setInitialDate}
+        label="Fecha Inicial"
+        isFinal={false}
+      />
+      <InputDate
+        date={finalDate}
+        setDate={setFinalDate}
+        label="Fecha Final"
+        isFinal
+      />
+
+      <Text
+        style={[styles.resultText, {color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize}]}
+        accessibilityLabel={`Total de tipos: ${response.length}`}>
+        Tipos de movimiento: {response.length}
+      </Text>
+
       <FlatList
-        style={[styles.list]}
-        data={Object.keys(response).map(key => response[key])}
+        style={styles.list}
+        data={response}
         renderItem={({item}) => <DashboardItem item={item} />}
         refreshing={isLoading}
         onRefresh={loadData}
         keyExtractor={item => item.tipo}
+        accessibilityRole="list"
+        accessibilityLabel="Resumen de salidas por tipo"
+        ListEmptyComponent={
+          isLoading ? null : (
+            <EmptyState
+              title="Sin movimientos"
+              description="No hay salidas en el rango de fechas seleccionado."
+              icon="exit-outline"
+            />
+          )
+        }
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {flex: 1},
+  title: {
+    textAlign: 'center',
+    paddingVertical: 10,
+    fontStyle: 'italic',
+  },
+  resultText: {
+    textAlign: 'center',
+  },
   list: {
     width: '100%',
     paddingHorizontal: 10,

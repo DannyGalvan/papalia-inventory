@@ -1,55 +1,35 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { TouchableButton } from '../components/button/TouchableButton';
-import {
-  createNativeStackNavigator,
-  NativeStackHeaderBackProps,
-  NativeStackHeaderItemProps,
-} from '@react-navigation/native-stack';
-import PrincipalStack from './PrincipalStack';
-import { appColors, appStyles } from '../styles/globalStyles';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AppStackParamList } from '../interfaces/IAppStartNavitgation';
-import { Image, StyleSheet } from 'react-native';
-import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
+import { HeaderLeft } from '../components/navigation/HeaderLeft';
+import { HeaderRight } from '../components/navigation/HeaderRight';
 import { ProductProvider } from '../context/ProductContext';
-
-const HeaderRight = ({}: NativeStackHeaderItemProps) => {
-  const navigation = useNavigation<NavigationProp<AppStackParamList>>();
-
-  const handleConfigurationPress = () => {
-    navigation.navigate('Configuration');
-  };
-
-  return (
-    <TouchableButton
-      onPress={handleConfigurationPress}
-      styles={{}}
-      textStyle={appStyles.textWhite}
-      icon="settings"
-      iconColor={appColors.warning}
-    />
-  );
-};
-
-const HeaderLeft = ({}: NativeStackHeaderBackProps) => {
-  return (
-    <Image source={require('../assets/papalia.png')} style={styles.logo} />
-  );
-};
+import { useTheme } from '../hooks/useTheme';
+import { AppStackParamList } from '../interfaces/IAppStartNavigation';
+import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
+import { MovementTypeCatalogScreen } from '../screens/catalog/MovementTypeCatalogScreen';
+import { PermissionsScreen } from '../screens/permissions/PermissionsScreen';
+import { appColors } from '../styles/globalStyles';
+import PrincipalStack from './PrincipalStack';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStartStack = () => {
+  const {theme} = useTheme();
+
   return (
     <ProductProvider>
       <Stack.Navigator
         screenOptions={{
-          headerTitleStyle: [appStyles.textWarning, appStyles.title],
-          headerStyle: [appStyles.bgWhite],
+          headerTitleStyle: {color: appColors.warning, fontWeight: 'bold'},
+          headerStyle: {backgroundColor: theme.colors.surface},
         }}
         id={undefined}
-        initialRouteName="Home"
-      >
+        initialRouteName="Permissions">
+        <Stack.Screen
+          name="Permissions"
+          component={PermissionsScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="Home"
           component={PrincipalStack}
@@ -67,18 +47,17 @@ const AppStartStack = () => {
           }}
           component={ConfigurationScreen}
         />
+        <Stack.Screen
+          name="MovementTypeCatalog"
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
+          component={MovementTypeCatalogScreen}
+        />
       </Stack.Navigator>
     </ProductProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  logo: {
-    width: 150,
-    height: 50,
-    resizeMode: 'contain',
-    marginLeft: -20,
-  },
-});
 
 export default AppStartStack;

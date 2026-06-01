@@ -1,16 +1,16 @@
 import { Between } from 'typeorm';
 import {
-  ALL_IN_OUT_ENUM,
-  ALL_IN_OUT_TYPES,
-  INPUT_ENUM,
+    ALL_IN_OUT_ENUM,
+    ALL_IN_OUT_TYPES,
+    INPUT_ENUM,
 } from '../../config/constants';
 import { dataSource } from '../connection/DataSource';
 import { LogHeader } from '../models/LogHeader';
-import { Response } from '../models/response/Response';
-import { getProductById, updateProduct } from './ProductRepository';
-import { LogDetailResponse } from '../models/response/LogDetailResponse';
 import { DashboardResponse } from '../models/response/DashboardResponse';
+import { LogDetailResponse } from '../models/response/LogDetailResponse';
+import { Response } from '../models/response/Response';
 import { LogDetailRepository } from './LogDetailRepository';
+import { getProductById, updateProduct } from './ProductRepository';
 
 export const LogHeaderRepository = dataSource.getRepository(LogHeader);
 
@@ -28,10 +28,11 @@ export const getAllLogsByDate = async (
   });
 };
 
-export const getDashboardInputs = async () => {
+export const getDashboardInputs = async (initialDate?: Date, finalDate?: Date) => {
   const logs = await LogHeaderRepository.find({
     where: {
       isInput: true,
+      ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
     },
     order: { id: 'DESC' },
     relations: ['logDetails', 'logDetails.product'],
@@ -86,7 +87,7 @@ export const getAllInputLogs = async () => {
         Codigo: d.productCode,
         tipo: INPUT_ENUM[log.type],
         creado: log.createdAt,
-        observaciones: log.commets,
+        observaciones: log.comments,
         cantidad: d.quantity,
         esEntrada: log.isInput,
         nombre: d.name,
@@ -101,10 +102,11 @@ export const getAllInputLogs = async () => {
   return DetailResponses;
 };
 
-export const getDashboardOutputs = async () => {
+export const getDashboardOutputs = async (initialDate?: Date, finalDate?: Date) => {
   const logs = await LogHeaderRepository.find({
     where: {
       isInput: false,
+      ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
     },
     order: { id: 'DESC' },
     relations: ['logDetails', 'logDetails.product'],
@@ -159,7 +161,7 @@ export const getAllOutputLogs = async () => {
         Codigo: d.productCode,
         tipo: ALL_IN_OUT_ENUM[log.type],
         creado: log.createdAt,
-        observaciones: log.commets,
+        observaciones: log.comments,
         cantidad: d.quantity,
         esEntrada: log.isInput,
         nombre: d.name,
@@ -190,7 +192,7 @@ export const getLogById = async (id: number) => {
     log.id = 0;
     log.logDetails = [];
     log.createdAt = new Date();
-    log.commets = 'No se encontraron datos';
+    log.comments = 'No se encontraron datos';
     log.type = ALL_IN_OUT_TYPES.no_seleccionado;
     log.isInput = false;
     return log;

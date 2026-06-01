@@ -1,5 +1,13 @@
 export const NAME_BD = 'papalia_inventory.sqlite';
 export const KEY_DIR_IMAGES = 'dir_images';
+export const KEY_THEME_PREFERENCE = 'theme_preference';
+export const KEY_CURRENCY_SYMBOL = 'currency_symbol';
+export const KEY_LOW_STOCK_THRESHOLD = 'low_stock_threshold';
+export const KEY_COMPANY_NAME = 'company_name';
+
+export const DEFAULT_CURRENCY_SYMBOL = 'Q';
+export const DEFAULT_LOW_STOCK_THRESHOLD = 5;
+export const DEFAULT_COMPANY_NAME = 'Papalia Inventario';
 
 export const OUTPUT_TYPES = {
   no_seleccionado: 0,

@@ -1,23 +1,27 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  DimensionValue,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    DimensionValue,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { checkStockForProduct } from '../../utils/stockValidator';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LogHeader } from '../../database/models/LogHeader';
+import { MovementType } from '../../database/models/MovementType';
 import { Product } from '../../database/models/Product';
 import { Response } from '../../database/models/response/Response';
 import { LogDetailRepository } from '../../database/repository/LogDetailRepository';
+import { getMovementTypes } from '../../database/repository/MovementTypeRepository';
 import { searchProductsByCodeOrName } from '../../database/repository/ProductRepository';
 import { useForm } from '../../hooks/useForm';
 import { useLogDetails } from '../../hooks/useLogDetails';
-import { appColors, appStyles } from '../../styles/globalStyles';
+import { useTheme } from '../../hooks/useTheme';
+import { validateLogForm } from '../../utils/validateLogForm';
 import { DetailsItem } from '../DetailsItem';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
@@ -30,29 +34,18 @@ interface Props {
   selectData?: {id: number; value: string}[];
 }
 
-const validateForm = (form: LogHeader) => {
-  let errors: any = {};
-  if (!form.commets) {
-    errors.commets = 'Los comentarios son requeridos';
-  }
-  if (form.type === 0) {
-    errors.type = 'El tipo de entrada es requerido';
-  }
+const NO_SELECTION: MovementType = {id: 0, name: 'Seleccione una opción', isInput: false, isActive: true};
 
-  if (form.logDetails.length === 0) {
-    errors.details = 'Debes agregar al menos un producto';
-  }
-
-  return errors;
-};
+const validateForm = validateLogForm;
 
 export const LogForm = ({
   initialForm,
   onSubmit,
   isReadonly,
   navigate,
-  selectData = [],
 }: Props) => {
+  const { theme } = useTheme();
+
   const {
     details,
     addDetail,
@@ -63,8 +56,17 @@ export const LogForm = ({
   } = useLogDetails();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [movementTypes, setMovementTypes] = useState<MovementType[]>([NO_SELECTION]);
+  const [stockWarnings, setStockWarnings] = useState<Record<number, string>>({});
+  const isOutput = !initialForm.isInput;
   const noImage = require('../../assets/sin_imagen.png');
   const dropdown = useRef<SelectDropdown>(null);
+
+  useEffect(() => {
+    getMovementTypes(initialForm.isInput).then(dbTypes => {
+      setMovementTypes([NO_SELECTION, ...dbTypes]);
+    });
+  }, [initialForm.isInput]);
 
   const handleSearch = async (text: string) => {
     const data = await searchProductsByCodeOrName(text);
@@ -94,6 +96,17 @@ export const LogForm = ({
     },
   );
 
+  const handleUpdateDetail = (item: Parameters<typeof updateDetail>[0], idx: number) => {
+    if (isOutput && item.product) {
+      const warning = checkStockForProduct(item.quantity, item.product.stock, item.name);
+      setStockWarnings(prev => ({
+        ...prev,
+        [idx]: warning.hasWarning ? warning.warningMessage : '',
+      }));
+    }
+    updateDetail(item, idx);
+  };
+
   const backToList = () => {
     navigate.goBack();
   };
@@ -109,54 +122,79 @@ export const LogForm = ({
         total: selectedItem.price,
         productCode: selectedItem.code,
         logHeaderId: null,
+        logHeader: null as any,
       },
       handleChange,
     );
   };
 
   return (
-    <ScrollView style={[appStyles.flexColumn, styles.container, styles.mButton]}>
+    <ScrollView style={[styles.container, styles.mButton]} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
       <View style={styles.selectContainer}>
-        <Text style={appStyles.textDark}>Tipo de entrada</Text>
-        <SelectDropdown
-          data={selectData}
-          defaultValue={selectData?.find(item => item.id === form.type)}
-          onSelect={selectedItem => {
-            handleChange(selectedItem.id, 'type'); 
-          }}
-          rowTextForSelection={item => {
-            return item.value;
-          }}
-          buttonTextAfterSelection={selectedItem => {
-            return selectedItem.value;
-          }}
-          buttonStyle={[styles.input, styles.select]}
-          disabled={isReadonly}
-        />
-        <View>
-          <Text style={[appStyles.textDanger, appStyles.textCenter]}>
-            {errors.type}
-          </Text>
+        <Text style={{ color: theme.colors.text, fontSize: theme.typography.body.fontSize }} accessibilityRole="header">
+          Tipo de entrada
+        </Text>
+        <View
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Tipo de entrada"
+          accessibilityHint="Selecciona el tipo de movimiento de inventario">
+          <SelectDropdown
+            data={movementTypes}
+            defaultValue={movementTypes.find(item => item.id === form.type)}
+            onSelect={selectedItem => {
+              handleChange(selectedItem.id, 'type');
+            }}
+            rowTextForSelection={item => item.name}
+            buttonTextAfterSelection={selectedItem => selectedItem.name}
+            buttonStyle={[styles.input, styles.select, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
+            buttonTextStyle={{color: theme.colors.text}}
+            dropdownStyle={{backgroundColor: theme.colors.surface}}
+            rowStyle={{backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}}
+            rowTextStyle={{color: theme.colors.text}}
+            selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
+            selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
+            dropdownOverlayColor="transparent"
+            disabled={isReadonly}
+          />
         </View>
+        {!!errors.type && (
+          <View>
+            <Text
+              style={[styles.errorText, { color: theme.colors.error, fontSize: theme.typography.caption.fontSize }]}
+              accessibilityLiveRegion="assertive"
+              accessibilityRole="alert">
+              {errors.type}
+            </Text>
+          </View>
+        )}
       </View>
       <InputForm
         label="Comentarios"
         placeholder="Ingresa una descripción"
-        placeholderTextColor={appColors.gray}
-        value={form.commets}
-        errors={errors.commets}
-        onChangeText={text => handleChange(text, 'commets')}
+        placeholderTextColor={theme.colors.disabled}
+        value={form.comments}
+        errors={errors.comments}
+        onChangeText={text => handleChange(text, 'comments')}
         secureTextEntry={false}
-        style={[styles.input, styles.textArea]}
+        colorText={{color: theme.colors.text}}
+        style={[styles.input, styles.textArea, { borderColor: theme.colors.border, color: theme.colors.text }]}
         multiline={true}
         readonly={isReadonly}
       />
       {!isReadonly && (
         <View style={styles.selectContainer}>
-          <Text style={appStyles.textDark}>Productos Busqueda</Text>
-          <SelectDropdown
-            ref={dropdown}
-            data={products}
+          <Text style={{ color: theme.colors.text, fontSize: theme.typography.body.fontSize }} accessibilityRole="header">
+            Productos Busqueda
+          </Text>
+          <View
+            accessible
+            accessibilityRole="search"
+            accessibilityLabel="Buscar productos para la entrada"
+            accessibilityHint="Busca y selecciona productos para agregar al movimiento">
+            <SelectDropdown
+              ref={dropdown}
+              data={products}
             onSelect={handleSelect}
             rowTextForSelection={(item: Product) => {
               return item.name;
@@ -164,15 +202,20 @@ export const LogForm = ({
             buttonTextAfterSelection={(selectedItem: Product) => {
               return selectedItem.name;
             }}
-            rowStyle={styles.itemSearchContainer}
+            rowStyle={[styles.itemSearchContainer, {backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}]}
+            buttonTextStyle={{color: theme.colors.text}}
+            dropdownStyle={{backgroundColor: theme.colors.surface}}
+            rowTextStyle={{color: theme.colors.text}}
+            selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
+            selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
+            searchInputStyle={{backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 8}}
+            searchInputTxtStyle={{color: theme.colors.text}}
+            searchPlaceHolderColor={theme.colors.textSecondary}
+            dropdownOverlayColor="transparent"
             renderCustomizedRowChild={(item: Product) => {
               return (
                 <TouchableOpacity
-                  style={[
-                    appStyles.flexRow,
-                    appStyles.alignCenter,
-                    appStyles.justifyBetween,
-                  ]}
+                  style={[styles.rowChild]}
                   onPress={() => {
                     handleSelect(item);
                     dropdown.current.closeDropdown();
@@ -189,50 +232,67 @@ export const LogForm = ({
                   />
                   <Text
                     style={[
-                      appStyles.textDark,
                       styles.itemSearchText,
                       styles.fontSize,
+                      { color: theme.colors.text },
                     ]}>
                     {item.name}
                   </Text>
-                  <Text style={[appStyles.textDark, styles.fontSize]}>
+                  <Text style={[styles.fontSize, { color: theme.colors.text }]}>
                     Q{item.price.toFixed(2)}
                   </Text>
                 </TouchableOpacity>
               );
             }}
-            buttonStyle={[styles.input, styles.select]}
+            buttonStyle={[styles.input, styles.select, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
             disabled={isReadonly}
             defaultButtonText="Busca productos para hacer una entrada"
             search
             searchPlaceHolder="Buscar ..."
             onChangeSearchInputText={handleSearch}
             renderDropdownIcon={() => (
-              <Icon name={'add-circle'} size={35} color={appColors.success} />
+              <Icon name={'add-circle'} size={35} color={theme.colors.success} />
             )}
             renderSearchInputRightIcon={() => (
-              <Icon name={'search'} size={35} color={appColors.primary} />
+              <Icon name={'search'} size={35} color={theme.colors.primary} />
             )}
           />
+          </View>
         </View>
       )}
       <Text
-        style={[appStyles.subTitle, appStyles.textCenter, appStyles.textDark]}>
+        style={[styles.subTitle, { color: theme.colors.text, fontSize: theme.typography.h2.fontSize }]}
+        accessibilityRole="header">
         Lista de Productos
       </Text>
-      <ScrollView style={[appStyles.flexColumn, styles.listContainer]}>
+      <ScrollView style={[styles.listContainer]}>
         {!isReadonly ? (
           <View>
             {details.map((detail, index) => (
-              <DetailsItem
-                key={index}
-                index={index}
-                detail={detail}
-                removeDetail={(id: number) => {
-                  removeDetail(id, handleChange);
-                }}
-                updateDetail={updateDetail}
-              />
+              <View key={index}>
+                <DetailsItem
+                  index={index}
+                  detail={detail}
+                  removeDetail={(id: number) => {
+                    removeDetail(id, handleChange);
+                  }}
+                  updateDetail={handleUpdateDetail}
+                />
+                {isOutput && !!stockWarnings[index] && (
+                  <Text
+                    style={[
+                      styles.stockWarning,
+                      {
+                        color: theme.colors.error,
+                        fontSize: theme.typography.caption.fontSize,
+                      },
+                    ]}
+                    accessibilityRole="alert"
+                    accessibilityLiveRegion="polite">
+                    {stockWarnings[index]}
+                  </Text>
+                )}
+              </View>
             ))}
           </View>
         ) : (
@@ -251,21 +311,33 @@ export const LogForm = ({
             ))}
           </View>
         )}
-        <Text style={[appStyles.textDanger, appStyles.textCenter]}>
-          {errors.details}
-        </Text>
+        {!!errors.details && (
+          <Text style={[styles.errorText, { color: theme.colors.error, fontSize: theme.typography.caption.fontSize }]}>
+            {errors.details}
+          </Text>
+        )}
       </ScrollView>
       <TouchableButton
         onPress={isReadonly ? backToList : handleSubmit}
         title={isReadonly ? 'Regresar' : 'Guardar Datos'}
         icon={isReadonly ? 'arrow-back-circle-sharp' : 'save'}
-        iconColor={appColors.white}
-        textStyle={[appStyles.subTitle]}
-        styles={styles.button}
+        iconColor="#FFFFFF"
+        textStyle={[styles.buttonText]}
+        styles={[styles.button, { backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.lg }]}
+        accessibilityLabel={isReadonly ? 'Regresar a la lista' : 'Guardar datos del movimiento'}
+        accessibilityHint={isReadonly ? 'Regresa a la lista anterior' : 'Guarda el movimiento de inventario'}
       />
       {response && (
         <View>
-          <Text style={[appStyles.textCenter, appStyles.subTitle]}>
+          <Text
+            style={[
+              styles.responseText,
+              {
+                color: response.success ? theme.colors.success : theme.colors.error,
+                fontSize: theme.typography.body.fontSize,
+                fontWeight: theme.typography.h2.fontWeight,
+              },
+            ]}>
             {response.message}
           </Text>
         </View>
@@ -278,22 +350,27 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     paddingHorizontal: 20,
+    flexDirection: 'column',
+  },
+  scrollContent: {
+    paddingBottom: 40,
   },
   mButton: {
     marginBottom: 10,
   },
   input: {
     borderBottomWidth: 1,
-    color: appColors.black,
   },
   button: {
-    backgroundColor: appColors.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10,
     marginVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   textArea: {
     height: 80,
@@ -308,17 +385,14 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 5,
   },
-  isReadonlySelect: {
-    height: 50,
-  },
   listContainer: {
     marginVertical: 10,
     height: 200,
+    flexDirection: 'column',
   },
   itemSearchContainer: {
     paddingHorizontal: 5,
     paddingVertical: 2,
-    ...appStyles.screen,
   },
   itemSearchText: {
     width: '60%',
@@ -330,5 +404,26 @@ const styles = StyleSheet.create({
     width: '20%' as DimensionValue,
     height: 45,
     resizeMode: 'contain',
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  stockWarning: {
+    textAlign: 'center',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  subTitle: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  responseText: {
+    textAlign: 'center',
+  },
+  rowChild: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });

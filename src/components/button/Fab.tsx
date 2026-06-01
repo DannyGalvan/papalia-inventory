@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  StyleProp,
-  ViewStyle,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
+    ActivityIndicator,
+    StyleProp,
+    StyleSheet,
+    TouchableOpacity,
+    ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -13,14 +13,27 @@ interface Props {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   isLoading?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
-export const Fab = ({iconName, onPress, style, isLoading}: Props) => {
+export const Fab = ({
+  iconName,
+  onPress,
+  style,
+  isLoading,
+  accessibilityLabel,
+  accessibilityHint,
+}: Props) => {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={onPress}
-      style={[styles.blackButton, style]}>
+      style={[styles.blackButton, style]}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? 'Botón de acción'}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{disabled: isLoading, busy: isLoading}}>
       {!isLoading ? (
         <Icon name={iconName} size={35} color="white" />
       ) : (
@@ -35,6 +48,8 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     height: 50,
     width: 50,
+    minHeight: 44,
+    minWidth: 44,
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',

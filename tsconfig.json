@@ -9,5 +9,6 @@
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "jsx": "react",
+    "types": ["jest", "node"]
   }
 }

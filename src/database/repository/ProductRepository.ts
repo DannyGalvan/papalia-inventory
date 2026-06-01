@@ -1,7 +1,7 @@
-import {Like} from 'typeorm';
-import {dataSource} from '../connection/DataSource';
-import {Product} from '../models/Product';
-import {Response} from '../models/response/Response';
+import { Like } from 'typeorm';
+import { dataSource } from '../connection/DataSource';
+import { Product } from '../models/Product';
+import { Response } from '../models/response/Response';
 
 export const ProductRepository = dataSource.getRepository(Product);
 
@@ -23,6 +23,24 @@ export const getFullProducts = async () => {
     console.log(error);
     return [];
   }
+};
+
+/**
+ * Fetch a single page of products using SQL `skip`/`take` so large inventories
+ * can be loaded incrementally (Requirement 9.1).
+ *
+ * Unlike the other read helpers, this function intentionally rethrows on
+ * failure so callers (e.g. `useProducts`) can apply the retry + sanitized
+ * error handling pattern instead of silently receiving an empty list.
+ *
+ * @param skip Number of leading rows to skip (page * pageSize).
+ * @param take Maximum number of rows to return (the page size).
+ */
+export const getProductsPaged = async (skip: number, take: number) => {
+  return await ProductRepository.find({
+    skip: Math.max(0, skip),
+    take: Math.max(0, take),
+  });
 };
 
 export const getProductById = async (id: string) => {

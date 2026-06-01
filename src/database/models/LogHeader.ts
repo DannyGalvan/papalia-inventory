@@ -5,7 +5,7 @@ import { LogDetail } from './LogDetail';
 export class LogHeader {
   @PrimaryGeneratedColumn('increment') id: number;
   @Column('integer') type: number;
-  @Column('varchar') commets: string;
+  @Column('varchar') comments: string;
   @Column('datetime') createdAt: Date;
   @Column('boolean') isInput: boolean;
 

@@ -14,7 +14,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'contributors_app' do
+target 'PapaliaInventory' do
   config = use_native_modules!
 
   use_react_native!(
@@ -30,5 +30,22 @@ target 'contributors_app' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Fix fmt 11.x consteval errors with Xcode 26+ / newer Clang.
+    # The issue is that Clang 26 rejects consteval in non-constant contexts.
+    # We patch the fmt header to replace `consteval` with `constexpr`.
+    fmt_base_h = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base_h)
+      File.chmod(0644, fmt_base_h)
+      content = File.read(fmt_base_h)
+      unless content.include?('// Patched for Xcode 26')
+        patched = content.gsub(
+          /^(\s*#\s*define\s+FMT_CONSTEVAL\s+)consteval/,
+          "// Patched for Xcode 26\n\\1constexpr"
+        )
+        File.write(fmt_base_h, patched)
+        Pod::UI.puts "Patched fmt/base.h: replaced consteval with constexpr for Xcode 26 compatibility"
+      end
+    end
   end
 end

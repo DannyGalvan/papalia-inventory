@@ -1,46 +1,83 @@
-import React, {useState} from 'react';
-import uuid from 'react-native-uuid';
-import {Alert, FlatList, StyleSheet, Text, View} from 'react-native';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {OutputListScreenProps} from '../../interfaces/IOutputNavigation';
-import {useOutputs} from '../../hooks/useOutputs';
-import {dateNow} from '../../utils/dateTime';
-import {InputDate} from '../../components/input/InputDate';
-import {LogItems} from '../../components/LogItems';
-import {Fab} from '../../components/button/Fab';
-import {getAllOutputLogs} from '../../database/repository/LogHeaderRepository';
-import {utils, write} from 'xlsx';
-import {DownloadDirectoryPath, writeFile} from '@dr.pogodin/react-native-fs';
+import React, { useCallback, useState } from 'react';
+import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
+import { Fab } from '../../components/button/Fab';
+import { EmptyState } from '../../components/feedback/EmptyState';
+import { Toast } from '../../components/feedback/Toast';
+import { InputDate } from '../../components/input/InputDate';
+import { LogItems } from '../../components/LogItems';
+import { LogHeaderRepository } from '../../database/repository/LogHeaderRepository';
+import { useOutputs } from '../../hooks/useOutputs';
+import { useTheme } from '../../hooks/useTheme';
+import { OutputListScreenProps } from '../../interfaces/IOutputNavigation';
+import { excelService } from '../../services/ExcelService';
+import { dateNow } from '../../utils/dateTime';
 
 const {fechaFin, fechaInicio} = dateNow();
 
 export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
+  const { theme } = useTheme();
   const [initialDate, setInitialDate] = useState(fechaInicio);
   const [finalDate, setFinalDate] = useState(fechaFin);
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
   const {outputs, isLoading, loadData} = useOutputs(initialDate, finalDate);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
 
   const downloadFile = async () => {
     try {
       setIsLoadingDownload(true);
-      const data = await getAllOutputLogs();
-      const ws = utils.json_to_sheet(data);
-      const wb = utils.book_new();
-      utils.book_append_sheet(wb, ws, 'Salidas');
-      const wbout = write(wb, {type: 'binary', bookType: 'xlsx'});
-      const fileSave = `${DownloadDirectoryPath}/Salidas_${uuid.v4()}.xlsx`;
-      await writeFile(fileSave, wbout, 'ascii');
-      Alert.alert('Archivo guardado en descargas', fileSave);
+      const logs = await LogHeaderRepository.find({
+        where: {isInput: false},
+        order: {id: 'DESC'},
+        relations: ['logDetails'],
+      });
+      const details = logs.flatMap(log => log.logDetails);
+      const filePath = await excelService.exportLogs(logs, details, false);
+      const fileName = filePath.split('/').pop() ?? filePath;
+      const location = Platform.OS === 'ios' ? 'Archivos (app)' : 'Descargas';
+      showToast(`Guardado en ${location}: ${fileName}`, 'success');
       setIsLoadingDownload(false);
-    } catch (e) {
-      Alert.alert('Error al descargar el archivo', e.message);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Error al exportar el archivo';
+      showToast(msg, 'error');
       setIsLoadingDownload(false);
     }
   };
 
+  const renderEmptyList = useCallback(() => {
+    if (isLoading) {
+      return null;
+    }
+    return (
+      <EmptyState
+        title="Sin salidas"
+        description="No hay salidas en el rango de fechas seleccionado. Presiona el botón + para registrar una nueva salida."
+        icon="exit-outline"
+      />
+    );
+  }, [isLoading]);
+
   return (
-    <View style={appStyles.screen}>
-      <Text style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        visible={toastVisible}
+        onDismiss={() => setToastVisible(false)}
+      />
+      <Text
+        style={[
+          styles.title,
+          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight },
+        ]}
+        accessibilityRole="header">
         Lista de salidas
       </Text>
       <InputDate
@@ -55,7 +92,12 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
         label="Fecha Final"
         isFinal
       />
-      <Text style={[appStyles.text, appStyles.textDark, appStyles.textCenter]}>
+      <Text
+        style={[
+          styles.resultText,
+          { color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize },
+        ]}
+        accessibilityLabel={`Total de resultados: ${outputs.length}`}>
         Total de Resultados: {outputs.length}
       </Text>
       <FlatList
@@ -69,31 +111,51 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
             }}
           />
         )}
-        refreshing={isLoading}
+        refreshing={false}
         onRefresh={loadData}
         keyExtractor={item => item.id.toString()}
+        accessibilityRole="list"
+        accessibilityLabel="Lista de salidas de inventario"
+        ListEmptyComponent={renderEmptyList}
       />
       <Fab
-        style={styles.fabR}
+        style={[styles.fabR, { backgroundColor: theme.colors.primary }]}
         iconName="add"
         onPress={() => navigation.navigate('CreateOutput')}
+        accessibilityLabel="Crear salida"
+        accessibilityHint="Abre el formulario para crear una nueva salida de inventario"
       />
       <Fab
-        style={styles.fabDash}
+        style={[styles.fabDash, { backgroundColor: theme.colors.warning }]}
         iconName="grid-outline"
         onPress={() => navigation.navigate('DashboardOutput')}
+        accessibilityLabel="Ver dashboard de salidas"
+        accessibilityHint="Abre el resumen de salidas por tipo"
       />
       <Fab
-        style={styles.fabL}
+        style={[styles.fabL, { backgroundColor: theme.colors.success }]}
         iconName="download"
         onPress={downloadFile}
         isLoading={isLoadingDownload}
+        accessibilityLabel="Descargar salidas"
+        accessibilityHint="Descarga las salidas en formato Excel"
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  title: {
+    fontStyle: 'italic',
+    paddingVertical: 10,
+    textAlign: 'center',
+  },
+  resultText: {
+    textAlign: 'center',
+  },
   fabR: {
     bottom: 20,
     right: 20,
@@ -103,31 +165,15 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     position: 'absolute' as 'absolute',
-    backgroundColor: appColors.success,
   },
   fabDash: {
     bottom: 80,
     left: 20,
     position: 'absolute' as 'absolute',
-    backgroundColor: appColors.warning,
-  },
-  labelDate: {
-    marginHorizontal: 20,
   },
   list: {
     padding: 10,
     marginVertical: 20,
     marginHorizontal: 10,
-  },
-  date: {
-    height: 50,
-    backgroundColor: appColors.white,
-    borderRadius: 10,
-    elevation: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    marginHorizontal: 20,
   },
 });

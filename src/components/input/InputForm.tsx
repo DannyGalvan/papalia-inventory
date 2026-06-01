@@ -1,6 +1,13 @@
 import React from 'react';
-import { Text, StyleSheet, TextInput, View, KeyboardType } from 'react-native';
-import { appColors, appStyles } from '../../styles/globalStyles';
+import {
+    KeyboardType,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from 'react-native';
+import { appColors } from '../../styles/globalStyles';
 
 interface Props {
   label: string;
@@ -19,6 +26,8 @@ interface Props {
   keyboardType?: KeyboardType;
   style?: any;
   readonly?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export const InputForm = ({
@@ -38,15 +47,21 @@ export const InputForm = ({
   keyboardType,
   style,
   readonly,
+  accessibilityLabel,
+  accessibilityHint,
 }: Props) => {
   return (
     <View style={[styles.container, containerStyles]}>
-      <Text style={colorText ? colorText : appStyles.textDark}>{label}</Text>
+      <Text
+        style={[styles.label, colorText]}
+        accessibilityRole="text">
+        {label}
+      </Text>
       <TextInput
         keyboardType={keyboardType ?? 'default'}
         style={[
           styles.input,
-          colorInput ? colorInput : appStyles.inputDark,
+          colorInput ? colorInput : styles.inputDefault,
           style,
         ]}
         placeholder={placeholder}
@@ -56,13 +71,21 @@ export const InputForm = ({
         secureTextEntry={secureTextEntry}
         onFocus={onFocus}
         multiline={multiline}
-        numberOfLines={8}
+        numberOfLines={multiline ? 4 : 1}
         textBreakStrategy="highQuality"
         readOnly={readonly}
+        accessibilityLabel={accessibilityLabel ?? label}
+        accessibilityHint={accessibilityHint ?? placeholder}
+        accessibilityState={{disabled: readonly}}
       />
-      <View>
-        <Text style={[appStyles.textDanger, styles.textCenter]}>{errors}</Text>
-      </View>
+      {!!errors && (
+        <Text
+          style={styles.errorText}
+          accessibilityLiveRegion="assertive"
+          accessibilityRole="alert">
+          {errors}
+        </Text>
+      )}
     </View>
   );
 };
@@ -71,12 +94,27 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     width: '100%',
-    marginVertical: 5,
+    marginVertical: 6,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   input: {
-    height: 50,
+    minHeight: 44,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    paddingHorizontal: 4,
+    fontSize: 16,
   },
-  textCenter: {
+  inputDefault: {
+    borderBottomWidth: 1,
+    borderColor: appColors.gray,
+  },
+  errorText: {
+    color: appColors.danger,
     textAlign: 'center',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
-import {appColors, appStyles} from '../../styles/globalStyles';
-import {StyleSheet, Text, View} from 'react-native';
+import { addHours, format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
-import {format, addHours} from 'date-fns';
-import {es} from 'date-fns/locale';
+import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
   date: Date;
@@ -13,36 +13,54 @@ interface Props {
 }
 
 export const InputDate = ({date, setDate, label, isFinal}: Props) => {
+  const {theme} = useTheme();
   const [open, setOpen] = useState(false);
+  const formattedDate = format(addHours(date, 6), 'dd MMMM yyyy : HH:mm', {
+    locale: es,
+  });
+
   return (
     <View>
-      <Text style={[appStyles.subTitle, appStyles.textDark, styles.labelDate]}>
+      <Text
+        style={[styles.labelDate, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize, fontWeight: '600'}]}
+        accessibilityRole="header">
         {label}
       </Text>
       <Text
         onPress={() => setOpen(true)}
-        style={[appStyles.title, appStyles.textDark, styles.date]}>
-        {format(addHours(date, 6), 'dd MMMM yyyy : HH:mm', {
-          locale: es,
-        })}
+        style={[
+          styles.date,
+          {
+            color: theme.colors.text,
+            backgroundColor: theme.colors.surface,
+            borderRadius: theme.borderRadius.md,
+          },
+          theme.elevation.low,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={`${label}: ${formattedDate}`}
+        accessibilityHint="Toca para seleccionar una fecha">
+        {formattedDate}
       </Text>
-      <DatePicker
-        modal
-        open={open}
-        date={new Date(addHours(date, 6))}
-        mode="date"
-        onConfirm={data => {
-          setOpen(false);
-          isFinal ? data.setHours(17, 59, 59, 59) : data.setHours(-6, 0, 0, 0);
-          setDate(data);
-        }}
-        onCancel={() => {
-          setOpen(false);
-        }}
-        title="Selecciona una fecha"
-        cancelText="Cancelar"
-        confirmText="Ok"
-      />
+      {open && (
+        <DatePicker
+          modal
+          open={open}
+          date={new Date(addHours(date, 6))}
+          mode="date"
+          onConfirm={data => {
+            setOpen(false);
+            isFinal ? data.setHours(17, 59, 59, 59) : data.setHours(-6, 0, 0, 0);
+            setDate(data);
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
+          title="Selecciona una fecha"
+          cancelText="Cancelar"
+          confirmText="Ok"
+        />
+      )}
     </View>
   );
 };
@@ -52,14 +70,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   date: {
-    height: 50,
-    backgroundColor: appColors.white,
-    borderRadius: 10,
-    elevation: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 44,
+    textAlignVertical: 'center',
     paddingHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 8,
     marginHorizontal: 20,
+    lineHeight: 44,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

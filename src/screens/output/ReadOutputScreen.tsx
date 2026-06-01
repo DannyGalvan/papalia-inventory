@@ -1,38 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
-import { LogForm } from '../../components/form/LogForm';
-import { appStyles } from '../../styles/globalStyles';
-import { getLogById } from '../../database/repository/LogHeaderRepository';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { LogDetailView } from '../../components/LogDetailView';
 import { LogHeader } from '../../database/models/LogHeader';
-import { OUPUT_DATA } from '../../config/constants';
+import { getLogById } from '../../database/repository/LogHeaderRepository';
+import { useTheme } from '../../hooks/useTheme';
 
-export const ReadOutputScreen = ({ route, navigation }) => {
-  const { id } = route.params;
-  const [logState, setLogState] = useState<LogHeader>(new LogHeader());
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+export const ReadOutputScreen = ({route}) => {
+  const {theme} = useTheme();
+  const {id} = route.params;
+  const [log, setLog] = useState<LogHeader | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const log = await getLogById(id);
-      setLogState(log);
-      setIsLoading(false);
-    })();
+    getLogById(id).then(setLog);
   }, [id]);
 
-  return (
-    <View style={appStyles.screen}>
-      <Text style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
-        Detalle de Operacion {id}
-      </Text>
-      {!isLoading && (
-        <LogForm
-          isReadonly
-          initialForm={logState}
-          onSubmit={null}
-          navigate={navigation}
-          selectData={OUPUT_DATA}
-        />
-      )}
-    </View>
-  );
+  if (!log) {
+    return (
+      <View style={[styles.centered, {backgroundColor: theme.colors.background}]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  return <LogDetailView log={log} />;
 };
+
+const styles = StyleSheet.create({
+  centered: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+});

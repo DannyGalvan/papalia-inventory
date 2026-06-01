@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
+    StyleProp,
+    StyleSheet,
+    Text,
+    TextStyle,
+    TouchableOpacity,
+    ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {appStyles} from '../../styles/globalStyles';
+import { appStyles } from '../../styles/globalStyles';
 
 interface Props {
   styles: StyleProp<ViewStyle>;
@@ -17,6 +18,8 @@ interface Props {
   iconColor?: string;
   icon?: string;
   iconSize?: number;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export const TouchableButton = ({
@@ -27,14 +30,25 @@ export const TouchableButton = ({
   title,
   iconColor,
   iconSize,
+  accessibilityLabel,
+  accessibilityHint,
 }: Props) => {
   return (
     <TouchableOpacity
-      style={[appStyles.button, styles]}
+      style={[appStyles.button, touchableStyles.touchTarget, styles]}
       onPress={onPress}
-      accessibilityLabel={title}>
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? title ?? 'Botón'}
+      accessibilityHint={accessibilityHint}>
       {title && <Text style={textStyle}>{title}</Text>}
       {icon && <Icon name={icon} size={iconSize ?? 30} color={iconColor} />}
     </TouchableOpacity>
   );
 };
+
+const touchableStyles = StyleSheet.create({
+  touchTarget: {
+    minHeight: 44,
+    minWidth: 44,
+  },
+});

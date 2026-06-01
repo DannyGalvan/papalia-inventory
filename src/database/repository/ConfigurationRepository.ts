@@ -41,6 +41,28 @@ export const createConfiguration = async (data: Configuration) => {
   }
 };
 
+export const upsertConfiguration = async (key: string, value: string) => {
+  const response = new Response<Configuration>();
+  try {
+    const existing = await ConfigurationRepository.findOne({where: {key}});
+    if (existing) {
+      existing.value = value;
+      response.data = await ConfigurationRepository.save(existing);
+    } else {
+      const entity = ConfigurationRepository.create({key, value});
+      response.data = await ConfigurationRepository.save(entity);
+    }
+    response.success = true;
+    response.message = 'Configuración guardada correctamente';
+    return response;
+  } catch (error) {
+    response.data = null;
+    response.success = false;
+    response.message = 'Error al guardar la configuración: ' + (error as Error).message;
+    return response;
+  }
+};
+
 export const updateConfiguration = async (data: Configuration) => {
   const response = new Response<Configuration>();
   try {

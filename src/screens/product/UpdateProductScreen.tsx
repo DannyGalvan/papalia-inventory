@@ -1,18 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {appStyles} from '../../styles/globalStyles';
-import {ProductForm} from '../../components/form/ProductForm';
-import {ProductEditScreenProps} from '../../interfaces/IProductNavigation';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { ProductForm } from '../../components/form/ProductForm';
+import { Product } from '../../database/models/Product';
 import {
-  getProductById,
-  updateProduct,
+    getProductById,
+    updateProduct,
 } from '../../database/repository/ProductRepository';
-import {Product} from '../../database/models/Product';
+import { useTheme } from '../../hooks/useTheme';
+import { ProductEditScreenProps } from '../../interfaces/IProductNavigation';
 
 export const UpdateProductScreen = ({
   navigation,
   route,
 }: ProductEditScreenProps) => {
+  const {theme} = useTheme();
   const {id} = route.params;
   const [productState, setProductState] = useState<Product>(new Product());
   const [isLoading, setIsLoading] = useState(true);
@@ -38,23 +39,28 @@ export const UpdateProductScreen = ({
   };
 
   return (
-    <View style={[styles.container, appStyles.screen]}>
-      <ScrollView>
-        <Text
-          style={[appStyles.title, appStyles.textDark, appStyles.textCenter]}>
-          Actualizar Producto
-        </Text>
-        {!isLoading && (
-          <ProductForm initialForm={productState} onSubmit={onSubmit} update />
-        )}
-      </ScrollView>
+    <View style={[styles.screen, {backgroundColor: theme.colors.background}]}>
+      <Text
+        style={[styles.title, {color: theme.colors.text}]}
+        accessibilityRole="header">
+        Actualizar Producto
+      </Text>
+      {!isLoading && (
+        <ProductForm initialForm={productState} onSubmit={onSubmit} update />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+  screen: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 10,
   },
 });
