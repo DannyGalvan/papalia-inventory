@@ -1,97 +1,196 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Inventory Management
 
-# Getting Started
+Aplicación móvil de gestión de inventario para pequeñas y medianas empresas. Desarrollada con React Native 0.82.1 para Android e iOS. Funciona completamente **offline** con base de datos local SQLite.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## Características principales
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Productos
+- CRUD completo (código, nombre, descripción, precio, stock inicial, imagen)
+- Asignación de **categoría** (con color visual), **proveedor** y **unidad de medida**
+- Búsqueda por código o nombre
+- Paginación incremental para inventarios grandes
+- Importación masiva desde Excel (.xlsx)
+- Exportación de catálogo a Excel
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Entradas y Salidas de inventario
+- Registro de movimientos con tipo, comentarios y múltiples productos por movimiento
+- Validación de stock en tiempo real antes de confirmar una salida
+- Advertencia inline de stock insuficiente al agregar productos en el formulario
+- Vista de detalle completa de cada movimiento (badge Entrada/Salida, tipo, fecha, comentarios, lista de productos con subtotales y total)
+- Filtro por rango de fechas en listas y dashboards
+- Exportación de movimientos a Excel
 
-```sh
-# Using npm
-npm start
+### Dashboards
+- Resumen por tipo de movimiento: cantidad de unidades y valor total
+- Filtro de fecha inicial y final con selector visual
+- Compatible con tipos de movimiento del catálogo de BD (incluye tipos personalizados)
 
-# OR using Yarn
-yarn start
+### Reportes
+- **Reporte Crítico**: productos con stock bajo (umbral configurable) y productos sin stock, top productos más movidos
+- **Resumen General**: valor total del inventario, total de productos, unidades en stock, distribución por rangos
+- **Reporte de Movimientos**: entradas vs salidas, movimientos por tipo, top 5 categorías
+
+### Catálogos configurables
+- **Tipos de movimiento**: CRUD con activar/desactivar, separados por Entradas y Salidas
+- **Categorías de producto**: CRUD con selector de color visual (10 colores predefinidos)
+- **Proveedores**: CRUD con teléfono, email, dirección y notas; vista expandible por proveedor
+- **Unidades de medida**: CRUD con nombre y abreviación (badge visual); seeds: uds, kg, g, L, ml, caj, par, m, cm
+
+### Configuración
+- Carpeta de imágenes de productos
+- Símbolo de moneda (visible en precios, dashboards y detalle de movimientos)
+- Umbral de stock bajo (usado en reportes críticos)
+- Nombre de empresa
+- Descarga de copia de seguridad de la base de datos
+
+### Temas
+- Modo claro y oscuro (detección automática del sistema + preferencia guardada en BD)
+- Todos los componentes usan el sistema de tokens de diseño (`theme.colors`, `theme.typography`, `theme.borderRadius`, `theme.elevation`)
+
+### Otras funcionalidades
+- Pantalla de permisos al inicio (Android): solicita acceso a imágenes según API level
+- Splash screen con logo transparente adaptable a tema claro/oscuro
+- Soporte para importación de archivos Excel multiplataforma (Android content:// e iOS file://)
+
+---
+
+## Stack técnico
+
+| Tecnología | Versión | Uso |
+|---|---|---|
+| React Native | 0.82.1 | Framework principal |
+| TypeScript | ^5.8.3 | Tipado estático |
+| TypeORM | ^0.3.27 | ORM para SQLite |
+| react-native-nitro-sqlite | ^9.1.11 | Driver SQLite nativo de alta performance |
+| @react-navigation/native-stack | ^7.6.2 | Navegación entre pantallas |
+| @react-navigation/material-top-tabs | ^7.4.2 | Pestañas principales (Productos / Entradas / Salidas) |
+| react-native-date-picker | ^4.3.5 | Selector de fechas nativo |
+| react-native-select-dropdown | ^3.4.0 | Dropdowns temados con búsqueda |
+| exceljs | ^4.4.0 | Importación y exportación de archivos Excel |
+| @dr.pogodin/react-native-fs | ^2.22.0 | Acceso al sistema de archivos (cross-platform) |
+| @react-native-documents/picker | ^11.0.0 | Selector de archivos e imágenes |
+| react-native-vector-icons | ^10.0.3 | Iconografía (Ionicons) |
+| fast-check | ^4.8.0 | Tests de propiedades |
+
+---
+
+## Esquema de base de datos
+
+```
+product          — Productos del inventario
+product_category — Catálogo de categorías (con color)
+supplier         — Catálogo de proveedores
+unit_of_measure  — Catálogo de unidades de medida
+log_header       — Cabecera de cada movimiento (entrada/salida)
+log_detail       — Líneas de productos por movimiento
+movement_type    — Catálogo de tipos de movimiento
+configuration    — Configuración clave-valor de la app
 ```
 
-## Step 2: Build and run your app
+Las migraciones se ejecutan automáticamente al iniciar la app (`migrationsRun: true`).
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+---
 
-### Android
+## Requisitos previos
 
-```sh
-# Using npm
-npm run android
+- Node.js >= 20
+- React Native CLI configurado ([guía oficial](https://reactnative.dev/docs/set-up-your-environment))
+- Android: SDK con API 29 o superior
+- iOS: Xcode 15+, CocoaPods
 
-# OR using Yarn
-yarn android
-```
+---
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Instalación
 
 ```sh
+# Instalar dependencias JS
+npm install
+
+# iOS — instalar dependencias nativas (solo primera vez o al actualizar)
 bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
 bundle exec pod install
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
+
+## Ejecución en desarrollo
 
 ```sh
-# Using npm
-npm run ios
+# Iniciar Metro bundler
+npm start
 
-# OR using Yarn
-yarn ios
+# Android
+npm run android
+
+# iOS
+npm run ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Tests
 
-## Step 3: Modify your app
+```sh
+npm test
+```
 
-Now that you have successfully run the app, let's make changes!
+Incluye tests unitarios y tests de propiedades (property-based testing con `fast-check`) para:
+- Validación de stock
+- Cálculo de reportes (distribución, valor de inventario, productos críticos)
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+---
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Estructura del proyecto
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+```
+src/
+├── assets/                  # Imágenes y recursos estáticos
+├── components/
+│   ├── button/              # Fab, TouchableButton
+│   ├── feedback/            # EmptyState, Toast, SkeletonLoader, ErrorBoundary
+│   ├── form/                # LogForm, ProductForm
+│   ├── input/               # InputDate, InputForm, InputSearch
+│   ├── navigation/          # HeaderLeft, HeaderRight
+│   └── product/             # ProductItem
+├── config/                  # Constantes y claves de configuración
+├── context/                 # ThemeContext, ProductContext
+├── database/
+│   ├── connection/          # DataSource (TypeORM)
+│   ├── migrations/          # Migraciones SQL numeradas
+│   ├── models/              # Entidades TypeORM
+│   └── repository/          # Funciones de acceso a datos
+├── design-system/
+│   ├── themes/              # light.ts, dark.ts
+│   └── tokens/              # colors, typography, spacing, elevation, borders
+├── hooks/                   # useTheme, useProducts, useInputs, useOutputs, etc.
+├── interfaces/              # Tipos de navegación por stack
+├── screens/
+│   ├── catalog/             # CategoryCatalog, SupplierCatalog, UnitOfMeasureCatalog, MovementTypeCatalog
+│   ├── configuration/       # ConfigurationScreen
+│   ├── input/               # InputList, CreateInput, ReadInput, DashboardInput
+│   ├── output/              # OutputList, CreateOutput, ReadOutput, DashboardOutput
+│   ├── permissions/         # PermissionsScreen (Android)
+│   ├── product/             # ProductList, CreateProduct, UpdateProduct
+│   └── reports/             # CriticalReport, SummaryReport, MovementReport
+├── services/                # ExcelService, ReportService
+├── stacks/                  # AppStartStack, PrincipalStack, ProductStack, InputStack, OutputStack
+├── styles/                  # Estilos globales
+└── utils/                   # dateTime, formatCurrency, stockValidator, validateLogForm
+```
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
+## Plataformas
 
-### Now what?
+| Plataforma | Estado |
+|---|---|
+| Android (API 29+) | Soportado |
+| iOS | Soportado |
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+---
 
-# Troubleshooting
+## Licencia
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Uso privado. Todos los derechos reservados.
