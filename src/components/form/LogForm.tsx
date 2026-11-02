@@ -32,6 +32,7 @@ import { resolveImageUri } from '../../utils/filePaths';
 import { DetailsItem } from '../DetailsItem';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
+import { KeyboardAwareScrollView } from '../layout/KeyboardAwareScrollView';
 
 interface Props {
   initialForm: LogHeader;
@@ -163,9 +164,8 @@ export const LogForm = ({
   };
 
   return (
-    <ScrollView
+    <KeyboardAwareScrollView
       style={[styles.container, styles.mButton]}
-      keyboardShouldPersistTaps="handled"
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.selectContainer}>
@@ -476,7 +476,7 @@ export const LogForm = ({
           </Text>
         </View>
       )}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

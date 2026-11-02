@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -20,6 +19,7 @@ import {
   updateUnit,
 } from '../../database/repository/UnitOfMeasureRepository';
 import { useTheme } from '../../hooks/useTheme';
+import { KeyboardAwareScrollView } from '../../components/layout/KeyboardAwareScrollView';
 
 type EditingState = { id: number; name: string; abbreviation: string } | null;
 type ToastState = {
@@ -150,10 +150,7 @@ export const UnitOfMeasureCatalogScreen = () => {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+      <KeyboardAwareScrollView contentContainerStyle={styles.content}>
         <Text
           style={[
             styles.title,
@@ -429,7 +426,7 @@ export const UnitOfMeasureCatalogScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <Toast
         message={toast.message}

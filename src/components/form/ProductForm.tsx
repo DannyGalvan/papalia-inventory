@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Image,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -30,6 +28,7 @@ import {
   formatPct,
   LOW_MARGIN_THRESHOLD_PCT,
 } from '../../utils/profit';
+import { KeyboardAwareScrollView } from '../layout/KeyboardAwareScrollView';
 
 interface Props {
   initialForm: Product;
@@ -139,337 +138,327 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
   ];
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+    <KeyboardAwareScrollView
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.container}>
-          <InputForm
-            label="Codigo"
-            placeholder="Ingresa un codigo"
-            placeholderTextColor={theme.colors.disabled}
-            value={form.code}
-            errors={errors.code}
-            onChangeText={text => handleChange(text, 'code')}
-            secureTextEntry={false}
-            style={inputStyle}
-            colorText={{ color: theme.colors.text }}
-            readonly={update}
-          />
-          <InputForm
-            label="Nombre"
-            placeholder="Ingresa un nombre"
-            placeholderTextColor={theme.colors.disabled}
-            value={form.name}
-            errors={errors.name}
-            onChangeText={text => handleChange(text, 'name')}
-            secureTextEntry={false}
-            style={inputStyle}
-            colorText={{ color: theme.colors.text }}
-            multiline={true}
-          />
-          <InputForm
-            label="Descripción"
-            placeholder="Ingresa una descripcion"
-            placeholderTextColor={theme.colors.disabled}
-            value={form.description}
-            errors={errors.description}
-            onChangeText={text => handleChange(text, 'description')}
-            secureTextEntry={false}
-            style={textAreaStyle}
-            colorText={{ color: theme.colors.text }}
-            multiline={true}
-          />
-          <InputForm
-            label="Precio"
-            placeholder="Ingresa un precio"
-            placeholderTextColor={theme.colors.disabled}
-            value={form.price.toString()}
-            errors={errors.price}
-            onChangeText={text => handleChange(text, 'price')}
-            secureTextEntry={false}
-            style={inputStyle}
-            colorText={{ color: theme.colors.text }}
-            keyboardType="decimal-pad"
-          />
-          <InputForm
-            label="Costo"
-            placeholder="Ingresa el costo unitario"
-            placeholderTextColor={theme.colors.disabled}
-            value={String(form.cost ?? '')}
-            errors={errors.cost}
-            onChangeText={text => handleChange(text, 'cost')}
-            secureTextEntry={false}
-            style={inputStyle}
-            colorText={{ color: theme.colors.text }}
-            keyboardType="decimal-pad"
-            accessibilityHint="Costo de adquisición de una unidad del producto"
-          />
-          {marginPct !== null && (
-            <Text
-              style={[
-                styles.marginHint,
-                {
-                  color:
-                    marginPct < 0
-                      ? theme.colors.error
-                      : marginPct < LOW_MARGIN_THRESHOLD_PCT
-                      ? theme.colors.warning
-                      : theme.colors.textSecondary,
-                },
-              ]}
-              accessibilityLiveRegion="polite"
-            >
-              {marginPct < 0
-                ? `El costo es mayor que el precio (margen ${formatPct(
-                    marginPct,
-                  )})`
-                : `Margen estimado: ${formatPct(marginPct)}`}
-            </Text>
-          )}
-
-          {!update ? (
-            <InputForm
-              label="Stock inicial"
-              placeholder="Ingresa un stock inicial"
-              placeholderTextColor={theme.colors.disabled}
-              value={form.stock.toString()}
-              errors={errors.stock}
-              onChangeText={text => handleChange(text, 'stock')}
-              secureTextEntry={false}
-              style={inputStyle}
-              colorText={{ color: theme.colors.text }}
-              keyboardType="numeric"
-            />
-          ) : (
-            <View style={styles.stock}>
-              <Text style={[styles.stockText, { color: theme.colors.text }]}>
-                Inventario en existencia actual: {form.stock}
-              </Text>
-            </View>
-          )}
-
-          {/* ── Categoría ── */}
-          <View style={styles.selectorBlock}>
-            <Text
-              style={[
-                styles.selectorLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontSize: theme.typography.caption.fontSize,
-                },
-              ]}
-            >
-              CATEGORÍA
-            </Text>
-            <SelectDropdown
-              data={categories}
-              defaultValue={
-                categories.find(c => c.id === form.categoryId) ?? NO_CATEGORY
-              }
-              onSelect={item => handleChange(item.id, 'categoryId')}
-              rowTextForSelection={item => item.label}
-              buttonTextAfterSelection={item => item.label}
-              buttonStyle={dropdownBtnStyle}
-              buttonTextStyle={{
-                ...styles.dropdownButtonText,
-                color: theme.colors.text,
-              }}
-              dropdownStyle={{ backgroundColor: theme.colors.surface }}
-              rowStyle={{
-                backgroundColor: theme.colors.surface,
-                borderBottomColor: theme.colors.border,
-              }}
-              rowTextStyle={{ color: theme.colors.text }}
-              selectedRowStyle={{
-                backgroundColor: theme.colors.primary + '22',
-              }}
-              selectedRowTextStyle={{
-                ...styles.selectedRowText,
-                color: theme.colors.primary,
-              }}
-              dropdownOverlayColor="transparent"
-              renderDropdownIcon={() => (
-                <Icon
-                  name="chevron-down"
-                  size={16}
-                  color={theme.colors.textSecondary}
-                />
-              )}
-            />
-          </View>
-
-          {/* ── Proveedor ── */}
-          <View style={styles.selectorBlock}>
-            <Text
-              style={[
-                styles.selectorLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontSize: theme.typography.caption.fontSize,
-                },
-              ]}
-            >
-              PROVEEDOR
-            </Text>
-            <SelectDropdown
-              data={suppliers}
-              defaultValue={
-                suppliers.find(s => s.id === form.supplierId) ?? NO_SUPPLIER
-              }
-              onSelect={item => handleChange(item.id, 'supplierId')}
-              rowTextForSelection={item => item.label}
-              buttonTextAfterSelection={item => item.label}
-              buttonStyle={dropdownBtnStyle}
-              buttonTextStyle={{
-                ...styles.dropdownButtonText,
-                color: theme.colors.text,
-              }}
-              dropdownStyle={{ backgroundColor: theme.colors.surface }}
-              rowStyle={{
-                backgroundColor: theme.colors.surface,
-                borderBottomColor: theme.colors.border,
-              }}
-              rowTextStyle={{ color: theme.colors.text }}
-              selectedRowStyle={{
-                backgroundColor: theme.colors.primary + '22',
-              }}
-              selectedRowTextStyle={{
-                ...styles.selectedRowText,
-                color: theme.colors.primary,
-              }}
-              dropdownOverlayColor="transparent"
-              renderDropdownIcon={() => (
-                <Icon
-                  name="chevron-down"
-                  size={16}
-                  color={theme.colors.textSecondary}
-                />
-              )}
-              search
-              searchPlaceHolder="Buscar proveedor..."
-              searchPlaceHolderColor={theme.colors.textSecondary}
-              searchInputStyle={{
-                ...styles.searchInput,
-                backgroundColor: theme.colors.background,
-                borderColor: theme.colors.border,
-              }}
-              searchInputTxtStyle={{ color: theme.colors.text }}
-            />
-          </View>
-
-          {/* ── Unidad de medida ── */}
-          <View style={styles.selectorBlock}>
-            <Text
-              style={[
-                styles.selectorLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontSize: theme.typography.caption.fontSize,
-                },
-              ]}
-            >
-              UNIDAD DE MEDIDA
-            </Text>
-            <SelectDropdown
-              data={units}
-              defaultValue={units.find(u => u.id === form.unitId) ?? NO_UNIT}
-              onSelect={item => handleChange(item.id, 'unitId')}
-              rowTextForSelection={item => item.label}
-              buttonTextAfterSelection={item => item.label}
-              buttonStyle={dropdownBtnStyle}
-              buttonTextStyle={{
-                ...styles.dropdownButtonText,
-                color: theme.colors.text,
-              }}
-              dropdownStyle={{ backgroundColor: theme.colors.surface }}
-              rowStyle={{
-                backgroundColor: theme.colors.surface,
-                borderBottomColor: theme.colors.border,
-              }}
-              rowTextStyle={{ color: theme.colors.text }}
-              selectedRowStyle={{
-                backgroundColor: theme.colors.primary + '22',
-              }}
-              selectedRowTextStyle={{
-                ...styles.selectedRowText,
-                color: theme.colors.primary,
-              }}
-              dropdownOverlayColor="transparent"
-              renderDropdownIcon={() => (
-                <Icon
-                  name="chevron-down"
-                  size={16}
-                  color={theme.colors.textSecondary}
-                />
-              )}
-            />
-          </View>
-
-          {/* ── Imagen ── */}
-          <TouchableOpacity
-            style={styles.imageContainer}
-            onPress={handleSelectImage}
-            accessibilityRole="button"
-            accessibilityLabel="Seleccionar imagen del producto"
-            accessibilityHint="Abre la galería para elegir una imagen del producto"
-          >
-            <Image
-              style={[styles.image, { backgroundColor: theme.colors.border }]}
-              source={
-                form.image ? { uri: resolveImageUri(form.image) } : noImage
-              }
-              accessibilityRole="image"
-              accessibilityLabel={
-                form.name
-                  ? `Imagen del producto ${form.name}`
-                  : 'Sin imagen seleccionada'
-              }
-            />
-          </TouchableOpacity>
-
-          <TouchableButton
-            onPress={handleSubmit}
-            title="Guardar Datos"
-            icon="send"
-            iconColor="#FFFFFF"
-            textStyle={[styles.buttonText]}
-            styles={[
-              styles.button,
+      <View style={styles.container}>
+        <InputForm
+          label="Codigo"
+          placeholder="Ingresa un codigo"
+          placeholderTextColor={theme.colors.disabled}
+          value={form.code}
+          errors={errors.code}
+          onChangeText={text => handleChange(text, 'code')}
+          secureTextEntry={false}
+          style={inputStyle}
+          colorText={{ color: theme.colors.text }}
+          readonly={update}
+        />
+        <InputForm
+          label="Nombre"
+          placeholder="Ingresa un nombre"
+          placeholderTextColor={theme.colors.disabled}
+          value={form.name}
+          errors={errors.name}
+          onChangeText={text => handleChange(text, 'name')}
+          secureTextEntry={false}
+          style={inputStyle}
+          colorText={{ color: theme.colors.text }}
+          multiline={true}
+        />
+        <InputForm
+          label="Descripción"
+          placeholder="Ingresa una descripcion"
+          placeholderTextColor={theme.colors.disabled}
+          value={form.description}
+          errors={errors.description}
+          onChangeText={text => handleChange(text, 'description')}
+          secureTextEntry={false}
+          style={textAreaStyle}
+          colorText={{ color: theme.colors.text }}
+          multiline={true}
+        />
+        <InputForm
+          label="Precio"
+          placeholder="Ingresa un precio"
+          placeholderTextColor={theme.colors.disabled}
+          value={form.price.toString()}
+          errors={errors.price}
+          onChangeText={text => handleChange(text, 'price')}
+          secureTextEntry={false}
+          style={inputStyle}
+          colorText={{ color: theme.colors.text }}
+          keyboardType="decimal-pad"
+        />
+        <InputForm
+          label="Costo"
+          placeholder="Ingresa el costo unitario"
+          placeholderTextColor={theme.colors.disabled}
+          value={String(form.cost ?? '')}
+          errors={errors.cost}
+          onChangeText={text => handleChange(text, 'cost')}
+          secureTextEntry={false}
+          style={inputStyle}
+          colorText={{ color: theme.colors.text }}
+          keyboardType="decimal-pad"
+          accessibilityHint="Costo de adquisición de una unidad del producto"
+        />
+        {marginPct !== null && (
+          <Text
+            style={[
+              styles.marginHint,
               {
-                backgroundColor: theme.colors.primary,
-                borderRadius: theme.borderRadius.lg,
+                color:
+                  marginPct < 0
+                    ? theme.colors.error
+                    : marginPct < LOW_MARGIN_THRESHOLD_PCT
+                    ? theme.colors.warning
+                    : theme.colors.textSecondary,
               },
             ]}
-            accessibilityLabel="Guardar datos del producto"
-            accessibilityHint="Guarda la información del producto"
+            accessibilityLiveRegion="polite"
+          >
+            {marginPct < 0
+              ? `El costo es mayor que el precio (margen ${formatPct(
+                  marginPct,
+                )})`
+              : `Margen estimado: ${formatPct(marginPct)}`}
+          </Text>
+        )}
+
+        {!update ? (
+          <InputForm
+            label="Stock inicial"
+            placeholder="Ingresa un stock inicial"
+            placeholderTextColor={theme.colors.disabled}
+            value={form.stock.toString()}
+            errors={errors.stock}
+            onChangeText={text => handleChange(text, 'stock')}
+            secureTextEntry={false}
+            style={inputStyle}
+            colorText={{ color: theme.colors.text }}
+            keyboardType="numeric"
           />
-          {response && (
-            <View style={styles.responseContainer}>
-              <Text
-                style={[
-                  styles.responseText,
-                  {
-                    color: response.success
-                      ? theme.colors.success
-                      : theme.colors.error,
-                  },
-                ]}
-              >
-                {response.message}
-              </Text>
-            </View>
-          )}
+        ) : (
+          <View style={styles.stock}>
+            <Text style={[styles.stockText, { color: theme.colors.text }]}>
+              Inventario en existencia actual: {form.stock}
+            </Text>
+          </View>
+        )}
+
+        {/* ── Categoría ── */}
+        <View style={styles.selectorBlock}>
+          <Text
+            style={[
+              styles.selectorLabel,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
+            CATEGORÍA
+          </Text>
+          <SelectDropdown
+            data={categories}
+            defaultValue={
+              categories.find(c => c.id === form.categoryId) ?? NO_CATEGORY
+            }
+            onSelect={item => handleChange(item.id, 'categoryId')}
+            rowTextForSelection={item => item.label}
+            buttonTextAfterSelection={item => item.label}
+            buttonStyle={dropdownBtnStyle}
+            buttonTextStyle={{
+              ...styles.dropdownButtonText,
+              color: theme.colors.text,
+            }}
+            dropdownStyle={{ backgroundColor: theme.colors.surface }}
+            rowStyle={{
+              backgroundColor: theme.colors.surface,
+              borderBottomColor: theme.colors.border,
+            }}
+            rowTextStyle={{ color: theme.colors.text }}
+            selectedRowStyle={{
+              backgroundColor: theme.colors.primary + '22',
+            }}
+            selectedRowTextStyle={{
+              ...styles.selectedRowText,
+              color: theme.colors.primary,
+            }}
+            dropdownOverlayColor="transparent"
+            renderDropdownIcon={() => (
+              <Icon
+                name="chevron-down"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
+            )}
+          />
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        {/* ── Proveedor ── */}
+        <View style={styles.selectorBlock}>
+          <Text
+            style={[
+              styles.selectorLabel,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
+            PROVEEDOR
+          </Text>
+          <SelectDropdown
+            data={suppliers}
+            defaultValue={
+              suppliers.find(s => s.id === form.supplierId) ?? NO_SUPPLIER
+            }
+            onSelect={item => handleChange(item.id, 'supplierId')}
+            rowTextForSelection={item => item.label}
+            buttonTextAfterSelection={item => item.label}
+            buttonStyle={dropdownBtnStyle}
+            buttonTextStyle={{
+              ...styles.dropdownButtonText,
+              color: theme.colors.text,
+            }}
+            dropdownStyle={{ backgroundColor: theme.colors.surface }}
+            rowStyle={{
+              backgroundColor: theme.colors.surface,
+              borderBottomColor: theme.colors.border,
+            }}
+            rowTextStyle={{ color: theme.colors.text }}
+            selectedRowStyle={{
+              backgroundColor: theme.colors.primary + '22',
+            }}
+            selectedRowTextStyle={{
+              ...styles.selectedRowText,
+              color: theme.colors.primary,
+            }}
+            dropdownOverlayColor="transparent"
+            renderDropdownIcon={() => (
+              <Icon
+                name="chevron-down"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
+            )}
+            search
+            searchPlaceHolder="Buscar proveedor..."
+            searchPlaceHolderColor={theme.colors.textSecondary}
+            searchInputStyle={{
+              ...styles.searchInput,
+              backgroundColor: theme.colors.background,
+              borderColor: theme.colors.border,
+            }}
+            searchInputTxtStyle={{ color: theme.colors.text }}
+          />
+        </View>
+
+        {/* ── Unidad de medida ── */}
+        <View style={styles.selectorBlock}>
+          <Text
+            style={[
+              styles.selectorLabel,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
+            UNIDAD DE MEDIDA
+          </Text>
+          <SelectDropdown
+            data={units}
+            defaultValue={units.find(u => u.id === form.unitId) ?? NO_UNIT}
+            onSelect={item => handleChange(item.id, 'unitId')}
+            rowTextForSelection={item => item.label}
+            buttonTextAfterSelection={item => item.label}
+            buttonStyle={dropdownBtnStyle}
+            buttonTextStyle={{
+              ...styles.dropdownButtonText,
+              color: theme.colors.text,
+            }}
+            dropdownStyle={{ backgroundColor: theme.colors.surface }}
+            rowStyle={{
+              backgroundColor: theme.colors.surface,
+              borderBottomColor: theme.colors.border,
+            }}
+            rowTextStyle={{ color: theme.colors.text }}
+            selectedRowStyle={{
+              backgroundColor: theme.colors.primary + '22',
+            }}
+            selectedRowTextStyle={{
+              ...styles.selectedRowText,
+              color: theme.colors.primary,
+            }}
+            dropdownOverlayColor="transparent"
+            renderDropdownIcon={() => (
+              <Icon
+                name="chevron-down"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
+            )}
+          />
+        </View>
+
+        {/* ── Imagen ── */}
+        <TouchableOpacity
+          style={styles.imageContainer}
+          onPress={handleSelectImage}
+          accessibilityRole="button"
+          accessibilityLabel="Seleccionar imagen del producto"
+          accessibilityHint="Abre la galería para elegir una imagen del producto"
+        >
+          <Image
+            style={[styles.image, { backgroundColor: theme.colors.border }]}
+            source={form.image ? { uri: resolveImageUri(form.image) } : noImage}
+            accessibilityRole="image"
+            accessibilityLabel={
+              form.name
+                ? `Imagen del producto ${form.name}`
+                : 'Sin imagen seleccionada'
+            }
+          />
+        </TouchableOpacity>
+
+        <TouchableButton
+          onPress={handleSubmit}
+          title="Guardar Datos"
+          icon="send"
+          iconColor="#FFFFFF"
+          textStyle={[styles.buttonText]}
+          styles={[
+            styles.button,
+            {
+              backgroundColor: theme.colors.primary,
+              borderRadius: theme.borderRadius.lg,
+            },
+          ]}
+          accessibilityLabel="Guardar datos del producto"
+          accessibilityHint="Guarda la información del producto"
+        />
+        {response && (
+          <View style={styles.responseContainer}>
+            <Text
+              style={[
+                styles.responseText,
+                {
+                  color: response.success
+                    ? theme.colors.success
+                    : theme.colors.error,
+                },
+              ]}
+            >
+              {response.message}
+            </Text>
+          </View>
+        )}
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 

@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -23,6 +20,7 @@ import {
   updateSupplier,
 } from '../../database/repository/SupplierRepository';
 import { useTheme } from '../../hooks/useTheme';
+import { KeyboardAwareScrollView } from '../../components/layout/KeyboardAwareScrollView';
 
 type FormState = {
   name: string;
@@ -217,14 +215,8 @@ export const SupplierCatalogScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.content}>
         <Text
           style={[
             styles.title,
@@ -552,7 +544,7 @@ export const SupplierCatalogScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <Toast
         message={toast.message}
@@ -560,7 +552,7 @@ export const SupplierCatalogScreen = () => {
         visible={toast.visible}
         onDismiss={() => setToast(EMPTY_TOAST)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

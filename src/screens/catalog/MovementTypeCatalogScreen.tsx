@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -22,6 +21,7 @@ import {
   updateMovementType,
 } from '../../database/repository/MovementTypeRepository';
 import { useTheme } from '../../hooks/useTheme';
+import { KeyboardAwareScrollView } from '../../components/layout/KeyboardAwareScrollView';
 
 /** Text color drawn on top of the selected (accent) type button. */
 const ON_ACCENT_TEXT = '#fff';
@@ -326,10 +326,7 @@ export const MovementTypeCatalogScreen = () => {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+      <KeyboardAwareScrollView contentContainerStyle={styles.content}>
         <Text
           style={[
             styles.title,
@@ -541,7 +538,7 @@ export const MovementTypeCatalogScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <Toast
         message={toast.message}

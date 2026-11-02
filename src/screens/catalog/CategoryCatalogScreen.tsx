@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -20,6 +19,7 @@ import {
   updateCategory,
 } from '../../database/repository/CategoryRepository';
 import { useTheme } from '../../hooks/useTheme';
+import { KeyboardAwareScrollView } from '../../components/layout/KeyboardAwareScrollView';
 
 const PALETTE = [
   '#6B7280',
@@ -190,10 +190,7 @@ export const CategoryCatalogScreen = () => {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
+      <KeyboardAwareScrollView contentContainerStyle={styles.content}>
         <Text
           style={[
             styles.title,
@@ -486,7 +483,7 @@ export const CategoryCatalogScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <Toast
         message={toast.message}

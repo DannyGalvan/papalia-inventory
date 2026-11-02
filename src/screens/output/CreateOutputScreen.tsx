@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Toast } from '../../components/feedback/Toast';
 import { LogForm } from '../../components/form/LogForm';
 import { OUTPUT_TYPES } from '../../config/constants';
@@ -77,11 +77,7 @@ export const CreateOutputScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Toast
         message={toastMessage}
         type={toastType}
@@ -106,7 +102,7 @@ export const CreateOutputScreen = () => {
         isReadonly={false}
         onSubmit={sendForm}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

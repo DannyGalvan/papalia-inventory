@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -34,6 +32,7 @@ import { useDownloadBd } from '../../hooks/useDownloadBd';
 import { useImages } from '../../hooks/useImages';
 import { useTheme } from '../../hooks/useTheme';
 import { ConfigurationScreenProps } from '../../interfaces/IAppStartNavigation';
+import { KeyboardAwareScrollView } from '../../components/layout/KeyboardAwareScrollView';
 
 type ToastState = {
   visible: boolean;
@@ -209,14 +208,8 @@ export const ConfigurationScreen = ({
   ];
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent}>
         <Text
           style={[
             styles.title,
@@ -803,7 +796,7 @@ export const ConfigurationScreen = ({
         >
           Versión: {appVersion}
         </Text>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <Toast
         message={downloadResult?.message || ''}
@@ -841,7 +834,7 @@ export const ConfigurationScreen = ({
         visible={timezoneToast.visible}
         onDismiss={() => setTimezoneToast(EMPTY_TOAST)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
