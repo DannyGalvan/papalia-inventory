@@ -3,6 +3,7 @@ import { DimensionValue, Image, StyleSheet, Text, View } from 'react-native';
 import { LogDetail } from '../database/models/LogDetail';
 import { appColors, appStyles } from '../styles/globalStyles';
 import { TouchableButton } from './button/TouchableButton';
+import { resolveImageUri } from '../utils/filePaths';
 
 interface Props {
   detail: LogDetail;
@@ -85,7 +86,7 @@ export const DetailsItem = ({
         source={
           detail.product.image
             ? {
-                uri: detail.product.image,
+                uri: resolveImageUri(detail.product.image),
               }
             : noImage
         }

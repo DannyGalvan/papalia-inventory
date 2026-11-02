@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "typeorm": "typeorm-ts-node-commonjs -d ./typeorm.migrations.ts"
+    "typeorm": "typeorm-ts-node-commonjs -d ./typeorm.migrations.ts",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@dr.pogodin/react-native-fs": "^2.22.0-alpha.1",

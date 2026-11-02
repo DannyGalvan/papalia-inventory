@@ -24,6 +24,7 @@ import { useImages } from '../../hooks/useImages';
 import { useTheme } from '../../hooks/useTheme';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
+import { resolveImageUri } from '../../utils/filePaths';
 
 interface Props {
   initialForm: Product;
@@ -263,7 +264,7 @@ export const ProductForm = ({initialForm, onSubmit, update}: Props) => {
             accessibilityHint="Abre la galería para elegir una imagen del producto">
             <Image
               style={[styles.image, {backgroundColor: theme.colors.border}]}
-              source={form.image ? {uri: form.image} : noImage}
+              source={form.image ? {uri: resolveImageUri(form.image)} : noImage}
               accessibilityRole="image"
               accessibilityLabel={form.name ? `Imagen del producto ${form.name}` : 'Sin imagen seleccionada'}
             />

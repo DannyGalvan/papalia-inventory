@@ -19,6 +19,7 @@ import { getConfigurationByKey } from '../database/repository/ConfigurationRepos
 import { getAllMovementTypes } from '../database/repository/MovementTypeRepository';
 import { useTheme } from '../hooks/useTheme';
 import { formatCurrency } from '../utils/formatCurrency';
+import { resolveImageUri } from '../utils/filePaths';
 
 interface Props {
   log: LogHeader;
@@ -113,7 +114,7 @@ export const LogDetailView = ({log}: Props) => {
               theme.elevation.low,
             ]}>
             <Image
-              source={detail.product?.image ? {uri: detail.product.image} : noImage}
+              source={detail.product?.image ? {uri: resolveImageUri(detail.product.image)} : noImage}
               style={styles.productImage}
               resizeMode="contain"
               accessibilityRole="image"

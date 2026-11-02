@@ -12,6 +12,7 @@ import {
 import { Product } from '../../database/models/Product';
 import { useTheme } from '../../hooks/useTheme';
 import { ProductStackParamList } from '../../interfaces/IProductNavigation';
+import { resolveImageUri } from '../../utils/filePaths';
 
 interface Props {
   product: Product;
@@ -109,7 +110,7 @@ const ProductItemInner = ({product, isVisible = true, currencySymbol = 'Q'}: Pro
             accessible
             accessibilityRole="image"
             accessibilityLabel={`Imagen de ${product.name}`}
-            source={product.image ? {uri: product.image} : noImage}
+            source={product.image ? {uri: resolveImageUri(product.image)} : noImage}
           />
         ) : (
           <View style={[styles.image, styles.imagePlaceholder, {backgroundColor: theme.colors.background, borderRadius: theme.borderRadius.sm}]}

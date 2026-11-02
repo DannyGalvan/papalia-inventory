@@ -12,6 +12,7 @@ import { Alert, Platform } from 'react-native';
 import uuid from 'react-native-uuid';
 import { ProductContext } from '../context/ProductContext';
 import { logService } from '../services/LogService';
+import { resolveImageUri, toFsPath } from '../utils/filePaths';
 import { useStoragePermissions } from './useStoragePermissions';
 
 /**
@@ -22,15 +23,6 @@ import { useStoragePermissions } from './useStoragePermissions';
 const getImageBaseDir = (): string =>
   Platform.OS === 'android' ? PicturesDirectoryPath : DocumentDirectoryPath;
 
-/**
- * Normalise a URI returned by the document picker so RNFS file operations
- * receive a plain filesystem path.
- *
- * - `file:///...` → strip scheme → `/...`  (iOS + some Android)
- * - `content://...` → leave as-is  (Android ContentResolver; RNFS handles it)
- */
-const resolvePickerUri = (uri: string): string =>
-  uri.startsWith('file://') ? uri.replace(/^file:\/\//, '') : uri;
 
 export const useImages = () => {
   const {checkStoragePermissions} = useStoragePermissions();
@@ -73,7 +65,8 @@ export const useImages = () => {
       }
 
       const res = await pick({ type: [types.images] });
-      const pickedUri = res[0].uri;
+      // Plain, percent-decoded path (iOS returns encoded file:// URIs).
+      const pickedUri = toFsPath(res[0].uri);
 
       const baseDir = getImageBaseDir();
       const saveDir = `${baseDir}/${dirImages}`;
@@ -92,15 +85,15 @@ export const useImages = () => {
 
       // Remove the previous image for this product if it exists.
       if (afterImage) {
-        const previousPath = afterImage.replace(/^file:\/\//, '');
+        // Rebase onto the current container (iOS sandbox path changes on update).
+        const previousPath = toFsPath(resolveImageUri(afterImage));
         const previousExists = await exists(previousPath);
         if (previousExists) {
           await unlink(previousPath);
         }
       }
 
-      // copyFile handles both file:// URIs and content:// URIs on Android.
-      // On iOS the picker always returns file:// URIs.
+      // copyFile needs a plain path on iOS; content:// URIs are handled on Android.
       await copyFile(pickedUri, destPath);
 
       // Store absolute path with the file:// scheme so RN <Image> can render it.

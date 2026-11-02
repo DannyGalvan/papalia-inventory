@@ -25,6 +25,7 @@ import { useLogDetails } from '../../hooks/useLogDetails';
 import { useTheme } from '../../hooks/useTheme';
 import { validateLogForm } from '../../utils/validateLogForm';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { resolveImageUri } from '../../utils/filePaths';
 import { DetailsItem } from '../DetailsItem';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
@@ -235,7 +236,7 @@ export const LogForm = ({
                     source={
                       item.image
                         ? {
-                            uri: item.image,
+                            uri: resolveImageUri(item.image),
                           }
                         : noImage
                     }

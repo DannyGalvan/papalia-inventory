@@ -31,6 +31,7 @@
  */
 
 import { readFile as rnfsReadFile } from '@dr.pogodin/react-native-fs';
+import { toFsPath } from '../utils/filePaths';
 import ExcelJS from 'exceljs';
 import uuid from 'react-native-uuid';
 import { ALL_IN_OUT_ENUM, INPUT_ENUM } from '../config/constants';
@@ -255,9 +256,8 @@ export class ExcelServiceImpl implements ExcelService {
       // return on both iOS and Android so rnfsReadFile always receives a plain
       // filesystem path. Content URIs (content://) are left untouched — RNFS
       // handles them on Android via the ContentResolver native bridge.
-      const resolvedPath = filePath.startsWith('file://')
-        ? filePath.replace(/^file:\/\//, '')
-        : filePath;
+      // iOS URIs are percent-encoded (spaces, accents), so decode them too.
+      const resolvedPath = toFsPath(filePath);
 
       // Read the file as base64 and decode to the binary buffer exceljs needs.
       const base64 = await rnfsReadFile(resolvedPath, 'base64');
