@@ -18,7 +18,17 @@ import { UnitOfMeasure } from '../models/UnitOfMeasure';
 
 export const dataSource = new DataSource({
   database: NAME_BD,
-  entities: [LogHeader, LogDetail, Product, Configuration, MovementType, Category, Supplier, UnitOfMeasure, Timezone],
+  entities: [
+    LogHeader,
+    LogDetail,
+    Product,
+    Configuration,
+    MovementType,
+    Category,
+    Supplier,
+    UnitOfMeasure,
+    Timezone,
+  ],
   location: '.',
   logging: __DEV__ ? ['error', 'warn'] : false,
   type: 'react-native',

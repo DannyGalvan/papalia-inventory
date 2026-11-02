@@ -24,7 +24,10 @@ import {
   KEY_LOW_STOCK_THRESHOLD,
 } from '../../config/constants';
 import { useTimezone } from '../../context/TimezoneContext';
-import { getConfigurationByKey, upsertConfiguration } from '../../database/repository/ConfigurationRepository';
+import {
+  getConfigurationByKey,
+  upsertConfiguration,
+} from '../../database/repository/ConfigurationRepository';
 import { Timezone } from '../../database/models/Timezone';
 import { getActiveTimezones } from '../../database/repository/TimezoneRepository';
 import { useDownloadBd } from '../../hooks/useDownloadBd';
@@ -38,13 +41,19 @@ type ToastState = {
   type: 'success' | 'error';
 };
 
-const EMPTY_TOAST: ToastState = {visible: false, message: '', type: 'success'};
+const EMPTY_TOAST: ToastState = {
+  visible: false,
+  message: '',
+  type: 'success',
+};
 
-export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
-  const {theme} = useTheme();
-  const {ianaTimezone, setTimezone} = useTimezone();
-  const {save, downloadResult, clearResult} = useDownloadBd();
-  const {dirImages, changeDirImages, isLoading} = useImages();
+export const ConfigurationScreen = ({
+  navigation,
+}: ConfigurationScreenProps) => {
+  const { theme } = useTheme();
+  const { ianaTimezone, setTimezone } = useTimezone();
+  const { save, downloadResult, clearResult } = useDownloadBd();
+  const { dirImages, changeDirImages, isLoading } = useImages();
   const [activeTimezones, setActiveTimezones] = useState<Timezone[]>([]);
   const [timezoneToast, setTimezoneToast] = useState<ToastState>(EMPTY_TOAST);
 
@@ -57,7 +66,9 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   const [currencyToast, setCurrencyToast] = useState<ToastState>(EMPTY_TOAST);
 
   // Low stock threshold
-  const [thresholdInput, setThresholdInput] = useState(String(DEFAULT_LOW_STOCK_THRESHOLD));
+  const [thresholdInput, setThresholdInput] = useState(
+    String(DEFAULT_LOW_STOCK_THRESHOLD),
+  );
   const [thresholdToast, setThresholdToast] = useState<ToastState>(EMPTY_TOAST);
 
   // Company name
@@ -75,15 +86,22 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   useEffect(() => {
     (async () => {
       setSettingsLoading(true);
-      const [currencyConfig, thresholdConfig, companyConfig, tzs] = await Promise.all([
-        getConfigurationByKey(KEY_CURRENCY_SYMBOL),
-        getConfigurationByKey(KEY_LOW_STOCK_THRESHOLD),
-        getConfigurationByKey(KEY_COMPANY_NAME),
-        getActiveTimezones(),
-      ]);
-      if (currencyConfig?.value) {setCurrencyInput(currencyConfig.value);}
-      if (thresholdConfig?.value) {setThresholdInput(thresholdConfig.value);}
-      if (companyConfig?.value) {setCompanyInput(companyConfig.value);}
+      const [currencyConfig, thresholdConfig, companyConfig, tzs] =
+        await Promise.all([
+          getConfigurationByKey(KEY_CURRENCY_SYMBOL),
+          getConfigurationByKey(KEY_LOW_STOCK_THRESHOLD),
+          getConfigurationByKey(KEY_COMPANY_NAME),
+          getActiveTimezones(),
+        ]);
+      if (currencyConfig?.value) {
+        setCurrencyInput(currencyConfig.value);
+      }
+      if (thresholdConfig?.value) {
+        setThresholdInput(thresholdConfig.value);
+      }
+      if (companyConfig?.value) {
+        setCompanyInput(companyConfig.value);
+      }
       setActiveTimezones(tzs);
       setSettingsLoading(false);
     })();
@@ -94,20 +112,36 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   const handleSaveFolder = useCallback(async () => {
     try {
       await changeDirImages(folderInput);
-      setFolderToast({visible: true, message: 'Carpeta actualizada correctamente', type: 'success'});
+      setFolderToast({
+        visible: true,
+        message: 'Carpeta actualizada correctamente',
+        type: 'success',
+      });
     } catch {
-      setFolderToast({visible: true, message: 'Error al guardar la carpeta', type: 'error'});
+      setFolderToast({
+        visible: true,
+        message: 'Error al guardar la carpeta',
+        type: 'error',
+      });
     }
   }, [changeDirImages, folderInput]);
 
   const handleSaveCurrency = useCallback(async () => {
     const trimmed = currencyInput.trim();
     if (!trimmed) {
-      setCurrencyToast({visible: true, message: 'El símbolo no puede estar vacío', type: 'error'});
+      setCurrencyToast({
+        visible: true,
+        message: 'El símbolo no puede estar vacío',
+        type: 'error',
+      });
       return;
     }
     if (trimmed.length > 5) {
-      setCurrencyToast({visible: true, message: 'El símbolo no puede tener más de 5 caracteres', type: 'error'});
+      setCurrencyToast({
+        visible: true,
+        message: 'El símbolo no puede tener más de 5 caracteres',
+        type: 'error',
+      });
       return;
     }
     const result = await upsertConfiguration(KEY_CURRENCY_SYMBOL, trimmed);
@@ -121,10 +155,17 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   const handleSaveThreshold = useCallback(async () => {
     const num = parseInt(thresholdInput, 10);
     if (isNaN(num) || num < 1 || num > 999) {
-      setThresholdToast({visible: true, message: 'El umbral debe ser un número entre 1 y 999', type: 'error'});
+      setThresholdToast({
+        visible: true,
+        message: 'El umbral debe ser un número entre 1 y 999',
+        type: 'error',
+      });
       return;
     }
-    const result = await upsertConfiguration(KEY_LOW_STOCK_THRESHOLD, String(num));
+    const result = await upsertConfiguration(
+      KEY_LOW_STOCK_THRESHOLD,
+      String(num),
+    );
     setThresholdToast({
       visible: true,
       message: result.success ? 'Umbral de stock guardado' : result.message,
@@ -135,7 +176,11 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
   const handleSaveCompany = useCallback(async () => {
     const trimmed = companyInput.trim();
     if (!trimmed) {
-      setCompanyToast({visible: true, message: 'El nombre no puede estar vacío', type: 'error'});
+      setCompanyToast({
+        visible: true,
+        message: 'El nombre no puede estar vacío',
+        type: 'error',
+      });
       return;
     }
     const result = await upsertConfiguration(KEY_COMPANY_NAME, trimmed);
@@ -157,16 +202,21 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
 
   const btnStyle = [
     styles.saveButton,
-    {backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.md},
+    {
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.md,
+    },
   ];
 
   return (
     <KeyboardAvoidingView
-      style={[styles.screen, {backgroundColor: theme.colors.background}]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      style={[styles.screen, { backgroundColor: theme.colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+      >
         <Text
           style={[
             styles.title,
@@ -177,16 +227,33 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
               lineHeight: theme.typography.h2.lineHeight,
             },
           ]}
-          accessibilityRole="header">
+          accessibilityRole="header"
+        >
           Configuración
         </Text>
 
         {/* ── Descargar base de datos ── */}
-        <View style={[styles.section, {borderColor: theme.colors.border}]}>
-          <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+        <View style={[styles.section, { borderColor: theme.colors.border }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                fontSize: theme.typography.body.fontSize,
+              },
+            ]}
+          >
             Descargar base de datos
           </Text>
-          <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+          <Text
+            style={[
+              styles.sectionDesc,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
             {Platform.OS === 'ios'
               ? 'Guarda una copia en Archivos (app).'
               : 'Guarda una copia en la carpeta Descargas.'}
@@ -194,8 +261,14 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
           <TouchableButton
             icon="download"
             onPress={save}
-            styles={[styles.saveButton, {backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.md}]}
-            textStyle={[styles.btnText, {color: theme.colors.surface}]}
+            styles={[
+              styles.saveButton,
+              {
+                backgroundColor: theme.colors.primary,
+                borderRadius: theme.borderRadius.md,
+              },
+            ]}
+            textStyle={[styles.btnText, { color: theme.colors.surface }]}
             title="Descargar"
             iconColor={theme.colors.surface}
             accessibilityLabel="Descargar base de datos"
@@ -203,15 +276,36 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
         </View>
 
         {settingsLoading || isLoading ? (
-          <ActivityIndicator color={theme.colors.primary} style={styles.loader} />
+          <ActivityIndicator
+            color={theme.colors.primary}
+            style={styles.loader}
+          />
         ) : (
           <>
             {/* ── Carpeta de imágenes ── */}
-            <View style={[styles.section, {borderColor: theme.colors.border}]}>
-              <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <View
+              style={[styles.section, { borderColor: theme.colors.border }]}
+            >
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: theme.colors.text,
+                    fontSize: theme.typography.body.fontSize,
+                  },
+                ]}
+              >
                 Carpeta de imágenes
               </Text>
-              <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              <Text
+                style={[
+                  styles.sectionDesc,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
                 Nombre de la carpeta donde se guardan las fotos de productos.
               </Text>
               <InputForm
@@ -220,7 +314,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 value={folderInput}
                 onChangeText={(text: string) => setFolderInput(text)}
                 secureTextEntry={false}
-                colorText={{color: theme.colors.text}}
+                colorText={{ color: theme.colors.text }}
                 placeholderTextColor={theme.colors.textSecondary}
                 style={inputStyle}
               />
@@ -228,7 +322,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 icon="save"
                 onPress={handleSaveFolder}
                 styles={btnStyle}
-                textStyle={[styles.btnText, {color: theme.colors.surface}]}
+                textStyle={[styles.btnText, { color: theme.colors.surface }]}
                 title="Guardar"
                 iconColor={theme.colors.surface}
                 accessibilityLabel="Guardar carpeta de imágenes"
@@ -236,11 +330,29 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
             </View>
 
             {/* ── Símbolo de moneda ── */}
-            <View style={[styles.section, {borderColor: theme.colors.border}]}>
-              <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <View
+              style={[styles.section, { borderColor: theme.colors.border }]}
+            >
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: theme.colors.text,
+                    fontSize: theme.typography.body.fontSize,
+                  },
+                ]}
+              >
                 Símbolo de moneda
               </Text>
-              <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              <Text
+                style={[
+                  styles.sectionDesc,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
                 Prefijo que se muestra en precios e inventario (ej. Q, $, €).
               </Text>
               <InputForm
@@ -249,7 +361,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 value={currencyInput}
                 onChangeText={(text: string) => setCurrencyInput(text)}
                 secureTextEntry={false}
-                colorText={{color: theme.colors.text}}
+                colorText={{ color: theme.colors.text }}
                 placeholderTextColor={theme.colors.textSecondary}
                 style={inputStyle}
               />
@@ -257,7 +369,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 icon="save"
                 onPress={handleSaveCurrency}
                 styles={btnStyle}
-                textStyle={[styles.btnText, {color: theme.colors.surface}]}
+                textStyle={[styles.btnText, { color: theme.colors.surface }]}
                 title="Guardar"
                 iconColor={theme.colors.surface}
                 accessibilityLabel="Guardar símbolo de moneda"
@@ -265,12 +377,31 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
             </View>
 
             {/* ── Umbral de stock bajo ── */}
-            <View style={[styles.section, {borderColor: theme.colors.border}]}>
-              <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <View
+              style={[styles.section, { borderColor: theme.colors.border }]}
+            >
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: theme.colors.text,
+                    fontSize: theme.typography.body.fontSize,
+                  },
+                ]}
+              >
                 Umbral de stock bajo
               </Text>
-              <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
-                Productos con stock igual o menor a este número aparecen en el Reporte Crítico.
+              <Text
+                style={[
+                  styles.sectionDesc,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
+                Productos con stock igual o menor a este número aparecen en el
+                Reporte Crítico.
               </Text>
               <InputForm
                 label="Umbral (unidades)"
@@ -278,7 +409,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 value={thresholdInput}
                 onChangeText={(text: string) => setThresholdInput(text)}
                 secureTextEntry={false}
-                colorText={{color: theme.colors.text}}
+                colorText={{ color: theme.colors.text }}
                 placeholderTextColor={theme.colors.textSecondary}
                 keyboardType="numeric"
                 style={inputStyle}
@@ -287,7 +418,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 icon="save"
                 onPress={handleSaveThreshold}
                 styles={btnStyle}
-                textStyle={[styles.btnText, {color: theme.colors.surface}]}
+                textStyle={[styles.btnText, { color: theme.colors.surface }]}
                 title="Guardar"
                 iconColor={theme.colors.surface}
                 accessibilityLabel="Guardar umbral de stock"
@@ -295,11 +426,29 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
             </View>
 
             {/* ── Nombre de empresa ── */}
-            <View style={[styles.section, {borderColor: theme.colors.border}]}>
-              <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <View
+              style={[styles.section, { borderColor: theme.colors.border }]}
+            >
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  {
+                    color: theme.colors.text,
+                    fontSize: theme.typography.body.fontSize,
+                  },
+                ]}
+              >
                 Nombre de empresa
               </Text>
-              <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              <Text
+                style={[
+                  styles.sectionDesc,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
                 Nombre que identifica tu negocio dentro de la aplicación.
               </Text>
               <InputForm
@@ -308,7 +457,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 value={companyInput}
                 onChangeText={(text: string) => setCompanyInput(text)}
                 secureTextEntry={false}
-                colorText={{color: theme.colors.text}}
+                colorText={{ color: theme.colors.text }}
                 placeholderTextColor={theme.colors.textSecondary}
                 style={inputStyle}
               />
@@ -316,7 +465,7 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
                 icon="save"
                 onPress={handleSaveCompany}
                 styles={btnStyle}
-                textStyle={[styles.btnText, {color: theme.colors.surface}]}
+                textStyle={[styles.btnText, { color: theme.colors.surface }]}
                 title="Guardar"
                 iconColor={theme.colors.surface}
                 accessibilityLabel="Guardar nombre de empresa"
@@ -326,127 +475,331 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
         )}
 
         {/* ── Zona horaria ── */}
-        <View style={[styles.section, {borderColor: theme.colors.border}]}>
-          <Text style={[styles.sectionTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+        <View style={[styles.section, { borderColor: theme.colors.border }]}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                fontSize: theme.typography.body.fontSize,
+              },
+            ]}
+          >
             Zona horaria
           </Text>
-          <Text style={[styles.sectionDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+          <Text
+            style={[
+              styles.sectionDesc,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
             Afecta cómo se muestran y filtran las fechas en toda la app.
           </Text>
           {activeTimezones.length > 0 && (
             <SelectDropdown
               data={activeTimezones}
-              defaultValue={activeTimezones.find(tz => tz.ianaName === ianaTimezone) ?? activeTimezones[0]}
+              defaultValue={
+                activeTimezones.find(tz => tz.ianaName === ianaTimezone) ??
+                activeTimezones[0]
+              }
               onSelect={async (item: Timezone) => {
                 await setTimezone(item.ianaName);
-                setTimezoneToast({visible: true, message: `Zona horaria cambiada a ${item.displayName}`, type: 'success'});
+                setTimezoneToast({
+                  visible: true,
+                  message: `Zona horaria cambiada a ${item.displayName}`,
+                  type: 'success',
+                });
               }}
-              rowTextForSelection={(item: Timezone) => `${item.displayName}  ${item.utcOffset}`}
-              buttonTextAfterSelection={(item: Timezone) => `${item.displayName}  ${item.utcOffset}`}
-              buttonStyle={[styles.dropdownBtn, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
-              buttonTextStyle={{color: theme.colors.text, fontSize: 13, textAlign: 'left'}}
-              dropdownStyle={{backgroundColor: theme.colors.surface}}
-              rowStyle={{backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}}
-              rowTextStyle={{color: theme.colors.text, fontSize: 13}}
-              selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
-              selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
+              rowTextForSelection={(item: Timezone) =>
+                `${item.displayName}  ${item.utcOffset}`
+              }
+              buttonTextAfterSelection={(item: Timezone) =>
+                `${item.displayName}  ${item.utcOffset}`
+              }
+              buttonStyle={[
+                styles.dropdownBtn,
+                {
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.surface,
+                },
+              ]}
+              buttonTextStyle={{
+                color: theme.colors.text,
+                fontSize: 13,
+                textAlign: 'left',
+              }}
+              dropdownStyle={{ backgroundColor: theme.colors.surface }}
+              rowStyle={{
+                backgroundColor: theme.colors.surface,
+                borderBottomColor: theme.colors.border,
+              }}
+              rowTextStyle={{ color: theme.colors.text, fontSize: 13 }}
+              selectedRowStyle={{
+                backgroundColor: theme.colors.primary + '22',
+              }}
+              selectedRowTextStyle={{
+                color: theme.colors.primary,
+                fontWeight: '600',
+              }}
               dropdownOverlayColor="transparent"
               search
               searchPlaceHolder="Buscar zona..."
               searchPlaceHolderColor={theme.colors.textSecondary}
-              searchInputStyle={{backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 8}}
-              searchInputTxtStyle={{color: theme.colors.text}}
-              renderDropdownIcon={() => <Icon name="chevron-down" size={14} color={theme.colors.textSecondary} />}
+              searchInputStyle={{
+                backgroundColor: theme.colors.background,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                borderRadius: 8,
+              }}
+              searchInputTxtStyle={{ color: theme.colors.text }}
+              renderDropdownIcon={() => (
+                <Icon
+                  name="chevron-down"
+                  size={14}
+                  color={theme.colors.textSecondary}
+                />
+              )}
             />
           )}
           <TouchableOpacity
-            style={[styles.tzCatalogLink, {borderColor: theme.colors.border}]}
+            style={[styles.tzCatalogLink, { borderColor: theme.colors.border }]}
             onPress={() => navigation.navigate('TimezoneCatalog')}
-            accessibilityRole="button">
+            accessibilityRole="button"
+          >
             <Icon name="globe-outline" size={16} color={theme.colors.primary} />
-            <Text style={[styles.tzCatalogLinkText, {color: theme.colors.primary, fontSize: theme.typography.caption.fontSize}]}>
+            <Text
+              style={[
+                styles.tzCatalogLinkText,
+                {
+                  color: theme.colors.primary,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
+            >
               Gestionar zonas disponibles
             </Text>
-            <Icon name="chevron-forward" size={14} color={theme.colors.textSecondary} />
+            <Icon
+              name="chevron-forward"
+              size={14}
+              color={theme.colors.textSecondary}
+            />
           </TouchableOpacity>
         </View>
 
         {/* ── Catálogos ── */}
-        <Text style={[styles.catalogSectionTitle, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+        <Text
+          style={[
+            styles.catalogSectionTitle,
+            {
+              color: theme.colors.textSecondary,
+              fontSize: theme.typography.caption.fontSize,
+            },
+          ]}
+        >
           CATÁLOGOS
         </Text>
 
         <TouchableOpacity
-          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          style={[
+            styles.catalogBtn,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.borderRadius.md,
+            },
+          ]}
           onPress={() => navigation.navigate('CategoryCatalog')}
           accessibilityRole="button"
-          accessibilityLabel="Gestionar categorías de productos">
-          <Icon name="pricetags-outline" size={22} color={theme.colors.primary} />
+          accessibilityLabel="Gestionar categorías de productos"
+        >
+          <Icon
+            name="pricetags-outline"
+            size={22}
+            color={theme.colors.primary}
+          />
           <View style={styles.catalogBtnText}>
-            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnTitle,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.body.fontSize,
+                },
+              ]}
+            >
               Categorías
             </Text>
-            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnDesc,
+                {
+                  color: theme.colors.textSecondary,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
+            >
               Organiza tus productos por categoría.
             </Text>
           </View>
-          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+          <Icon
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          style={[
+            styles.catalogBtn,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.borderRadius.md,
+            },
+          ]}
           onPress={() => navigation.navigate('SupplierCatalog')}
           accessibilityRole="button"
-          accessibilityLabel="Gestionar proveedores">
-          <Icon name="business-outline" size={22} color={theme.colors.primary} />
+          accessibilityLabel="Gestionar proveedores"
+        >
+          <Icon
+            name="business-outline"
+            size={22}
+            color={theme.colors.primary}
+          />
           <View style={styles.catalogBtnText}>
-            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnTitle,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.body.fontSize,
+                },
+              ]}
+            >
               Proveedores
             </Text>
-            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnDesc,
+                {
+                  color: theme.colors.textSecondary,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
+            >
               Registra y gestiona tus proveedores.
             </Text>
           </View>
-          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+          <Icon
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          style={[
+            styles.catalogBtn,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.borderRadius.md,
+            },
+          ]}
           onPress={() => navigation.navigate('UnitOfMeasureCatalog')}
           accessibilityRole="button"
-          accessibilityLabel="Gestionar unidades de medida">
+          accessibilityLabel="Gestionar unidades de medida"
+        >
           <Icon name="scale-outline" size={22} color={theme.colors.primary} />
           <View style={styles.catalogBtnText}>
-            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnTitle,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.body.fontSize,
+                },
+              ]}
+            >
               Unidades de medida
             </Text>
-            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnDesc,
+                {
+                  color: theme.colors.textSecondary,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
+            >
               Define cómo se miden las cantidades (kg, L, uds…).
             </Text>
           </View>
-          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+          <Icon
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.catalogBtn, {backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md}]}
+          style={[
+            styles.catalogBtn,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.borderRadius.md,
+            },
+          ]}
           onPress={() => navigation.navigate('MovementTypeCatalog')}
           accessibilityRole="button"
-          accessibilityLabel="Gestionar tipos de movimiento">
+          accessibilityLabel="Gestionar tipos de movimiento"
+        >
           <Icon name="list-outline" size={22} color={theme.colors.primary} />
           <View style={styles.catalogBtnText}>
-            <Text style={[styles.catalogBtnTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnTitle,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.body.fontSize,
+                },
+              ]}
+            >
               Tipos de movimiento
             </Text>
-            <Text style={[styles.catalogBtnDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+            <Text
+              style={[
+                styles.catalogBtnDesc,
+                {
+                  color: theme.colors.textSecondary,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
+            >
               Gestiona los tipos de entradas y salidas del inventario.
             </Text>
           </View>
-          <Icon name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+          <Icon
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.textSecondary}
+          />
         </TouchableOpacity>
 
         {/* ── Versión ── */}
         <Text
-          style={[styles.versionText, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+          style={[
+            styles.versionText,
+            {
+              color: theme.colors.textSecondary,
+              fontSize: theme.typography.caption.fontSize,
+            },
+          ]}
+        >
           Versión: {appVersion}
         </Text>
       </ScrollView>
@@ -457,22 +810,42 @@ export const ConfigurationScreen = ({navigation}: ConfigurationScreenProps) => {
         visible={downloadResult !== null}
         onDismiss={clearResult}
       />
-      <Toast message={folderToast.message} type={folderToast.type} visible={folderToast.visible}
-        onDismiss={() => setFolderToast(EMPTY_TOAST)} />
-      <Toast message={currencyToast.message} type={currencyToast.type} visible={currencyToast.visible}
-        onDismiss={() => setCurrencyToast(EMPTY_TOAST)} />
-      <Toast message={thresholdToast.message} type={thresholdToast.type} visible={thresholdToast.visible}
-        onDismiss={() => setThresholdToast(EMPTY_TOAST)} />
-      <Toast message={companyToast.message} type={companyToast.type} visible={companyToast.visible}
-        onDismiss={() => setCompanyToast(EMPTY_TOAST)} />
-      <Toast message={timezoneToast.message} type={timezoneToast.type} visible={timezoneToast.visible}
-        onDismiss={() => setTimezoneToast(EMPTY_TOAST)} />
+      <Toast
+        message={folderToast.message}
+        type={folderToast.type}
+        visible={folderToast.visible}
+        onDismiss={() => setFolderToast(EMPTY_TOAST)}
+      />
+      <Toast
+        message={currencyToast.message}
+        type={currencyToast.type}
+        visible={currencyToast.visible}
+        onDismiss={() => setCurrencyToast(EMPTY_TOAST)}
+      />
+      <Toast
+        message={thresholdToast.message}
+        type={thresholdToast.type}
+        visible={thresholdToast.visible}
+        onDismiss={() => setThresholdToast(EMPTY_TOAST)}
+      />
+      <Toast
+        message={companyToast.message}
+        type={companyToast.type}
+        visible={companyToast.visible}
+        onDismiss={() => setCompanyToast(EMPTY_TOAST)}
+      />
+      <Toast
+        message={timezoneToast.message}
+        type={timezoneToast.type}
+        visible={timezoneToast.visible}
+        onDismiss={() => setTimezoneToast(EMPTY_TOAST)}
+      />
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {flex: 1},
+  screen: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 48,
@@ -483,7 +856,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     textAlign: 'center',
   },
-  loader: {marginTop: 32},
+  loader: { marginTop: 32 },
   section: {
     width: '100%',
     paddingVertical: 16,
@@ -506,7 +879,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-start',
   },
-  btnText: {fontWeight: '600'},
+  btnText: { fontWeight: '600' },
   input: {
     borderWidth: 1,
     paddingHorizontal: 10,
@@ -528,9 +901,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  catalogBtnText: {flex: 1},
-  catalogBtnTitle: {fontWeight: '600'},
-  catalogBtnDesc: {marginTop: 2},
+  catalogBtnText: { flex: 1 },
+  catalogBtnTitle: { fontWeight: '600' },
+  catalogBtnDesc: { marginTop: 2 },
   versionText: {
     marginTop: 24,
     textAlign: 'center',
@@ -551,5 +924,5 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     marginTop: 4,
   },
-  tzCatalogLinkText: {flex: 1, fontWeight: '500'},
+  tzCatalogLinkText: { flex: 1, fontWeight: '500' },
 });

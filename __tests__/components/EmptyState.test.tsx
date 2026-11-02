@@ -19,19 +19,19 @@ import { lightTheme } from '../../src/design-system/themes';
 // The native vector-icons module ships untranspiled ESM; mock it with a simple
 // component that forwards its props so we can assert on the icon name.
 jest.mock('react-native-vector-icons/Ionicons', () => {
-  const {Text: RNText} = require('react-native');
-  return (props: {name: string}) => <RNText {...props} />;
+  const { Text: RNText } = require('react-native');
+  return (props: { name: string }) => <RNText {...props} />;
 });
 
 // useTheme transitively imports the TypeORM/native SQLite layer (via
 // ThemeContext). Mock the hook to return the real lightTheme tokens so the
 // component is exercised with genuine theme values, decoupled from the DB.
 jest.mock('../../src/hooks/useTheme', () => {
-  const {lightTheme: theme} = require('../../src/design-system/themes');
+  const { lightTheme: theme } = require('../../src/design-system/themes');
   return {
-    useTheme: () => ({theme, isDark: false, toggleTheme: () => {}}),
+    useTheme: () => ({ theme, isDark: false, toggleTheme: () => {} }),
     __esModule: true,
-    default: () => ({theme, isDark: false, toggleTheme: () => {}}),
+    default: () => ({ theme, isDark: false, toggleTheme: () => {} }),
   };
 });
 

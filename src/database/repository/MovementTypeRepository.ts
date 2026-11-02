@@ -4,13 +4,15 @@ import { Response } from '../models/response/Response';
 
 export const MovementTypeRepository = dataSource.getRepository(MovementType);
 
-export const getMovementTypes = async (isInput: boolean): Promise<MovementType[]> => {
+export const getMovementTypes = async (
+  isInput: boolean,
+): Promise<MovementType[]> => {
   try {
     // Use explicit 1/0 — nitro-sqlite on Android maps boolean true → 'true' string,
     // which SQLite casts to 0, causing true to match nothing while false matches rows with isInput=0.
     return await MovementTypeRepository.find({
-      where: {isInput: (isInput ? 1 : 0) as any, isActive: 1 as any},
-      order: {name: 'ASC'},
+      where: { isInput: (isInput ? 1 : 0) as any, isActive: 1 as any },
+      order: { name: 'ASC' },
     });
   } catch (error) {
     console.log('getMovementTypes error:', error);
@@ -20,17 +22,26 @@ export const getMovementTypes = async (isInput: boolean): Promise<MovementType[]
 
 export const getAllMovementTypes = async (): Promise<MovementType[]> => {
   try {
-    return await MovementTypeRepository.find({order: {isInput: 'ASC', name: 'ASC'}});
+    return await MovementTypeRepository.find({
+      order: { isInput: 'ASC', name: 'ASC' },
+    });
   } catch (error) {
     console.log('getAllMovementTypes error:', error);
     return [];
   }
 };
 
-export const createMovementType = async (name: string, isInput: boolean): Promise<Response<MovementType>> => {
+export const createMovementType = async (
+  name: string,
+  isInput: boolean,
+): Promise<Response<MovementType>> => {
   const response = new Response<MovementType>();
   try {
-    const entity = MovementTypeRepository.create({name: name.trim(), isInput, isActive: true});
+    const entity = MovementTypeRepository.create({
+      name: name.trim(),
+      isInput,
+      isActive: true,
+    });
     response.data = await MovementTypeRepository.save(entity);
     response.success = true;
     response.message = 'Tipo creado correctamente';
@@ -42,10 +53,13 @@ export const createMovementType = async (name: string, isInput: boolean): Promis
   }
 };
 
-export const updateMovementType = async (id: number, name: string): Promise<Response<MovementType>> => {
+export const updateMovementType = async (
+  id: number,
+  name: string,
+): Promise<Response<MovementType>> => {
   const response = new Response<MovementType>();
   try {
-    const entity = await MovementTypeRepository.findOne({where: {id}});
+    const entity = await MovementTypeRepository.findOne({ where: { id } });
     if (!entity) {
       response.success = false;
       response.message = 'Tipo no encontrado';
@@ -58,15 +72,18 @@ export const updateMovementType = async (id: number, name: string): Promise<Resp
     return response;
   } catch (error) {
     response.success = false;
-    response.message = 'Error al actualizar el tipo: ' + (error as Error).message;
+    response.message =
+      'Error al actualizar el tipo: ' + (error as Error).message;
     return response;
   }
 };
 
-export const toggleMovementTypeActive = async (id: number): Promise<Response<MovementType>> => {
+export const toggleMovementTypeActive = async (
+  id: number,
+): Promise<Response<MovementType>> => {
   const response = new Response<MovementType>();
   try {
-    const entity = await MovementTypeRepository.findOne({where: {id}});
+    const entity = await MovementTypeRepository.findOne({ where: { id } });
     if (!entity) {
       response.success = false;
       response.message = 'Tipo no encontrado';
@@ -79,12 +96,15 @@ export const toggleMovementTypeActive = async (id: number): Promise<Response<Mov
     return response;
   } catch (error) {
     response.success = false;
-    response.message = 'Error al cambiar el estado: ' + (error as Error).message;
+    response.message =
+      'Error al cambiar el estado: ' + (error as Error).message;
     return response;
   }
 };
 
-export const deleteMovementType = async (id: number): Promise<Response<null>> => {
+export const deleteMovementType = async (
+  id: number,
+): Promise<Response<null>> => {
   const response = new Response<null>();
   try {
     await MovementTypeRepository.delete(id);

@@ -49,7 +49,9 @@ function makeOperation<T>(failCount: number, successValue: T): jest.Mock {
     calls += 1;
     if (calls <= failCount) {
       // Deliberately "technical" message to confirm it is never surfaced.
-      throw new Error(`SELECT * FROM log_header at run (DataSource.ts:${calls})`);
+      throw new Error(
+        `SELECT * FROM log_header at run (DataSource.ts:${calls})`,
+      );
     }
     return successValue;
   });
@@ -63,10 +65,12 @@ function makeOperation<T>(failCount: number, successValue: T): jest.Mock {
 async function runWithRetry<T>(
   operation: () => Promise<T>,
   fallback: string,
-): Promise<{status: 'resolved'; value: T} | {status: 'rejected'; error: Error}> {
+): Promise<
+  { status: 'resolved'; value: T } | { status: 'rejected'; error: Error }
+> {
   const settled = withRetry(operation, fallback).then(
-    value => ({status: 'resolved' as const, value}),
-    error => ({status: 'rejected' as const, error: error as Error}),
+    value => ({ status: 'resolved' as const, value }),
+    error => ({ status: 'rejected' as const, error: error as Error }),
   );
   // Let the initial attempt settle and the retry delay (if any) elapse.
   await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS);
@@ -94,7 +98,7 @@ describe('withRetry — example cases', () => {
     const outcome = await runWithRetry(operation, fallback);
 
     expect(operation).toHaveBeenCalledTimes(1);
-    expect(outcome).toEqual({status: 'resolved', value: 'ok'});
+    expect(outcome).toEqual({ status: 'resolved', value: 'ok' });
     expect(mockedLogError).not.toHaveBeenCalled();
   });
 
@@ -103,7 +107,7 @@ describe('withRetry — example cases', () => {
     const outcome = await runWithRetry(operation, fallback);
 
     expect(operation).toHaveBeenCalledTimes(2);
-    expect(outcome).toEqual({status: 'resolved', value: 'recovered'});
+    expect(outcome).toEqual({ status: 'resolved', value: 'recovered' });
     // No error surfaced when the retry succeeds.
     expect(mockedLogError).not.toHaveBeenCalled();
   });
@@ -141,7 +145,7 @@ describe('Feature: app-modernization, Property 10: Database retry executes exact
     fc.string(),
     fc.integer(),
     fc.boolean(),
-    fc.record({id: fc.integer(), name: fc.string()}),
+    fc.record({ id: fc.integer(), name: fc.string() }),
   );
 
   it('always attempts at most twice; surfaces the fallback error only when both attempts fail', async () => {
@@ -149,7 +153,7 @@ describe('Feature: app-modernization, Property 10: Database retry executes exact
       fc.asyncProperty(
         // failCount: how many leading attempts throw (0..3 covers success,
         // retry-recovery, and total-failure scenarios).
-        fc.nat({max: 3}),
+        fc.nat({ max: 3 }),
         successArb,
         fallbackArb,
         async (failCount, successValue, fallback) => {
@@ -164,7 +168,10 @@ describe('Feature: app-modernization, Property 10: Database retry executes exact
             // Exactly failCount + 1 attempts (1 when it succeeds first try,
             // 2 when the single retry recovers it).
             expect(operation).toHaveBeenCalledTimes(failCount + 1);
-            expect(outcome).toEqual({status: 'resolved', value: successValue});
+            expect(outcome).toEqual({
+              status: 'resolved',
+              value: successValue,
+            });
             // No error is surfaced or logged when the operation ultimately
             // succeeds.
             expect(mockedLogError).not.toHaveBeenCalled();
@@ -184,7 +191,7 @@ describe('Feature: app-modernization, Property 10: Database retry executes exact
           }
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });

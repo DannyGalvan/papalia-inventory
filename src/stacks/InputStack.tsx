@@ -11,7 +11,7 @@ import { appColors } from '../styles/globalStyles';
 const Stack = createNativeStackNavigator<InputStackParamList>();
 
 function InputStack() {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Stack.Navigator
@@ -20,13 +20,14 @@ function InputStack() {
         headerTintColor: appColors.warning,
         headerBackTitle: 'Regresar',
         headerTitle: '',
-        headerStyle: {backgroundColor: theme.colors.surface},
+        headerStyle: { backgroundColor: theme.colors.surface },
         headerShadowVisible: false,
-      }}>
+      }}
+    >
       <Stack.Screen
         name="InputList"
         component={InputListScreen}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
       <Stack.Screen name="CreateInput" component={CreateInputScreen} />
       <Stack.Screen name="ReadInput" component={ReadInputScreen} />

@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
-import { DimensionValue, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  DimensionValue,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { appColors, appStyles } from '../../styles/globalStyles';
 
-export const InputSearch = ({updateFn}: {updateFn: (text: string) => void}) => {
+export const InputSearch = ({
+  updateFn,
+}: {
+  updateFn: (text: string) => void;
+}) => {
   const [query, setQuery] = useState<string>('');
 
   return (
@@ -29,7 +38,8 @@ export const InputSearch = ({updateFn}: {updateFn: (text: string) => void}) => {
         onPress={() => updateFn(query)}
         accessibilityRole="button"
         accessibilityLabel="Buscar"
-        accessibilityHint="Inicia la búsqueda de productos">
+        accessibilityHint="Inicia la búsqueda de productos"
+      >
         <Icon name="search" size={20} color={appColors.white} />
       </TouchableOpacity>
     </View>

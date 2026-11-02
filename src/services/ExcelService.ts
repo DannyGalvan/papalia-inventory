@@ -123,7 +123,8 @@ function bytesToBase64(bytes: Uint8Array): string {
 
     output += BASE64_ALPHABET[(triplet >> 18) & 0x3f];
     output += BASE64_ALPHABET[(triplet >> 12) & 0x3f];
-    output += i + 1 < bytes.length ? BASE64_ALPHABET[(triplet >> 6) & 0x3f] : '=';
+    output +=
+      i + 1 < bytes.length ? BASE64_ALPHABET[(triplet >> 6) & 0x3f] : '=';
     output += i + 2 < bytes.length ? BASE64_ALPHABET[triplet & 0x3f] : '=';
   }
   return output;
@@ -145,10 +146,7 @@ function base64ToBytes(base64: string): Uint8Array {
     const e3 = BASE64_ALPHABET.indexOf(clean[i + 3]);
 
     const triplet =
-      (e0 << 18) |
-      (e1 << 12) |
-      ((e2 < 0 ? 0 : e2) << 6) |
-      (e3 < 0 ? 0 : e3);
+      (e0 << 18) | (e1 << 12) | ((e2 < 0 ? 0 : e2) << 6) | (e3 < 0 ? 0 : e3);
 
     if (byteIndex < length) bytes[byteIndex++] = (triplet >> 16) & 0xff;
     if (byteIndex < length) bytes[byteIndex++] = (triplet >> 8) & 0xff;

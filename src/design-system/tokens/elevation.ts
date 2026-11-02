@@ -12,7 +12,7 @@
 /** A single elevation level with cross-platform shadow properties. */
 export interface ElevationLevel {
   shadowColor: string;
-  shadowOffset: {width: number; height: number};
+  shadowOffset: { width: number; height: number };
   shadowOpacity: number;
   shadowRadius: number;
   elevation: number;
@@ -29,21 +29,21 @@ export interface ElevationScale {
 export const elevation: ElevationScale = {
   low: {
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.18,
     shadowRadius: 2,
     elevation: 2,
   },
   medium: {
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.22,
     shadowRadius: 4,
     elevation: 6,
   },
   high: {
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 6},
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.28,
     shadowRadius: 8,
     elevation: 12,

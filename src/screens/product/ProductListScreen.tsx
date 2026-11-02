@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Platform,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    ViewToken,
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewToken,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Fab } from '../../components/button/Fab';
@@ -20,9 +20,15 @@ import { ProductItem } from '../../components/product/ProductItem';
 import { Product } from '../../database/models/Product';
 import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { getFullProducts } from '../../database/repository/ProductRepository';
-import { PRODUCT_LIST_PERFORMANCE_PROPS, useProducts } from '../../hooks/useProducts';
+import {
+  PRODUCT_LIST_PERFORMANCE_PROPS,
+  useProducts,
+} from '../../hooks/useProducts';
 import { useTheme } from '../../hooks/useTheme';
-import { DEFAULT_CURRENCY_SYMBOL, KEY_CURRENCY_SYMBOL } from '../../config/constants';
+import {
+  DEFAULT_CURRENCY_SYMBOL,
+  KEY_CURRENCY_SYMBOL,
+} from '../../config/constants';
 import { ProductListScreenProps } from '../../interfaces/IProductNavigation';
 import { excelService } from '../../services/ExcelService';
 
@@ -32,16 +38,28 @@ type ToastState = {
   type: 'success' | 'error' | 'warning';
 };
 
-export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
-  const {theme} = useTheme();
-  const {products, total, loadData, isLoading, isLoadingMore, hasMore, loadMore, searchProducts, error, clearError} =
-    useProducts();
+export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
+  const { theme } = useTheme();
+  const {
+    products,
+    total,
+    loadData,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadMore,
+    searchProducts,
+    error,
+    clearError,
+  } = useProducts();
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
 
   useEffect(() => {
     getConfigurationByKey(KEY_CURRENCY_SYMBOL).then(config => {
-      if (config?.value) { setCurrencySymbol(config.value); }
+      if (config?.value) {
+        setCurrencySymbol(config.value);
+      }
     });
   }, []);
   const [showReports, setShowReports] = useState(false);
@@ -53,13 +71,13 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
 
   const showToast = useCallback(
     (message: string, type: 'success' | 'error' | 'warning') => {
-      setToast({visible: true, message, type});
+      setToast({ visible: true, message, type });
     },
     [],
   );
 
   const dismissToast = useCallback(() => {
-    setToast(prev => ({...prev, visible: false}));
+    setToast(prev => ({ ...prev, visible: false }));
   }, []);
 
   const downloadFile = useCallback(async () => {
@@ -91,7 +109,7 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
 
   const onViewableItemsChanged = useRef(
-    ({viewableItems}: {viewableItems: ViewToken[]}) => {
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       const visibleCodes = new Set(
         viewableItems
           .filter(token => token.isViewable && token.item)
@@ -108,8 +126,12 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
   }).current;
 
   const renderProductItem = useCallback(
-    ({item}: {item: Product}) => (
-      <ProductItem product={item} isVisible={visibleItems.has(item.code)} currencySymbol={currencySymbol} />
+    ({ item }: { item: Product }) => (
+      <ProductItem
+        product={item}
+        isVisible={visibleItems.has(item.code)}
+        currencySymbol={currencySymbol}
+      />
     ),
     [visibleItems, currencySymbol],
   );
@@ -122,7 +144,9 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
     return (
       <View style={styles.footer}>
         <ActivityIndicator size="small" color={theme.colors.primary} />
-        <Text style={[styles.footerText, {color: theme.colors.textSecondary}]}>
+        <Text
+          style={[styles.footerText, { color: theme.colors.textSecondary }]}
+        >
           Cargando más productos...
         </Text>
       </View>
@@ -147,8 +171,9 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
 
   return (
     <View
-      style={[styles.screen, {backgroundColor: theme.colors.background}]}
-      accessible={false}>
+      style={[styles.screen, { backgroundColor: theme.colors.background }]}
+      accessible={false}
+    >
       <Text
         style={[
           styles.title,
@@ -159,7 +184,8 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
             lineHeight: theme.typography.h2.lineHeight,
           },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Lista de productos
       </Text>
       <View>
@@ -171,7 +197,8 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
               fontSize: theme.typography.body.fontSize,
             },
           ]}
-          accessibilityLabel={`Total de productos: ${total}`}>
+          accessibilityLabel={`Total de productos: ${total}`}
+        >
           Total de productos: {total}
         </Text>
       </View>
@@ -186,13 +213,12 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
         onPress={() => setShowReports(prev => !prev)}
         accessibilityRole="button"
         accessibilityLabel="Reportes"
-        accessibilityHint="Muestra las opciones de reportes de inventario">
+        accessibilityHint="Muestra las opciones de reportes de inventario"
+      >
         <Icon name="bar-chart-outline" size={18} color={theme.colors.primary} />
         <Text
-          style={[
-            styles.reportsToggleText,
-            {color: theme.colors.primary},
-          ]}>
+          style={[styles.reportsToggleText, { color: theme.colors.primary }]}
+        >
           Reportes
         </Text>
         <Icon
@@ -210,25 +236,21 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
               backgroundColor: theme.colors.surface,
               borderRadius: theme.borderRadius.md,
             },
-          ]}>
+          ]}
+        >
           <TouchableOpacity
             style={[
               styles.reportButton,
-              {borderBottomColor: theme.colors.border},
+              { borderBottomColor: theme.colors.border },
             ]}
             onPress={() => navigation.navigate('CriticalReport')}
             accessibilityRole="button"
-            accessibilityLabel="Reporte Crítico">
-            <Icon
-              name="warning-outline"
-              size={20}
-              color={theme.colors.error}
-            />
+            accessibilityLabel="Reporte Crítico"
+          >
+            <Icon name="warning-outline" size={20} color={theme.colors.error} />
             <Text
-              style={[
-                styles.reportButtonText,
-                {color: theme.colors.text},
-              ]}>
+              style={[styles.reportButtonText, { color: theme.colors.text }]}
+            >
               Reporte Crítico
             </Text>
             <Icon
@@ -240,21 +262,20 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
           <TouchableOpacity
             style={[
               styles.reportButton,
-              {borderBottomColor: theme.colors.border},
+              { borderBottomColor: theme.colors.border },
             ]}
             onPress={() => navigation.navigate('SummaryReport')}
             accessibilityRole="button"
-            accessibilityLabel="Resumen General">
+            accessibilityLabel="Resumen General"
+          >
             <Icon
               name="stats-chart-outline"
               size={20}
               color={theme.colors.primary}
             />
             <Text
-              style={[
-                styles.reportButtonText,
-                {color: theme.colors.text},
-              ]}>
+              style={[styles.reportButtonText, { color: theme.colors.text }]}
+            >
               Resumen General
             </Text>
             <Icon
@@ -267,17 +288,16 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
             style={styles.reportButton}
             onPress={() => navigation.navigate('MovementReport')}
             accessibilityRole="button"
-            accessibilityLabel="Reporte de Movimientos">
+            accessibilityLabel="Reporte de Movimientos"
+          >
             <Icon
               name="swap-horizontal-outline"
               size={20}
               color={theme.colors.success}
             />
             <Text
-              style={[
-                styles.reportButtonText,
-                {color: theme.colors.text},
-              ]}>
+              style={[styles.reportButtonText, { color: theme.colors.text }]}
+            >
               Reporte de Movimientos
             </Text>
             <Icon
@@ -318,14 +338,14 @@ export const ProductListScreen = ({navigation}: ProductListScreenProps) => {
         />
       )}
       <Fab
-        style={[styles.fabR, {backgroundColor: theme.colors.primary}]}
+        style={[styles.fabR, { backgroundColor: theme.colors.primary }]}
         iconName="add"
         onPress={() => navigation.navigate('CreateProduct')}
         accessibilityLabel="Agregar producto"
         accessibilityHint="Abre el formulario para crear un nuevo producto"
       />
       <Fab
-        style={[styles.fabL, {backgroundColor: theme.colors.success}]}
+        style={[styles.fabL, { backgroundColor: theme.colors.success }]}
         iconName="download"
         onPress={downloadFile}
         isLoading={isLoadingDownload}

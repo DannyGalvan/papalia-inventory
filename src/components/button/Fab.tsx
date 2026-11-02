@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-    ActivityIndicator,
-    StyleProp,
-    StyleSheet,
-    TouchableOpacity,
-    ViewStyle,
+  ActivityIndicator,
+  StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -33,7 +33,8 @@ export const Fab = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? 'Botón de acción'}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{disabled: isLoading, busy: isLoading}}>
+      accessibilityState={{ disabled: isLoading, busy: isLoading }}
+    >
       {!isLoading ? (
         <Icon name={iconName} size={35} color="white" />
       ) : (

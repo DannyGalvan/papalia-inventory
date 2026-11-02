@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type ProductStackParamList = {
   ListProduct: undefined;
   CreateProduct: undefined;
-  EditProduct: {id: string};
+  EditProduct: { id: string };
   CriticalReport: undefined;
   SummaryReport: undefined;
   MovementReport: undefined;

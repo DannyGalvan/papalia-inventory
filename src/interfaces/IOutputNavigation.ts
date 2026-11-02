@@ -1,9 +1,9 @@
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type OutputStackParamList = {
   OutputList: undefined;
   CreateOutput: undefined;
-  ReadOutput: {id: number};
+  ReadOutput: { id: number };
   DashboardOutput: undefined;
 };
 

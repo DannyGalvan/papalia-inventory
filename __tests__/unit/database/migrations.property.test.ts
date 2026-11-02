@@ -193,7 +193,7 @@ describe('Feature: app-modernization, Property 6: Database migration preserves c
       fc.asyncProperty(
         // Any list of arbitrary strings — including empty strings, quotes,
         // accents, emoji and other unicode — stored in the "commets" column.
-        fc.array(fc.string(), {minLength: 1, maxLength: 25}),
+        fc.array(fc.string(), { minLength: 1, maxLength: 25 }),
         async comments => {
           const db = seedDatabase(comments);
           try {
@@ -218,7 +218,7 @@ describe('Feature: app-modernization, Property 6: Database migration preserves c
           }
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });

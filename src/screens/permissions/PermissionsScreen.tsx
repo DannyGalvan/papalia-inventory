@@ -31,7 +31,8 @@ const getRequiredPermissions = (): Omit<PermissionItem, 'status'>[] => {
         key: 'images',
         permission: PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         title: 'Acceso a imágenes',
-        description: 'Necesario para asignar fotos a los productos del inventario.',
+        description:
+          'Necesario para asignar fotos a los productos del inventario.',
         icon: 'image-outline',
       },
     ];
@@ -43,7 +44,8 @@ const getRequiredPermissions = (): Omit<PermissionItem, 'status'>[] => {
         key: 'read',
         permission: PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         title: 'Leer almacenamiento',
-        description: 'Necesario para leer imágenes de productos desde el almacenamiento.',
+        description:
+          'Necesario para leer imágenes de productos desde el almacenamiento.',
         icon: 'folder-open-outline',
       },
     ];
@@ -54,21 +56,23 @@ const getRequiredPermissions = (): Omit<PermissionItem, 'status'>[] => {
       key: 'read',
       permission: PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       title: 'Leer almacenamiento',
-      description: 'Necesario para leer imágenes de productos desde el almacenamiento.',
+      description:
+        'Necesario para leer imágenes de productos desde el almacenamiento.',
       icon: 'folder-open-outline',
     },
     {
       key: 'write',
       permission: PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       title: 'Escribir almacenamiento',
-      description: 'Necesario para guardar reportes Excel en la carpeta de descargas.',
+      description:
+        'Necesario para guardar reportes Excel en la carpeta de descargas.',
       icon: 'download-outline',
     },
   ];
 };
 
-export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
-  const {theme} = useTheme();
+export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
+  const { theme } = useTheme();
   const [items, setItems] = useState<PermissionItem[]>([]);
   const [isRequesting, setIsRequesting] = useState(false);
 
@@ -85,7 +89,10 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
     const withStatus: PermissionItem[] = await Promise.all(
       defs.map(async def => {
         const granted = await PermissionsAndroid.check(def.permission as any);
-        return {...def, status: granted ? 'granted' : 'unknown'} as PermissionItem;
+        return {
+          ...def,
+          status: granted ? 'granted' : 'unknown',
+        } as PermissionItem;
       }),
     );
     setItems(withStatus);
@@ -107,11 +114,13 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
           const result = results[item.permission as keyof typeof results];
           return {
             ...item,
-            status: (result as string) === PermissionsAndroid.RESULTS.GRANTED
-              ? 'granted'
-              : (result as string) === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-              ? 'never_ask_again'
-              : 'denied',
+            status:
+              (result as string) === PermissionsAndroid.RESULTS.GRANTED
+                ? 'granted'
+                : (result as string) ===
+                  PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+                ? 'never_ask_again'
+                : 'denied',
           };
         }),
       );
@@ -120,16 +129,21 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
     }
   }, []);
 
-  const allGranted = items.length > 0 && items.every(i => i.status === 'granted');
+  const allGranted =
+    items.length > 0 && items.every(i => i.status === 'granted');
   const anyDeniedPermanently = items.some(i => i.status === 'never_ask_again');
   const anyUngranted = items.some(i => i.status !== 'granted');
 
   const statusIcon = (status: PermissionItem['status']) => {
     switch (status) {
-      case 'granted':        return {name: 'checkmark-circle', color: theme.colors.success};
-      case 'denied':         return {name: 'close-circle-outline', color: theme.colors.error};
-      case 'never_ask_again':return {name: 'ban-outline', color: theme.colors.error};
-      default:               return {name: 'ellipse-outline', color: theme.colors.textSecondary};
+      case 'granted':
+        return { name: 'checkmark-circle', color: theme.colors.success };
+      case 'denied':
+        return { name: 'close-circle-outline', color: theme.colors.error };
+      case 'never_ask_again':
+        return { name: 'ban-outline', color: theme.colors.error };
+      default:
+        return { name: 'ellipse-outline', color: theme.colors.textSecondary };
     }
   };
 
@@ -139,10 +153,10 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled">
-
+      keyboardShouldPersistTaps="handled"
+    >
       {/* Logo */}
       <Image
         source={require('../../assets/papalia_transparent.png')}
@@ -153,12 +167,29 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
       />
 
       <Text
-        style={[styles.title, {color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight}]}
-        accessibilityRole="header">
+        style={[
+          styles.title,
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+          },
+        ]}
+        accessibilityRole="header"
+      >
         Permisos necesarios
       </Text>
-      <Text style={[styles.subtitle, {color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize}]}>
-        Para funcionar correctamente, la app necesita los siguientes permisos. Concédelos ahora para evitar interrupciones.
+      <Text
+        style={[
+          styles.subtitle,
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.body.fontSize,
+          },
+        ]}
+      >
+        Para funcionar correctamente, la app necesita los siguientes permisos.
+        Concédelos ahora para evitar interrupciones.
       </Text>
 
       {/* Permission cards */}
@@ -173,19 +204,42 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
                 {
                   backgroundColor: theme.colors.surface,
                   borderRadius: theme.borderRadius.md,
-                  borderColor: item.status === 'granted' ? theme.colors.success : theme.colors.border,
+                  borderColor:
+                    item.status === 'granted'
+                      ? theme.colors.success
+                      : theme.colors.border,
                 },
               ]}
               accessible
-              accessibilityLabel={`${item.title}: ${item.status === 'granted' ? 'concedido' : 'pendiente'}`}>
+              accessibilityLabel={`${item.title}: ${
+                item.status === 'granted' ? 'concedido' : 'pendiente'
+              }`}
+            >
               <View style={styles.cardHeader}>
                 <Icon name={item.icon} size={24} color={theme.colors.primary} />
-                <Text style={[styles.cardTitle, {color: theme.colors.text, fontSize: theme.typography.body.fontSize, fontWeight: '600'}]}>
+                <Text
+                  style={[
+                    styles.cardTitle,
+                    {
+                      color: theme.colors.text,
+                      fontSize: theme.typography.body.fontSize,
+                      fontWeight: '600',
+                    },
+                  ]}
+                >
                   {item.title}
                 </Text>
                 <Icon name={si.name} size={22} color={si.color} />
               </View>
-              <Text style={[styles.cardDesc, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              <Text
+                style={[
+                  styles.cardDesc,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
                 {item.description}
               </Text>
             </View>
@@ -195,10 +249,29 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
 
       {/* Permanent denial warning */}
       {anyDeniedPermanently && (
-        <View style={[styles.warningBox, {backgroundColor: theme.colors.error + '20', borderColor: theme.colors.error, borderRadius: theme.borderRadius.sm}]}>
+        <View
+          style={[
+            styles.warningBox,
+            {
+              backgroundColor: theme.colors.error + '20',
+              borderColor: theme.colors.error,
+              borderRadius: theme.borderRadius.sm,
+            },
+          ]}
+        >
           <Icon name="warning-outline" size={18} color={theme.colors.error} />
-          <Text style={[styles.warningText, {color: theme.colors.error, fontSize: theme.typography.caption.fontSize}]}>
-            Uno o más permisos fueron denegados permanentemente. Ve a Configuración {'>'} Aplicaciones {'>'} Papalia Inventory {'>'} Permisos para habilitarlos.
+          <Text
+            style={[
+              styles.warningText,
+              {
+                color: theme.colors.error,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
+            Uno o más permisos fueron denegados permanentemente. Ve a
+            Configuración {'>'} Aplicaciones {'>'} Papalia Inventory {'>'}{' '}
+            Permisos para habilitarlos.
           </Text>
         </View>
       )}
@@ -206,11 +279,18 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
       {/* Actions */}
       {anyUngranted && !anyDeniedPermanently && (
         <TouchableOpacity
-          style={[styles.primaryBtn, {backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.lg}]}
+          style={[
+            styles.primaryBtn,
+            {
+              backgroundColor: theme.colors.primary,
+              borderRadius: theme.borderRadius.lg,
+            },
+          ]}
           onPress={requestAll}
           disabled={isRequesting}
           accessibilityRole="button"
-          accessibilityLabel="Conceder permisos">
+          accessibilityLabel="Conceder permisos"
+        >
           <Icon name="shield-checkmark-outline" size={20} color="#FFFFFF" />
           <Text style={styles.primaryBtnText}>
             {isRequesting ? 'Solicitando...' : 'Conceder permisos'}
@@ -223,15 +303,31 @@ export const PermissionsScreen = ({navigation}: PermissionsScreenProps) => {
           styles.secondaryBtn,
           {
             borderRadius: theme.borderRadius.lg,
-            borderColor: allGranted ? theme.colors.success : theme.colors.border,
+            borderColor: allGranted
+              ? theme.colors.success
+              : theme.colors.border,
             backgroundColor: allGranted ? theme.colors.success : 'transparent',
           },
         ]}
         onPress={proceed}
         accessibilityRole="button"
-        accessibilityLabel={allGranted ? 'Continuar a la aplicación' : 'Continuar sin todos los permisos'}>
-        <Icon name={allGranted ? 'rocket-outline' : 'arrow-forward-outline'} size={20} color={allGranted ? '#FFFFFF' : theme.colors.textSecondary} />
-        <Text style={[styles.secondaryBtnText, {color: allGranted ? '#FFFFFF' : theme.colors.textSecondary}]}>
+        accessibilityLabel={
+          allGranted
+            ? 'Continuar a la aplicación'
+            : 'Continuar sin todos los permisos'
+        }
+      >
+        <Icon
+          name={allGranted ? 'rocket-outline' : 'arrow-forward-outline'}
+          size={20}
+          color={allGranted ? '#FFFFFF' : theme.colors.textSecondary}
+        />
+        <Text
+          style={[
+            styles.secondaryBtnText,
+            { color: allGranted ? '#FFFFFF' : theme.colors.textSecondary },
+          ]}
+        >
           {allGranted ? 'Continuar' : 'Continuar de todos modos'}
         </Text>
       </TouchableOpacity>

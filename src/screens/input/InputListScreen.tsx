@@ -16,7 +16,7 @@ import { excelService } from '../../services/ExcelService';
 
 export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   const { theme } = useTheme();
-  const {getTodayBounds} = useTimezone();
+  const { getTodayBounds } = useTimezone();
   const todayBounds = useMemo(() => getTodayBounds(), [getTodayBounds]);
   const [initialDate, setInitialDate] = useState(todayBounds.fechaInicio);
   const [finalDate, setFinalDate] = useState(todayBounds.fechaFin);
@@ -29,9 +29,14 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   }, []);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  );
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning',
+  ) => {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
@@ -52,7 +57,8 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
       showToast(`Guardado en ${location}: ${fileName}`, 'success');
       setIsLoadingDownload(false);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error al exportar el archivo';
+      const msg =
+        e instanceof Error ? e.message : 'Error al exportar el archivo';
       showToast(msg, 'error');
       setIsLoadingDownload(false);
     }
@@ -82,9 +88,14 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
       <Text
         style={[
           styles.title,
-          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight },
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+          },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Lista de entradas
       </Text>
       <InputDate
@@ -102,9 +113,13 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
       <Text
         style={[
           styles.resultText,
-          { color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize },
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.body.fontSize,
+          },
         ]}
-        accessibilityLabel={`Total de resultados: ${inputs.length}`}>
+        accessibilityLabel={`Total de resultados: ${inputs.length}`}
+      >
         Total de Resultados: {inputs.length}
       </Text>
       <FlatList
@@ -167,17 +182,17 @@ const styles = StyleSheet.create({
   fabR: {
     bottom: 20,
     right: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   fabL: {
     bottom: 20,
     left: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   fabDash: {
     bottom: 80,
     left: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   list: {
     padding: 10,

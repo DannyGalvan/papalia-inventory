@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    DimensionValue,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  DimensionValue,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { checkStockForProduct } from '../../utils/stockValidator';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { DEFAULT_CURRENCY_SYMBOL, KEY_CURRENCY_SYMBOL } from '../../config/constants';
+import {
+  DEFAULT_CURRENCY_SYMBOL,
+  KEY_CURRENCY_SYMBOL,
+} from '../../config/constants';
 import { LogHeader } from '../../database/models/LogHeader';
 import { MovementType } from '../../database/models/MovementType';
 import { Product } from '../../database/models/Product';
@@ -35,10 +38,15 @@ interface Props {
   onSubmit: (values: LogHeader) => Promise<Response<LogHeader>> | any;
   isReadonly: boolean;
   navigate?: any;
-  selectData?: {id: number; value: string}[];
+  selectData?: { id: number; value: string }[];
 }
 
-const NO_SELECTION: MovementType = {id: 0, name: 'Seleccione una opción', isInput: false, isActive: true};
+const NO_SELECTION: MovementType = {
+  id: 0,
+  name: 'Seleccione una opción',
+  isInput: false,
+  isActive: true,
+};
 
 const validateForm = validateLogForm;
 
@@ -60,8 +68,12 @@ export const LogForm = ({
   } = useLogDetails();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [movementTypes, setMovementTypes] = useState<MovementType[]>([NO_SELECTION]);
-  const [stockWarnings, setStockWarnings] = useState<Record<number, string>>({});
+  const [movementTypes, setMovementTypes] = useState<MovementType[]>([
+    NO_SELECTION,
+  ]);
+  const [stockWarnings, setStockWarnings] = useState<Record<number, string>>(
+    {},
+  );
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const isOutput = !initialForm.isInput;
   const noImage = require('../../assets/sin_imagen.png');
@@ -75,7 +87,9 @@ export const LogForm = ({
 
   useEffect(() => {
     getConfigurationByKey(KEY_CURRENCY_SYMBOL).then(config => {
-      if (config?.value) { setCurrencySymbol(config.value); }
+      if (config?.value) {
+        setCurrencySymbol(config.value);
+      }
     });
   }, []);
 
@@ -84,7 +98,7 @@ export const LogForm = ({
     setProducts(data);
   };
 
-  const {form, errors, handleChange, handleSubmit, response} = useForm(
+  const { form, errors, handleChange, handleSubmit, response } = useForm(
     initialForm,
     validateForm,
     async (inform: LogHeader) => {
@@ -107,9 +121,16 @@ export const LogForm = ({
     },
   );
 
-  const handleUpdateDetail = (item: Parameters<typeof updateDetail>[0], idx: number) => {
+  const handleUpdateDetail = (
+    item: Parameters<typeof updateDetail>[0],
+    idx: number,
+  ) => {
     if (isOutput && item.product) {
-      const warning = checkStockForProduct(item.quantity, item.product.stock, item.name);
+      const warning = checkStockForProduct(
+        item.quantity,
+        item.product.stock,
+        item.name,
+      );
       setStockWarnings(prev => ({
         ...prev,
         [idx]: warning.hasWarning ? warning.warningMessage : '',
@@ -140,16 +161,27 @@ export const LogForm = ({
   };
 
   return (
-    <ScrollView style={[styles.container, styles.mButton]} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={[styles.container, styles.mButton]}
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.selectContainer}>
-        <Text style={{ color: theme.colors.text, fontSize: theme.typography.body.fontSize }} accessibilityRole="header">
+        <Text
+          style={{
+            color: theme.colors.text,
+            fontSize: theme.typography.body.fontSize,
+          }}
+          accessibilityRole="header"
+        >
           Tipo de entrada
         </Text>
         <View
           accessible
           accessibilityRole="button"
           accessibilityLabel="Tipo de entrada"
-          accessibilityHint="Selecciona el tipo de movimiento de inventario">
+          accessibilityHint="Selecciona el tipo de movimiento de inventario"
+        >
           <SelectDropdown
             data={movementTypes}
             defaultValue={movementTypes.find(item => item.id === form.type)}
@@ -158,13 +190,26 @@ export const LogForm = ({
             }}
             rowTextForSelection={item => item.name}
             buttonTextAfterSelection={selectedItem => selectedItem.name}
-            buttonStyle={[styles.input, styles.select, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
-            buttonTextStyle={{color: theme.colors.text}}
-            dropdownStyle={{backgroundColor: theme.colors.surface}}
-            rowStyle={{backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}}
-            rowTextStyle={{color: theme.colors.text}}
-            selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
-            selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
+            buttonStyle={[
+              styles.input,
+              styles.select,
+              {
+                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+            buttonTextStyle={{ color: theme.colors.text }}
+            dropdownStyle={{ backgroundColor: theme.colors.surface }}
+            rowStyle={{
+              backgroundColor: theme.colors.surface,
+              borderBottomColor: theme.colors.border,
+            }}
+            rowTextStyle={{ color: theme.colors.text }}
+            selectedRowStyle={{ backgroundColor: theme.colors.primary + '22' }}
+            selectedRowTextStyle={{
+              color: theme.colors.primary,
+              fontWeight: '600',
+            }}
             dropdownOverlayColor="transparent"
             disabled={isReadonly}
           />
@@ -172,9 +217,16 @@ export const LogForm = ({
         {!!errors.type && (
           <View>
             <Text
-              style={[styles.errorText, { color: theme.colors.error, fontSize: theme.typography.caption.fontSize }]}
+              style={[
+                styles.errorText,
+                {
+                  color: theme.colors.error,
+                  fontSize: theme.typography.caption.fontSize,
+                },
+              ]}
               accessibilityLiveRegion="assertive"
-              accessibilityRole="alert">
+              accessibilityRole="alert"
+            >
               {errors.type}
             </Text>
           </View>
@@ -188,92 +240,138 @@ export const LogForm = ({
         errors={errors.comments}
         onChangeText={text => handleChange(text, 'comments')}
         secureTextEntry={false}
-        colorText={{color: theme.colors.text}}
-        style={[styles.input, styles.textArea, { borderColor: theme.colors.border, color: theme.colors.text }]}
+        colorText={{ color: theme.colors.text }}
+        style={[
+          styles.input,
+          styles.textArea,
+          { borderColor: theme.colors.border, color: theme.colors.text },
+        ]}
         multiline={true}
         readonly={isReadonly}
       />
       {!isReadonly && (
         <View style={styles.selectContainer}>
-          <Text style={{ color: theme.colors.text, fontSize: theme.typography.body.fontSize }} accessibilityRole="header">
+          <Text
+            style={{
+              color: theme.colors.text,
+              fontSize: theme.typography.body.fontSize,
+            }}
+            accessibilityRole="header"
+          >
             Productos Busqueda
           </Text>
           <View
             accessible
             accessibilityRole="search"
             accessibilityLabel="Buscar productos para la entrada"
-            accessibilityHint="Busca y selecciona productos para agregar al movimiento">
+            accessibilityHint="Busca y selecciona productos para agregar al movimiento"
+          >
             <SelectDropdown
               ref={dropdown}
               data={products}
-            onSelect={handleSelect}
-            rowTextForSelection={(item: Product) => {
-              return item.name;
-            }}
-            buttonTextAfterSelection={(selectedItem: Product) => {
-              return selectedItem.name;
-            }}
-            rowStyle={[styles.itemSearchContainer, {backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border}]}
-            buttonTextStyle={{color: theme.colors.text}}
-            dropdownStyle={{backgroundColor: theme.colors.surface}}
-            rowTextStyle={{color: theme.colors.text}}
-            selectedRowStyle={{backgroundColor: theme.colors.primary + '22'}}
-            selectedRowTextStyle={{color: theme.colors.primary, fontWeight: '600'}}
-            searchInputStyle={{backgroundColor: theme.colors.background, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 8}}
-            searchInputTxtStyle={{color: theme.colors.text}}
-            searchPlaceHolderColor={theme.colors.textSecondary}
-            dropdownOverlayColor="transparent"
-            renderCustomizedRowChild={(item: Product) => {
-              return (
-                <TouchableOpacity
-                  style={[styles.rowChild]}
-                  onPress={() => {
-                    handleSelect(item);
-                    dropdown.current.closeDropdown();
-                  }}>
-                  <Image
-                    style={styles.image}
-                    source={
-                      item.image
-                        ? {
-                            uri: resolveImageUri(item.image),
-                          }
-                        : noImage
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.itemSearchText,
-                      styles.fontSize,
-                      { color: theme.colors.text },
-                    ]}>
-                    {item.name}
-                  </Text>
-                  <Text style={[styles.fontSize, { color: theme.colors.text }]}>
-                    {formatCurrency(item.price, currencySymbol)}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-            buttonStyle={[styles.input, styles.select, {borderColor: theme.colors.border, backgroundColor: theme.colors.surface}]}
-            disabled={isReadonly}
-            defaultButtonText="Busca productos para hacer una entrada"
-            search
-            searchPlaceHolder="Buscar ..."
-            onChangeSearchInputText={handleSearch}
-            renderDropdownIcon={() => (
-              <Icon name={'add-circle'} size={35} color={theme.colors.success} />
-            )}
-            renderSearchInputRightIcon={() => (
-              <Icon name={'search'} size={35} color={theme.colors.primary} />
-            )}
-          />
+              onSelect={handleSelect}
+              rowTextForSelection={(item: Product) => {
+                return item.name;
+              }}
+              buttonTextAfterSelection={(selectedItem: Product) => {
+                return selectedItem.name;
+              }}
+              rowStyle={[
+                styles.itemSearchContainer,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderBottomColor: theme.colors.border,
+                },
+              ]}
+              buttonTextStyle={{ color: theme.colors.text }}
+              dropdownStyle={{ backgroundColor: theme.colors.surface }}
+              rowTextStyle={{ color: theme.colors.text }}
+              selectedRowStyle={{
+                backgroundColor: theme.colors.primary + '22',
+              }}
+              selectedRowTextStyle={{
+                color: theme.colors.primary,
+                fontWeight: '600',
+              }}
+              searchInputStyle={{
+                backgroundColor: theme.colors.background,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+                borderRadius: 8,
+              }}
+              searchInputTxtStyle={{ color: theme.colors.text }}
+              searchPlaceHolderColor={theme.colors.textSecondary}
+              dropdownOverlayColor="transparent"
+              renderCustomizedRowChild={(item: Product) => {
+                return (
+                  <TouchableOpacity
+                    style={[styles.rowChild]}
+                    onPress={() => {
+                      handleSelect(item);
+                      dropdown.current.closeDropdown();
+                    }}
+                  >
+                    <Image
+                      style={styles.image}
+                      source={
+                        item.image
+                          ? {
+                              uri: resolveImageUri(item.image),
+                            }
+                          : noImage
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.itemSearchText,
+                        styles.fontSize,
+                        { color: theme.colors.text },
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text
+                      style={[styles.fontSize, { color: theme.colors.text }]}
+                    >
+                      {formatCurrency(item.price, currencySymbol)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+              buttonStyle={[
+                styles.input,
+                styles.select,
+                {
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.surface,
+                },
+              ]}
+              disabled={isReadonly}
+              defaultButtonText="Busca productos para hacer una entrada"
+              search
+              searchPlaceHolder="Buscar ..."
+              onChangeSearchInputText={handleSearch}
+              renderDropdownIcon={() => (
+                <Icon
+                  name={'add-circle'}
+                  size={35}
+                  color={theme.colors.success}
+                />
+              )}
+              renderSearchInputRightIcon={() => (
+                <Icon name={'search'} size={35} color={theme.colors.primary} />
+              )}
+            />
           </View>
         </View>
       )}
       <Text
-        style={[styles.subTitle, { color: theme.colors.text, fontSize: theme.typography.h2.fontSize }]}
-        accessibilityRole="header">
+        style={[
+          styles.subTitle,
+          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize },
+        ]}
+        accessibilityRole="header"
+      >
         Lista de Productos
       </Text>
       <ScrollView style={[styles.listContainer]}>
@@ -299,7 +397,8 @@ export const LogForm = ({
                       },
                     ]}
                     accessibilityRole="alert"
-                    accessibilityLiveRegion="polite">
+                    accessibilityLiveRegion="polite"
+                  >
                     {stockWarnings[index]}
                   </Text>
                 )}
@@ -323,7 +422,15 @@ export const LogForm = ({
           </View>
         )}
         {!!errors.details && (
-          <Text style={[styles.errorText, { color: theme.colors.error, fontSize: theme.typography.caption.fontSize }]}>
+          <Text
+            style={[
+              styles.errorText,
+              {
+                color: theme.colors.error,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+          >
             {errors.details}
           </Text>
         )}
@@ -334,9 +441,21 @@ export const LogForm = ({
         icon={isReadonly ? 'arrow-back-circle-sharp' : 'save'}
         iconColor="#FFFFFF"
         textStyle={[styles.buttonText]}
-        styles={[styles.button, { backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.lg }]}
-        accessibilityLabel={isReadonly ? 'Regresar a la lista' : 'Guardar datos del movimiento'}
-        accessibilityHint={isReadonly ? 'Regresa a la lista anterior' : 'Guarda el movimiento de inventario'}
+        styles={[
+          styles.button,
+          {
+            backgroundColor: theme.colors.primary,
+            borderRadius: theme.borderRadius.lg,
+          },
+        ]}
+        accessibilityLabel={
+          isReadonly ? 'Regresar a la lista' : 'Guardar datos del movimiento'
+        }
+        accessibilityHint={
+          isReadonly
+            ? 'Regresa a la lista anterior'
+            : 'Guarda el movimiento de inventario'
+        }
       />
       {response && (
         <View>
@@ -344,11 +463,14 @@ export const LogForm = ({
             style={[
               styles.responseText,
               {
-                color: response.success ? theme.colors.success : theme.colors.error,
+                color: response.success
+                  ? theme.colors.success
+                  : theme.colors.error,
                 fontSize: theme.typography.body.fontSize,
                 fontWeight: theme.typography.h2.fontWeight,
               },
-            ]}>
+            ]}
+          >
             {response.message}
           </Text>
         </View>

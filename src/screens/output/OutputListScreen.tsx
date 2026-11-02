@@ -14,24 +14,29 @@ import { useTheme } from '../../hooks/useTheme';
 import { OutputListScreenProps } from '../../interfaces/IOutputNavigation';
 import { excelService } from '../../services/ExcelService';
 
-export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
+export const OutputListScreen = ({ navigation }: OutputListScreenProps) => {
   const { theme } = useTheme();
-  const {getTodayBounds} = useTimezone();
+  const { getTodayBounds } = useTimezone();
   const todayBounds = useMemo(() => getTodayBounds(), [getTodayBounds]);
   const [initialDate, setInitialDate] = useState(todayBounds.fechaInicio);
   const [finalDate, setFinalDate] = useState(todayBounds.fechaFin);
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
   const [typeCatalog, setTypeCatalog] = useState<MovementType[]>([]);
-  const {outputs, isLoading, loadData} = useOutputs(initialDate, finalDate);
+  const { outputs, isLoading, loadData } = useOutputs(initialDate, finalDate);
 
   useEffect(() => {
     getAllMovementTypes().then(setTypeCatalog);
   }, []);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  );
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning',
+  ) => {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
@@ -41,8 +46,8 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
     try {
       setIsLoadingDownload(true);
       const logs = await LogHeaderRepository.find({
-        where: {isInput: 0 as any},
-        order: {id: 'DESC'},
+        where: { isInput: 0 as any },
+        order: { id: 'DESC' },
         relations: ['logDetails'],
       });
       const details = logs.flatMap(log => log.logDetails);
@@ -52,7 +57,8 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
       showToast(`Guardado en ${location}: ${fileName}`, 'success');
       setIsLoadingDownload(false);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error al exportar el archivo';
+      const msg =
+        e instanceof Error ? e.message : 'Error al exportar el archivo';
       showToast(msg, 'error');
       setIsLoadingDownload(false);
     }
@@ -82,9 +88,14 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
       <Text
         style={[
           styles.title,
-          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight },
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+          },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Lista de salidas
       </Text>
       <InputDate
@@ -102,20 +113,24 @@ export const OutputListScreen = ({navigation}: OutputListScreenProps) => {
       <Text
         style={[
           styles.resultText,
-          { color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize },
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.body.fontSize,
+          },
         ]}
-        accessibilityLabel={`Total de resultados: ${outputs.length}`}>
+        accessibilityLabel={`Total de resultados: ${outputs.length}`}
+      >
         Total de Resultados: {outputs.length}
       </Text>
       <FlatList
         style={[styles.list]}
         data={outputs}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <LogItems
             logHeader={item}
             typeCatalog={typeCatalog}
             navigation={(id: number) => {
-              navigation.navigate('ReadOutput', {id});
+              navigation.navigate('ReadOutput', { id });
             }}
           />
         )}
@@ -167,17 +182,17 @@ const styles = StyleSheet.create({
   fabR: {
     bottom: 20,
     right: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   fabL: {
     bottom: 20,
     left: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   fabDash: {
     bottom: 80,
     left: 20,
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
   },
   list: {
     padding: 10,

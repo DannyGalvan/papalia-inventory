@@ -24,8 +24,8 @@ export interface EmptyStateProps {
   icon: string;
 }
 
-export const EmptyState = ({title, description, icon}: EmptyStateProps) => {
-  const {theme} = useTheme();
+export const EmptyState = ({ title, description, icon }: EmptyStateProps) => {
+  const { theme } = useTheme();
 
   return (
     <View
@@ -38,7 +38,8 @@ export const EmptyState = ({title, description, icon}: EmptyStateProps) => {
       ]}
       accessible
       accessibilityRole="text"
-      accessibilityLabel={`${title}. ${description}`}>
+      accessibilityLabel={`${title}. ${description}`}
+    >
       <Icon
         name={icon}
         size={64}
@@ -47,7 +48,7 @@ export const EmptyState = ({title, description, icon}: EmptyStateProps) => {
         // title and description announced on the container.
         accessibilityElementsHidden
         importantForAccessibility="no"
-        style={{marginBottom: theme.spacing.md}}
+        style={{ marginBottom: theme.spacing.md }}
       />
       <Text
         accessibilityRole="header"
@@ -60,7 +61,8 @@ export const EmptyState = ({title, description, icon}: EmptyStateProps) => {
             color: theme.colors.text,
             marginBottom: theme.spacing.sm,
           },
-        ]}>
+        ]}
+      >
         {title}
       </Text>
       <Text
@@ -72,7 +74,8 @@ export const EmptyState = ({title, description, icon}: EmptyStateProps) => {
             lineHeight: theme.typography.body.lineHeight,
             color: theme.colors.textSecondary,
           },
-        ]}>
+        ]}
+      >
         {description}
       </Text>
     </View>

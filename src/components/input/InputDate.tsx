@@ -11,17 +11,25 @@ interface Props {
   isFinal: boolean;
 }
 
-export const InputDate = ({date, setDate, label, isFinal}: Props) => {
-  const {theme} = useTheme();
-  const {formatDate} = useTimezone();
+export const InputDate = ({ date, setDate, label, isFinal }: Props) => {
+  const { theme } = useTheme();
+  const { formatDate } = useTimezone();
   const [open, setOpen] = useState(false);
   const formattedDate = formatDate(date);
 
   return (
     <View>
       <Text
-        style={[styles.labelDate, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize, fontWeight: '600'}]}
-        accessibilityRole="header">
+        style={[
+          styles.labelDate,
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.caption.fontSize,
+            fontWeight: '600',
+          },
+        ]}
+        accessibilityRole="header"
+      >
         {label}
       </Text>
       <Text
@@ -37,7 +45,8 @@ export const InputDate = ({date, setDate, label, isFinal}: Props) => {
         ]}
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${formattedDate}`}
-        accessibilityHint="Toca para seleccionar una fecha">
+        accessibilityHint="Toca para seleccionar una fecha"
+      >
         {formattedDate}
       </Text>
       {open && (

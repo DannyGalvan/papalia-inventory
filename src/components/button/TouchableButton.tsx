@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-    StyleProp,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    ViewStyle,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { appStyles } from '../../styles/globalStyles';
@@ -39,7 +39,8 @@ export const TouchableButton = ({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title ?? 'Botón'}
-      accessibilityHint={accessibilityHint}>
+      accessibilityHint={accessibilityHint}
+    >
       {title && <Text style={textStyle}>{title}</Text>}
       {icon && <Icon name={icon} size={iconSize ?? 30} color={iconColor} />}
     </TouchableOpacity>

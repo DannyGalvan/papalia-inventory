@@ -30,9 +30,9 @@ const resolveTypeName = (typeId: number, catalog: MovementType[]): string => {
   return found?.name ?? `Tipo ${typeId}`;
 };
 
-export const LogDetailView = ({log}: Props) => {
-  const {theme} = useTheme();
-  const {formatDateTime} = useTimezone();
+export const LogDetailView = ({ log }: Props) => {
+  const { theme } = useTheme();
+  const { formatDateTime } = useTimezone();
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const [typeCatalog, setTypeCatalog] = useState<MovementType[]>([]);
   const noImage = require('../assets/sin_imagen.png');
@@ -42,7 +42,9 @@ export const LogDetailView = ({log}: Props) => {
       getConfigurationByKey(KEY_CURRENCY_SYMBOL),
       getAllMovementTypes(),
     ]).then(([symbolConfig, catalog]) => {
-      if (symbolConfig?.value) {setCurrencySymbol(symbolConfig.value);}
+      if (symbolConfig?.value) {
+        setCurrencySymbol(symbolConfig.value);
+      }
       setTypeCatalog(catalog);
     });
   }, []);
@@ -58,36 +60,85 @@ export const LogDetailView = ({log}: Props) => {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-      contentContainerStyle={styles.content}>
-
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
+    >
       {/* ── Header card ── */}
-      <View style={[styles.card, {backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md}, theme.elevation.low]}>
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.colors.surface,
+            borderRadius: theme.borderRadius.md,
+          },
+          theme.elevation.low,
+        ]}
+      >
         <View style={styles.headerRow}>
-          <View style={[styles.badge, {backgroundColor: badgeColor + '22', borderColor: badgeColor}]}>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: badgeColor + '22', borderColor: badgeColor },
+            ]}
+          >
             <Icon name={badgeIcon} size={16} color={badgeColor} />
-            <Text style={[styles.badgeText, {color: badgeColor}]}>{badgeLabel}</Text>
+            <Text style={[styles.badgeText, { color: badgeColor }]}>
+              {badgeLabel}
+            </Text>
           </View>
-          <Text style={[styles.typeLabel, {color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight}]}>
+          <Text
+            style={[
+              styles.typeLabel,
+              {
+                color: theme.colors.text,
+                fontSize: theme.typography.h2.fontSize,
+                fontWeight: theme.typography.h2.fontWeight,
+              },
+            ]}
+          >
             {typeName}
           </Text>
         </View>
 
-        <View style={[styles.divider, {backgroundColor: theme.colors.border}]} />
+        <View
+          style={[styles.divider, { backgroundColor: theme.colors.border }]}
+        />
 
         <View style={styles.infoRow}>
-          <Icon name="calendar-outline" size={16} color={theme.colors.textSecondary} />
-          <Text style={[styles.infoLabel, {color: theme.colors.textSecondary}]}>Fecha</Text>
-          <Text style={[styles.infoValue, {color: theme.colors.text}]}>
+          <Icon
+            name="calendar-outline"
+            size={16}
+            color={theme.colors.textSecondary}
+          />
+          <Text
+            style={[styles.infoLabel, { color: theme.colors.textSecondary }]}
+          >
+            Fecha
+          </Text>
+          <Text style={[styles.infoValue, { color: theme.colors.text }]}>
             {formatDateTime(log.createdAt)}
           </Text>
         </View>
 
         {!!log.comments && (
           <View style={[styles.infoRow, styles.commentsRow]}>
-            <Icon name="chatbubble-outline" size={16} color={theme.colors.textSecondary} />
-            <Text style={[styles.infoLabel, {color: theme.colors.textSecondary}]}>Comentarios</Text>
-            <Text style={[styles.infoValue, styles.commentsValue, {color: theme.colors.text}]}>
+            <Icon
+              name="chatbubble-outline"
+              size={16}
+              color={theme.colors.textSecondary}
+            />
+            <Text
+              style={[styles.infoLabel, { color: theme.colors.textSecondary }]}
+            >
+              Comentarios
+            </Text>
+            <Text
+              style={[
+                styles.infoValue,
+                styles.commentsValue,
+                { color: theme.colors.text },
+              ]}
+            >
               {log.comments}
             </Text>
           </View>
@@ -95,12 +146,20 @@ export const LogDetailView = ({log}: Props) => {
       </View>
 
       {/* ── Products section ── */}
-      <Text style={[styles.sectionTitle, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.caption.fontSize,
+          },
+        ]}
+      >
         PRODUCTOS ({details.length})
       </Text>
 
       {details.length === 0 ? (
-        <Text style={[styles.emptyText, {color: theme.colors.textSecondary}]}>
+        <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
           Sin productos registrados
         </Text>
       ) : (
@@ -110,11 +169,19 @@ export const LogDetailView = ({log}: Props) => {
             style={[
               styles.card,
               styles.productCard,
-              {backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md},
+              {
+                backgroundColor: theme.colors.surface,
+                borderRadius: theme.borderRadius.md,
+              },
               theme.elevation.low,
-            ]}>
+            ]}
+          >
             <Image
-              source={detail.product?.image ? {uri: resolveImageUri(detail.product.image)} : noImage}
+              source={
+                detail.product?.image
+                  ? { uri: resolveImageUri(detail.product.image) }
+                  : noImage
+              }
               style={styles.productImage}
               resizeMode="contain"
               accessibilityRole="image"
@@ -122,20 +189,54 @@ export const LogDetailView = ({log}: Props) => {
             />
             <View style={styles.productInfo}>
               <Text
-                style={[styles.productName, {color: theme.colors.text, fontSize: theme.typography.body.fontSize, fontWeight: '600'}]}
-                numberOfLines={2}>
+                style={[
+                  styles.productName,
+                  {
+                    color: theme.colors.text,
+                    fontSize: theme.typography.body.fontSize,
+                    fontWeight: '600',
+                  },
+                ]}
+                numberOfLines={2}
+              >
                 {detail.name}
               </Text>
-              <Text style={[styles.productCode, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
+              <Text
+                style={[
+                  styles.productCode,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontSize: theme.typography.caption.fontSize,
+                  },
+                ]}
+              >
                 Cód. {detail.productCode}
               </Text>
               <View style={styles.productCalc}>
-                <Text style={[styles.calcText, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}>
-                  {detail.quantity} uds × {formatCurrency(Number(detail.price), currencySymbol)}
+                <Text
+                  style={[
+                    styles.calcText,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontSize: theme.typography.caption.fontSize,
+                    },
+                  ]}
+                >
+                  {detail.quantity} uds ×{' '}
+                  {formatCurrency(Number(detail.price), currencySymbol)}
                 </Text>
               </View>
             </View>
-            <Text style={[styles.productSubtotal, {color: theme.colors.text, fontSize: theme.typography.body.fontSize, fontWeight: '700'}]}>
+            <Text
+              style={[
+                styles.productSubtotal,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.body.fontSize,
+                  fontWeight: '700',
+                },
+              ]}
+            >
               {formatCurrency(Number(detail.total), currencySymbol)}
             </Text>
           </View>
@@ -144,12 +245,39 @@ export const LogDetailView = ({log}: Props) => {
 
       {/* ── Total footer ── */}
       {details.length > 0 && (
-        <View style={[styles.totalCard, {backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, borderColor: theme.colors.border}]}>
-          <Text style={[styles.totalLabel, {color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize}]}>
+        <View
+          style={[
+            styles.totalCard,
+            {
+              backgroundColor: theme.colors.surface,
+              borderRadius: theme.borderRadius.md,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.totalLabel,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.body.fontSize,
+              },
+            ]}
+          >
             Total del movimiento
           </Text>
-          <Text style={[styles.totalValue, {color: isInput ? theme.colors.success : theme.colors.error, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight}]}>
-            {isInput ? '+' : '-'}{formatCurrency(total, currencySymbol)}
+          <Text
+            style={[
+              styles.totalValue,
+              {
+                color: isInput ? theme.colors.success : theme.colors.error,
+                fontSize: theme.typography.h2.fontSize,
+                fontWeight: theme.typography.h2.fontWeight,
+              },
+            ]}
+          >
+            {isInput ? '+' : '-'}
+            {formatCurrency(total, currencySymbol)}
           </Text>
         </View>
       )}
@@ -158,9 +286,9 @@ export const LogDetailView = ({log}: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
-  content: {padding: 16, paddingBottom: 40, gap: 12},
-  card: {padding: 14},
+  container: { flex: 1 },
+  content: { padding: 16, paddingBottom: 40, gap: 12 },
+  card: { padding: 14 },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -177,26 +305,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
   },
-  badgeText: {fontSize: 13, fontWeight: '700'},
-  typeLabel: {flex: 1},
-  divider: {height: StyleSheet.hairlineWidth, marginBottom: 12},
+  badgeText: { fontSize: 13, fontWeight: '700' },
+  typeLabel: { flex: 1 },
+  divider: { height: StyleSheet.hairlineWidth, marginBottom: 12 },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
     marginBottom: 8,
   },
-  commentsRow: {alignItems: 'flex-start'},
-  infoLabel: {fontSize: 13, fontWeight: '600', width: 100},
-  infoValue: {flex: 1, fontSize: 14},
-  commentsValue: {flexShrink: 1},
+  commentsRow: { alignItems: 'flex-start' },
+  infoLabel: { fontSize: 13, fontWeight: '600', width: 100 },
+  infoValue: { flex: 1, fontSize: 14 },
+  commentsValue: { flexShrink: 1 },
   sectionTitle: {
     fontWeight: '600',
     letterSpacing: 1,
     marginTop: 4,
     marginBottom: 4,
   },
-  emptyText: {textAlign: 'center', fontStyle: 'italic'},
+  emptyText: { textAlign: 'center', fontStyle: 'italic' },
   productCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -208,12 +336,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'transparent',
   },
-  productInfo: {flex: 1},
-  productName: {marginBottom: 2},
-  productCode: {marginBottom: 4},
-  productCalc: {flexDirection: 'row', alignItems: 'center'},
+  productInfo: { flex: 1 },
+  productName: { marginBottom: 2 },
+  productCode: { marginBottom: 4 },
+  productCalc: { flexDirection: 'row', alignItems: 'center' },
   calcText: {},
-  productSubtotal: {textAlign: 'right', minWidth: 80},
+  productSubtotal: { textAlign: 'right', minWidth: 80 },
   totalCard: {
     flexDirection: 'row',
     alignItems: 'center',

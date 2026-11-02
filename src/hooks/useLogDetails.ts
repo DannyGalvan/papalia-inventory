@@ -1,6 +1,6 @@
-import {useState} from 'react';
-import {LogDetail} from '../database/models/LogDetail';
-import {Alert} from 'react-native';
+import { useState } from 'react';
+import { LogDetail } from '../database/models/LogDetail';
+import { Alert } from 'react-native';
 
 export const useLogDetails = () => {
   const [details, setDetails] = useState<LogDetail[]>([]);

@@ -21,11 +21,11 @@
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
-    Animated,
-    DimensionValue,
-    StyleSheet,
-    View,
-    ViewStyle,
+  Animated,
+  DimensionValue,
+  StyleSheet,
+  View,
+  ViewStyle,
 } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -71,8 +71,8 @@ const SkeletonBlock = ({
   />
 );
 
-export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
-  const {theme} = useTheme();
+export const SkeletonLoader = ({ layout, count }: SkeletonLoaderProps) => {
+  const { theme } = useTheme();
   const pulse = useRef(new Animated.Value(0)).current;
 
   // Resolve how many placeholder cards to render. Guard against invalid
@@ -151,7 +151,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
               color={blockColor}
               opacity={opacity}
               radius={theme.borderRadius.sm}
-              style={{marginTop: theme.spacing.sm}}
+              style={{ marginTop: theme.spacing.sm }}
             />
             <SkeletonBlock
               width="100%"
@@ -159,7 +159,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
               color={blockColor}
               opacity={opacity}
               radius={theme.borderRadius.md}
-              style={{marginTop: theme.spacing.sm}}
+              style={{ marginTop: theme.spacing.sm }}
             />
           </View>
         );
@@ -189,7 +189,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
               color={blockColor}
               opacity={opacity}
               radius={theme.borderRadius.sm}
-              style={{marginTop: theme.spacing.sm}}
+              style={{ marginTop: theme.spacing.sm }}
             />
             <SkeletonBlock
               width="90%"
@@ -197,7 +197,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
               color={blockColor}
               opacity={opacity}
               radius={theme.borderRadius.sm}
-              style={{marginTop: theme.spacing.xs}}
+              style={{ marginTop: theme.spacing.xs }}
             />
           </View>
         );
@@ -221,7 +221,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
                 radius={theme.borderRadius.sm}
               />
             </View>
-            <View style={[styles.row, {marginTop: theme.spacing.sm}]}>
+            <View style={[styles.row, { marginTop: theme.spacing.sm }]}>
               <SkeletonBlock
                 width="35%"
                 height={14}
@@ -237,7 +237,7 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
                 radius={theme.borderRadius.sm}
               />
             </View>
-            <View style={[styles.row, {marginTop: theme.spacing.sm}]}>
+            <View style={[styles.row, { marginTop: theme.spacing.sm }]}>
               <SkeletonBlock
                 width="40%"
                 height={14}
@@ -266,8 +266,9 @@ export const SkeletonLoader = ({layout, count}: SkeletonLoaderProps) => {
       style={styles.container}
       accessibilityRole="progressbar"
       accessibilityLabel="Cargando contenido"
-      accessibilityState={{busy: true}}>
-      {Array.from({length: itemCount}, (_, index) => renderCard(index))}
+      accessibilityState={{ busy: true }}
+    >
+      {Array.from({ length: itemCount }, (_, index) => renderCard(index))}
     </View>
   );
 };

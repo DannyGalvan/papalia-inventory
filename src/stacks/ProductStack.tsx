@@ -13,7 +13,7 @@ import { appColors } from '../styles/globalStyles';
 const Stack = createNativeStackNavigator<ProductStackParamList>();
 
 function ProductStack() {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Stack.Navigator
@@ -21,14 +21,15 @@ function ProductStack() {
         headerTintColor: appColors.warning,
         headerBackTitle: 'Regresar',
         headerTitle: '',
-        headerStyle: {backgroundColor: theme.colors.surface},
+        headerStyle: { backgroundColor: theme.colors.surface },
         headerShadowVisible: false,
       }}
-      id={undefined}>
+      id={undefined}
+    >
       <Stack.Screen
         name="ListProduct"
         component={ProductListScreen}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
       <Stack.Screen name="CreateProduct" component={CreateProductScreen} />
       <Stack.Screen name="EditProduct" component={UpdateProductScreen} />

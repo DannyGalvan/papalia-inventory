@@ -3,8 +3,8 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { ProductForm } from '../../components/form/ProductForm';
 import { Product } from '../../database/models/Product';
 import {
-    getProductById,
-    updateProduct,
+  getProductById,
+  updateProduct,
 } from '../../database/repository/ProductRepository';
 import { useTheme } from '../../hooks/useTheme';
 import { ProductEditScreenProps } from '../../interfaces/IProductNavigation';
@@ -13,8 +13,8 @@ export const UpdateProductScreen = ({
   navigation,
   route,
 }: ProductEditScreenProps) => {
-  const {theme} = useTheme();
-  const {id} = route.params;
+  const { theme } = useTheme();
+  const { id } = route.params;
   const [productState, setProductState] = useState<Product>(new Product());
   const [isLoading, setIsLoading] = useState(true);
 
@@ -39,10 +39,11 @@ export const UpdateProductScreen = ({
   };
 
   return (
-    <View style={[styles.screen, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Text
-        style={[styles.title, {color: theme.colors.text}]}
-        accessibilityRole="header">
+        style={[styles.title, { color: theme.colors.text }]}
+        accessibilityRole="header"
+      >
         Actualizar Producto
       </Text>
       {!isLoading && (

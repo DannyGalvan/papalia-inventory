@@ -1,10 +1,10 @@
 import {
-    DocumentDirectoryPath,
-    PicturesDirectoryPath,
-    copyFile,
-    exists,
-    mkdir,
-    unlink,
+  DocumentDirectoryPath,
+  PicturesDirectoryPath,
+  copyFile,
+  exists,
+  mkdir,
+  unlink,
 } from '@dr.pogodin/react-native-fs';
 import { pick, types } from '@react-native-documents/picker';
 import { useContext } from 'react';
@@ -23,10 +23,9 @@ import { useStoragePermissions } from './useStoragePermissions';
 const getImageBaseDir = (): string =>
   Platform.OS === 'android' ? PicturesDirectoryPath : DocumentDirectoryPath;
 
-
 export const useImages = () => {
-  const {checkStoragePermissions} = useStoragePermissions();
-  const {dirImages, changeDirImages, isLoading, setIsLoading} =
+  const { checkStoragePermissions } = useStoragePermissions();
+  const { dirImages, changeDirImages, isLoading, setIsLoading } =
     useContext(ProductContext);
 
   const uploadImage = async ({

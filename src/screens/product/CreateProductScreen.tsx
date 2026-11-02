@@ -26,7 +26,7 @@ export const CreateProductScreen = ({
   navigation,
 }: ProductCreateScreenProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   const onSubmit = async (product: Product) => {
     const response = await createProduct(product);
@@ -78,7 +78,9 @@ export const CreateProductScreen = ({
       setIsLoading(false);
       Alert.alert(
         'Importación exitosa',
-        `Se importaron ${data.length} producto${data.length !== 1 ? 's' : ''} correctamente.`,
+        `Se importaron ${data.length} producto${
+          data.length !== 1 ? 's' : ''
+        } correctamente.`,
       );
     } catch (error: unknown) {
       setIsLoading(false);
@@ -87,7 +89,7 @@ export const CreateProductScreen = ({
         error !== null &&
         typeof error === 'object' &&
         'code' in error &&
-        (error as {code: string}).code === 'OPERATION_CANCELED'
+        (error as { code: string }).code === 'OPERATION_CANCELED'
       ) {
         return;
       }
@@ -100,10 +102,11 @@ export const CreateProductScreen = ({
   };
 
   return (
-    <View style={[styles.screen, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Text
-        style={[styles.title, {color: theme.colors.text}]}
-        accessibilityRole="header">
+        style={[styles.title, { color: theme.colors.text }]}
+        accessibilityRole="header"
+      >
         Crear Nuevo Producto
       </Text>
       <ProductForm initialForm={initialForm} onSubmit={onSubmit} />

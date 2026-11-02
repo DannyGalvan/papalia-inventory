@@ -13,7 +13,11 @@ export { colorPalette, semanticColors } from './colors';
 export type { ColorPalette, SemanticColors } from './colors';
 
 export { typography } from './typography';
-export type { FontWeight, TypographyLevel, TypographyScale } from './typography';
+export type {
+  FontWeight,
+  TypographyLevel,
+  TypographyScale,
+} from './typography';
 
 export { spacing } from './spacing';
 export type { SpacingScale } from './spacing';
@@ -23,4 +27,3 @@ export type { ElevationLevel, ElevationScale } from './elevation';
 
 export { borderRadius } from './borders';
 export type { BorderRadiusScale } from './borders';
-

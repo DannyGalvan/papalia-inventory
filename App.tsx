@@ -33,10 +33,10 @@ type DbState = 'loading' | 'ready' | 'error';
  * Inner app content rendered after DB + Theme are ready.
  */
 function AppContent(): React.JSX.Element {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
-    <View style={[styles.flex, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.flex, { backgroundColor: theme.colors.background }]}>
       <NavigationContainer>
         <AppStartStack />
       </NavigationContainer>
@@ -82,9 +82,7 @@ function App(): React.JSX.Element {
     return (
       <View style={styles.centeredContainer}>
         <ActivityIndicator size="large" color="#1565C0" />
-        <Text style={styles.loadingText}>
-          Iniciando la aplicación...
-        </Text>
+        <Text style={styles.loadingText}>Iniciando la aplicación...</Text>
       </View>
     );
   }
@@ -96,7 +94,8 @@ function App(): React.JSX.Element {
         style={styles.centeredContainer}
         accessible
         accessibilityRole="alert"
-        accessibilityLabel="Error al iniciar la base de datos. Presione reintentar para intentar de nuevo.">
+        accessibilityLabel="Error al iniciar la base de datos. Presione reintentar para intentar de nuevo."
+      >
         <Text style={styles.errorTitle} accessibilityRole="header">
           Error de Base de Datos
         </Text>
@@ -108,7 +107,8 @@ function App(): React.JSX.Element {
           onPress={initializeDatabase}
           accessibilityRole="button"
           accessibilityLabel="Reintentar inicialización de base de datos"
-          style={styles.retryButton}>
+          style={styles.retryButton}
+        >
           <Text style={styles.retryButtonText}>Reintentar</Text>
         </TouchableOpacity>
       </View>

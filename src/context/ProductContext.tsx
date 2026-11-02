@@ -1,13 +1,12 @@
-import React, {ReactNode, createContext, useState} from 'react';
-import {Alert} from 'react-native';
-import {useEffect} from 'react';
+import React, { ReactNode, createContext, useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 import {
   ConfigurationRepository,
   createConfiguration,
   getConfigurationByKey,
   updateConfiguration,
 } from '../database/repository/ConfigurationRepository';
-import {KEY_DIR_IMAGES} from '../config/constants';
+import { KEY_DIR_IMAGES } from '../config/constants';
 
 export interface IProductContext {
   dirImages: string;
@@ -18,7 +17,7 @@ export interface IProductContext {
 
 export const ProductContext = createContext({} as IProductContext);
 
-export const ProductProvider = ({children}: {children: ReactNode}) => {
+export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [dirImages, setDirImages] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,7 +87,8 @@ export const ProductProvider = ({children}: {children: ReactNode}) => {
         changeDirImages,
         isLoading,
         setIsLoading,
-      }}>
+      }}
+    >
       {children}
     </ProductContext.Provider>
   );

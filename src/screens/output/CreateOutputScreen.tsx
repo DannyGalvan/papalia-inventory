@@ -5,8 +5,8 @@ import { LogForm } from '../../components/form/LogForm';
 import { OUTPUT_TYPES } from '../../config/constants';
 import { LogHeader } from '../../database/models/LogHeader';
 import {
-    LogHeaderRepository,
-    createLog,
+  LogHeaderRepository,
+  createLog,
 } from '../../database/repository/LogHeaderRepository';
 import { getProductById } from '../../database/repository/ProductRepository';
 import { useTheme } from '../../hooks/useTheme';
@@ -25,9 +25,14 @@ export const CreateOutputScreen = () => {
   const { theme } = useTheme();
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  );
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning',
+  ) => {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
@@ -52,11 +57,14 @@ export const CreateOutputScreen = () => {
       );
       if (!validation.isValid) {
         showToast(validation.errorMessage!, 'error');
-        return {success: false, message: validation.errorMessage};
+        return { success: false, message: validation.errorMessage };
       }
     } catch {
       showToast('Error al verificar el stock disponible', 'error');
-      return {success: false, message: 'Error al verificar el stock disponible'};
+      return {
+        success: false,
+        message: 'Error al verificar el stock disponible',
+      };
     }
 
     const result = await createLog(form);
@@ -72,7 +80,8 @@ export const CreateOutputScreen = () => {
     <KeyboardAvoidingView
       style={[styles.screen, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
       <Toast
         message={toastMessage}
         type={toastType}
@@ -82,9 +91,14 @@ export const CreateOutputScreen = () => {
       <Text
         style={[
           styles.title,
-          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight },
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+          },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Crear salida de producto
       </Text>
       <LogForm

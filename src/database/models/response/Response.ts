@@ -1,4 +1,4 @@
-import {IResponse} from '../../../interfaces/IResponse';
+import { IResponse } from '../../../interfaces/IResponse';
 
 export class Response<T> implements IResponse<T> {
   success: boolean;

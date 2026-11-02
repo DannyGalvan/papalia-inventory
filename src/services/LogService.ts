@@ -72,7 +72,6 @@ export class LogServiceImpl implements LogService {
 
     // Mirror to the console during development to aid debugging.
     if (__DEV__) {
-      // eslint-disable-next-line no-console
       console.error(
         `[${logEntry.source}] ${logEntry.operation}: ${logEntry.message}`,
       );

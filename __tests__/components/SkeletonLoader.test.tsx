@@ -20,17 +20,20 @@ import ReactTestRenderer from 'react-test-renderer';
 // environment. Stub the repository module so the theme context can be
 // imported without pulling in the native/ESM database stack.
 jest.mock('../../src/database/repository/ConfigurationRepository', () => ({
-  ConfigurationRepository: {create: jest.fn()},
+  ConfigurationRepository: { create: jest.fn() },
   createConfiguration: jest.fn(),
   getConfigurationByKey: jest.fn(),
   updateConfiguration: jest.fn(),
 }));
 
 import {
-    SkeletonLoader,
-    SkeletonLoaderProps,
+  SkeletonLoader,
+  SkeletonLoaderProps,
 } from '../../src/components/feedback/SkeletonLoader';
-import { ThemeContext, ThemeContextValue } from '../../src/context/ThemeContext';
+import {
+  ThemeContext,
+  ThemeContextValue,
+} from '../../src/context/ThemeContext';
 import { lightTheme } from '../../src/design-system/themes';
 
 const themeValue: ThemeContextValue = {
@@ -66,12 +69,10 @@ afterEach(() => {
   }
 });
 
-
 /** Count the placeholder cards: direct View children of the busy container. */
 const countCards = (renderer: ReactTestRenderer.ReactTestRenderer) => {
   const container = renderer.root.find(
-    node =>
-      node.type === View && node.props.accessibilityState?.busy === true,
+    node => node.type === View && node.props.accessibilityState?.busy === true,
   );
   return container.props.children.filter(Boolean).length;
 };
@@ -84,33 +85,33 @@ describe('SkeletonLoader', () => {
   ];
 
   it.each(layouts)('renders the "%s" layout without crashing', layout => {
-    const renderer = renderSkeleton({layout});
+    const renderer = renderSkeleton({ layout });
     expect(renderer.toJSON()).toBeTruthy();
   });
 
   it('renders the default number of cards when count is omitted', () => {
-    const renderer = renderSkeleton({layout: 'product-list'});
+    const renderer = renderSkeleton({ layout: 'product-list' });
     expect(countCards(renderer)).toBe(6);
   });
 
   it('renders exactly the requested number of cards', () => {
-    const renderer = renderSkeleton({layout: 'log-list', count: 3});
+    const renderer = renderSkeleton({ layout: 'log-list', count: 3 });
     expect(countCards(renderer)).toBe(3);
   });
 
   it('falls back to the default count for non-positive counts', () => {
-    const renderer = renderSkeleton({layout: 'dashboard', count: 0});
+    const renderer = renderSkeleton({ layout: 'dashboard', count: 0 });
     expect(countCards(renderer)).toBe(6);
   });
 
   it('renders animated placeholder blocks driven by Animated', () => {
-    const renderer = renderSkeleton({layout: 'product-list', count: 1});
+    const renderer = renderSkeleton({ layout: 'product-list', count: 1 });
     const animatedViews = renderer.root.findAllByType(Animated.View);
     expect(animatedViews.length).toBeGreaterThan(0);
   });
 
   it('exposes a busy accessibility state for assistive technology', () => {
-    const renderer = renderSkeleton({layout: 'product-list'});
+    const renderer = renderSkeleton({ layout: 'product-list' });
     const busy = renderer.root.findAll(
       node => node.props.accessibilityState?.busy === true,
     );

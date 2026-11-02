@@ -52,9 +52,9 @@ jest.mock('typeorm', () => {
 // Imports must come after jest.mock so the mocked module is wired in.
 import { LogHeader } from '../../../src/database/models/LogHeader';
 import {
-    LOG_FORM_MESSAGES,
-    UNSELECTED_TYPE,
-    validateLogForm,
+  LOG_FORM_MESSAGES,
+  UNSELECTED_TYPE,
+  validateLogForm,
 } from '../../../src/utils/validateLogForm';
 
 // ---------------------------------------------------------------------------

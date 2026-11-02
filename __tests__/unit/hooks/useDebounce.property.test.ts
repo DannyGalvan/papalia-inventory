@@ -21,7 +21,10 @@
 import fc from 'fast-check';
 import React from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
-import { DEFAULT_DEBOUNCE_DELAY, useDebounce } from '../../../src/hooks/useDebounce';
+import {
+  DEFAULT_DEBOUNCE_DELAY,
+  useDebounce,
+} from '../../../src/hooks/useDebounce';
 
 type HarnessProps = { value: string; delay?: number };
 type HarnessRef = { debouncedValue: string };
@@ -67,7 +70,9 @@ describe('useDebounce — example cases', () => {
     const { Harness, ref } = createHarness();
     let renderer!: TestRenderer.ReactTestRenderer;
     act(() => {
-      renderer = TestRenderer.create(React.createElement(Harness, { value: 'a' }));
+      renderer = TestRenderer.create(
+        React.createElement(Harness, { value: 'a' }),
+      );
     });
 
     act(() => {
@@ -86,7 +91,9 @@ describe('useDebounce — example cases', () => {
     const { Harness, ref } = createHarness();
     let renderer!: TestRenderer.ReactTestRenderer;
     act(() => {
-      renderer = TestRenderer.create(React.createElement(Harness, { value: 'a' }));
+      renderer = TestRenderer.create(
+        React.createElement(Harness, { value: 'a' }),
+      );
     });
 
     act(() => {
@@ -113,8 +120,11 @@ describe('Feature: app-modernization, Property 9: Debounce suppresses intermedia
     await fc.assert(
       fc.property(
         // Generate a non-empty array of search terms (1..20 intermediate values)
-        fc.array(fc.string({ minLength: 1, maxLength: 30 }), { minLength: 2, maxLength: 20 }),
-        (searchTerms) => {
+        fc.array(fc.string({ minLength: 1, maxLength: 30 }), {
+          minLength: 2,
+          maxLength: 20,
+        }),
+        searchTerms => {
           const { Harness, ref } = createHarness();
           const finalValue = searchTerms[searchTerms.length - 1];
 

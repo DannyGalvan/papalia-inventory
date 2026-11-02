@@ -20,13 +20,10 @@ jest.mock('@dr.pogodin/react-native-fs', () => ({
 }));
 
 import {
-    exists as rnfsExists,
-    writeFile as rnfsWriteFile,
+  exists as rnfsExists,
+  writeFile as rnfsWriteFile,
 } from '@dr.pogodin/react-native-fs';
-import {
-    FileServiceImpl,
-    PERMISSION_DENIED_MESSAGES,
-} from './FileService';
+import { FileServiceImpl, PERMISSION_DENIED_MESSAGES } from './FileService';
 
 const mockedExists = rnfsExists as jest.MockedFunction<typeof rnfsExists>;
 const mockedWriteFile = rnfsWriteFile as jest.MockedFunction<

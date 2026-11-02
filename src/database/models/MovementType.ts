@@ -5,5 +5,5 @@ export class MovementType {
   @PrimaryGeneratedColumn('increment') id: number;
   @Column('varchar') name: string;
   @Column('boolean') isInput: boolean;
-  @Column('boolean', {default: true}) isActive: boolean;
+  @Column('boolean', { default: true }) isActive: boolean;
 }

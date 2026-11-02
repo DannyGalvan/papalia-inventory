@@ -7,8 +7,8 @@ interface ReportCardProps {
   children: React.ReactNode;
 }
 
-export const ReportCard = ({title, children}: ReportCardProps) => {
-  const {theme} = useTheme();
+export const ReportCard = ({ title, children }: ReportCardProps) => {
+  const { theme } = useTheme();
 
   return (
     <View
@@ -21,8 +21,9 @@ export const ReportCard = ({title, children}: ReportCardProps) => {
           borderRadius: theme.borderRadius.md,
         },
         theme.elevation.low,
-      ]}>
-      <Text style={[styles.title, {color: theme.colors.text}]}>{title}</Text>
+      ]}
+    >
+      <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
       {children}
     </View>
   );

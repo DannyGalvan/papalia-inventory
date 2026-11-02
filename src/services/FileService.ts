@@ -33,10 +33,10 @@
  */
 
 import {
-    DocumentDirectoryPath,
-    DownloadDirectoryPath,
-    exists,
-    writeFile as rnfsWriteFile,
+  DocumentDirectoryPath,
+  DownloadDirectoryPath,
+  exists,
+  writeFile as rnfsWriteFile,
 } from '@dr.pogodin/react-native-fs';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { logService } from './LogService';
@@ -124,7 +124,10 @@ export class FileServiceImpl implements FileService {
 
       // Android 10+ (API 29+) uses Scoped Storage: writing to the downloads
       // location does not require the legacy WRITE_EXTERNAL_STORAGE permission.
-      if (Number.isNaN(apiLevel) || apiLevel >= ANDROID_SCOPED_STORAGE_API_LEVEL) {
+      if (
+        Number.isNaN(apiLevel) ||
+        apiLevel >= ANDROID_SCOPED_STORAGE_API_LEVEL
+      ) {
         return true;
       }
 
@@ -175,7 +178,11 @@ export class FileServiceImpl implements FileService {
       // The underlying library accepts the encoding as a string union
       // ('utf8' | 'ascii' | 'base64'); the FileService interface keeps it
       // loosely typed as `string` for ergonomics.
-      await rnfsWriteFile(path, content, encoding as 'utf8' | 'ascii' | 'base64');
+      await rnfsWriteFile(
+        path,
+        content,
+        encoding as 'utf8' | 'ascii' | 'base64',
+      );
     } catch (error) {
       const err = error as Error;
       logService.logError({

@@ -13,4 +13,3 @@ export type { Theme, ThemeColors, ThemeUIColors } from './types';
 
 export { darkTheme } from './dark';
 export { lightTheme } from './light';
-

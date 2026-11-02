@@ -14,7 +14,11 @@
  */
 
 import fc from 'fast-check';
-import { darkTheme, lightTheme, Theme } from '../../../src/design-system/themes';
+import {
+  darkTheme,
+  lightTheme,
+  Theme,
+} from '../../../src/design-system/themes';
 
 // ---------------------------------------------------------------------------
 // Test utilities
@@ -56,7 +60,7 @@ const TEXT_FOREGROUND_KEYS: Array<keyof Theme['colors']> = [
 const BACKGROUND_KEYS: Array<keyof Theme['colors']> = ['background', 'surface'];
 
 /** Parse a 6/3-digit hex color into 8-bit RGB channels. */
-function hexToRgb(hex: string): {r: number; g: number; b: number} {
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
   let value = hex.replace('#', '');
   if (value.length === 3) {
     value = value
@@ -79,7 +83,7 @@ function linearizeChannel(channel8bit: number): number {
 
 /** WCAG 2.1 relative luminance of a hex color. */
 function relativeLuminance(hex: string): number {
-  const {r, g, b} = hexToRgb(hex);
+  const { r, g, b } = hexToRgb(hex);
   return (
     0.2126 * linearizeChannel(r) +
     0.7152 * linearizeChannel(g) +
@@ -150,11 +154,15 @@ describe('Feature: app-modernization, Property 1: Theme completeness — both th
           expect(value).toMatch(HEX_COLOR);
 
           // Both themes must expose the very same set of keys.
-          expect(Object.prototype.hasOwnProperty.call(lightTheme.colors, colorKey)).toBe(true);
-          expect(Object.prototype.hasOwnProperty.call(darkTheme.colors, colorKey)).toBe(true);
+          expect(
+            Object.prototype.hasOwnProperty.call(lightTheme.colors, colorKey),
+          ).toBe(true);
+          expect(
+            Object.prototype.hasOwnProperty.call(darkTheme.colors, colorKey),
+          ).toBe(true);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -166,22 +174,19 @@ describe('Feature: app-modernization, Property 1: Theme completeness — both th
 describe('Feature: app-modernization, Property 2: Theme toggle involution — toggle(toggle(state)) === state', () => {
   it('toggling twice returns to the original preference and resolved theme', () => {
     fc.assert(
-      fc.property(
-        fc.constantFrom<ThemePreference>('light', 'dark'),
-        start => {
-          const once = togglePreference(start);
-          const twice = togglePreference(once);
+      fc.property(fc.constantFrom<ThemePreference>('light', 'dark'), start => {
+        const once = togglePreference(start);
+        const twice = togglePreference(once);
 
-          // A single toggle must switch to the alternate theme (Req 2.3).
-          expect(once).not.toBe(start);
-          expect(resolveTheme(once)).not.toBe(resolveTheme(start));
+        // A single toggle must switch to the alternate theme (Req 2.3).
+        expect(once).not.toBe(start);
+        expect(resolveTheme(once)).not.toBe(resolveTheme(start));
 
-          // Toggling twice is the identity (involution).
-          expect(twice).toBe(start);
-          expect(resolveTheme(twice)).toBe(resolveTheme(start));
-        },
-      ),
-      {numRuns: 100},
+        // Toggling twice is the identity (involution).
+        expect(twice).toBe(start);
+        expect(resolveTheme(twice)).toBe(resolveTheme(start));
+      }),
+      { numRuns: 100 },
     );
   });
 
@@ -189,7 +194,7 @@ describe('Feature: app-modernization, Property 2: Theme toggle involution — to
     fc.assert(
       fc.property(
         fc.constantFrom<ThemePreference>('light', 'dark'),
-        fc.integer({min: 0, max: 100}),
+        fc.integer({ min: 0, max: 100 }),
         (start, count) => {
           let state = start;
           for (let i = 0; i < count; i++) {
@@ -199,7 +204,7 @@ describe('Feature: app-modernization, Property 2: Theme toggle involution — to
           expect(state).toBe(expected);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -215,7 +220,7 @@ describe('Feature: app-modernization, Property 4: Color contrast compliance — 
         fc.constantFrom<'light' | 'dark'>('light', 'dark'),
         fc.constantFrom(...TEXT_FOREGROUND_KEYS),
         fc.constantFrom(...BACKGROUND_KEYS),
-        fc.integer({min: 8, max: 48}),
+        fc.integer({ min: 8, max: 48 }),
         (themeName, fgKey, bgKey, fontSize) => {
           const theme = THEMES[themeName];
           const foreground = theme.colors[fgKey];
@@ -228,7 +233,7 @@ describe('Feature: app-modernization, Property 4: Color contrast compliance — 
           expect(ratio).toBeGreaterThanOrEqual(required);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });

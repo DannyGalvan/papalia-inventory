@@ -37,14 +37,14 @@ jest.mock('../../../src/database/repository/ProductRepository', () => ({
 }));
 
 import {
-    getProductsPaged,
-    getTotalProducts,
-    searchProductsByCodeOrName,
+  getProductsPaged,
+  getTotalProducts,
+  searchProductsByCodeOrName,
 } from '../../../src/database/repository/ProductRepository';
 import {
-    PRODUCTS_PAGE_SIZE,
-    PRODUCT_LIST_PERFORMANCE_PROPS,
-    useProducts
+  PRODUCTS_PAGE_SIZE,
+  PRODUCT_LIST_PERFORMANCE_PROPS,
+  useProducts,
 } from '../../../src/hooks/useProducts';
 import { logService } from '../../../src/services/LogService';
 
@@ -56,7 +56,7 @@ type HookValue = ReturnType<typeof useProducts>;
 
 /** Build `count` fake products with sequential codes (optionally offset). */
 const makeProducts = (count: number, offset = 0) =>
-  Array.from({length: count}, (_, i) => ({
+  Array.from({ length: count }, (_, i) => ({
     code: `P${offset + i}`,
     name: `Producto ${offset + i}`,
     description: '',
@@ -70,7 +70,7 @@ const makeProducts = (count: number, offset = 0) =>
  * value and to flush pending promise microtasks.
  */
 const renderUseProducts = () => {
-  const ref: {current: HookValue | null} = {current: null};
+  const ref: { current: HookValue | null } = { current: null };
 
   const Harness = () => {
     ref.current = useProducts();

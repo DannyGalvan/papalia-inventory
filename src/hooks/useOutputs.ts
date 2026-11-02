@@ -32,5 +32,5 @@ export const useOutputs = (initialDate: Date, finalDate: Date) => {
     }, [loadData]),
   );
 
-  return {outputs, loadData, isLoading};
+  return { outputs, loadData, isLoading };
 };

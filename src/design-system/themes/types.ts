@@ -15,12 +15,12 @@
  */
 
 import type {
-    BorderRadiusScale,
-    ColorPalette,
-    ElevationScale,
-    SemanticColors,
-    SpacingScale,
-    TypographyScale,
+  BorderRadiusScale,
+  ColorPalette,
+  ElevationScale,
+  SemanticColors,
+  SpacingScale,
+  TypographyScale,
 } from '../tokens';
 
 /**

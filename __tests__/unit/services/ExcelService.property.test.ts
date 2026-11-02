@@ -84,11 +84,11 @@ import { LogDetail } from '../../../src/database/models/LogDetail';
 import { LogHeader } from '../../../src/database/models/LogHeader';
 import { Product } from '../../../src/database/models/Product';
 import {
-    excelService,
-    INPUTS_SHEET_NAME,
-    OUTPUTS_SHEET_NAME,
-    PRODUCT_COLUMNS,
-    PRODUCTS_SHEET_NAME,
+  excelService,
+  INPUTS_SHEET_NAME,
+  OUTPUTS_SHEET_NAME,
+  PRODUCT_COLUMNS,
+  PRODUCTS_SHEET_NAME,
 } from '../../../src/services/ExcelService';
 
 // ---------------------------------------------------------------------------
@@ -107,7 +107,10 @@ const SAFE_CHARS =
   );
 
 /** A string of safe characters within the given length bounds. */
-const safeString = (minLength: number, maxLength: number): fc.Arbitrary<string> =>
+const safeString = (
+  minLength: number,
+  maxLength: number,
+): fc.Arbitrary<string> =>
   fc
     .array(fc.constantFrom(...SAFE_CHARS), { minLength, maxLength })
     .map(chars => chars.join(''));
@@ -125,7 +128,10 @@ const priceArbitrary: fc.Arbitrary<number> = fc
   .map(cents => cents / 100);
 
 /** Stock: a non-negative integer. */
-const stockArbitrary: fc.Arbitrary<number> = fc.integer({ min: 0, max: 1_000_000 });
+const stockArbitrary: fc.Arbitrary<number> = fc.integer({
+  min: 0,
+  max: 1_000_000,
+});
 
 /** A single valid Product. */
 const productArbitrary: fc.Arbitrary<Product> = fc
@@ -149,10 +155,13 @@ const productArbitrary: fc.Arbitrary<Product> = fc
   });
 
 /** A non-empty array of products. */
-const productArrayArbitrary: fc.Arbitrary<Product[]> = fc.array(productArbitrary, {
-  minLength: 1,
-  maxLength: 15,
-});
+const productArrayArbitrary: fc.Arbitrary<Product[]> = fc.array(
+  productArbitrary,
+  {
+    minLength: 1,
+    maxLength: 15,
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -182,7 +191,9 @@ function expectEquivalentProducts(
 }
 
 /** Load the captured workbook for `filePath` from the in-memory store. */
-async function loadWorkbookFromStore(filePath: string): Promise<ExcelJS.Workbook> {
+async function loadWorkbookFromStore(
+  filePath: string,
+): Promise<ExcelJS.Workbook> {
   const base64 = mockFsStore.get(filePath);
   expect(base64).toBeDefined();
   const workbook = new ExcelJS.Workbook();
@@ -278,7 +289,9 @@ describe('ExcelService — round-trip examples', () => {
     expect(sheet).toBeDefined();
 
     const headerRow = (sheet as ExcelJS.Worksheet).getRow(1);
-    const headers = PRODUCT_COLUMNS.map((_, i) => headerRow.getCell(i + 1).value);
+    const headers = PRODUCT_COLUMNS.map(
+      (_, i) => headerRow.getCell(i + 1).value,
+    );
     expect(headers).toEqual([...PRODUCT_COLUMNS]);
   });
 
@@ -319,7 +332,11 @@ describe('ExcelService — round-trip examples', () => {
     outDetail.price = 199.99;
     outDetail.total = 199.99;
 
-    const outputPath = await excelService.exportLogs([outHeader], [outDetail], false);
+    const outputPath = await excelService.exportLogs(
+      [outHeader],
+      [outDetail],
+      false,
+    );
     const outputWorkbook = await loadWorkbookFromStore(outputPath);
     expect(outputWorkbook.getWorksheet(OUTPUTS_SHEET_NAME)).toBeDefined();
   });

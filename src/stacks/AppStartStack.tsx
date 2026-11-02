@@ -18,21 +18,22 @@ import PrincipalStack from './PrincipalStack';
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
 const AppStartStack = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <ProductProvider>
       <Stack.Navigator
         screenOptions={{
-          headerTitleStyle: {color: appColors.warning, fontWeight: 'bold'},
-          headerStyle: {backgroundColor: theme.colors.surface},
+          headerTitleStyle: { color: appColors.warning, fontWeight: 'bold' },
+          headerStyle: { backgroundColor: theme.colors.surface },
         }}
         id={undefined}
-        initialRouteName="Permissions">
+        initialRouteName="Permissions"
+      >
         <Stack.Screen
           name="Permissions"
           component={PermissionsScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Home"
@@ -53,27 +54,42 @@ const AppStartStack = () => {
         />
         <Stack.Screen
           name="MovementTypeCatalog"
-          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
           component={MovementTypeCatalogScreen}
         />
         <Stack.Screen
           name="CategoryCatalog"
-          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
           component={CategoryCatalogScreen}
         />
         <Stack.Screen
           name="SupplierCatalog"
-          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
           component={SupplierCatalogScreen}
         />
         <Stack.Screen
           name="UnitOfMeasureCatalog"
-          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
           component={UnitOfMeasureCatalogScreen}
         />
         <Stack.Screen
           name="TimezoneCatalog"
-          options={{headerTitle: 'Regresar', headerTintColor: appColors.warning}}
+          options={{
+            headerTitle: 'Regresar',
+            headerTintColor: appColors.warning,
+          }}
           component={TimezoneCatalogScreen}
         />
       </Stack.Navigator>

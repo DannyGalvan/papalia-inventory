@@ -1,12 +1,22 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { DEFAULT_TIMEZONE, KEY_TIMEZONE } from '../config/constants';
-import { getConfigurationByKey, upsertConfiguration } from '../database/repository/ConfigurationRepository';
+import {
+  getConfigurationByKey,
+  upsertConfiguration,
+} from '../database/repository/ConfigurationRepository';
 
 interface TimezoneContextValue {
   ianaTimezone: string;
   formatDate: (date: Date | string | null | undefined) => string;
   formatDateTime: (date: Date | string | null | undefined) => string;
-  getTodayBounds: () => {fechaInicio: Date; fechaFin: Date};
+  getTodayBounds: () => { fechaInicio: Date; fechaFin: Date };
   setTimezone: (ianaName: string) => Promise<void>;
 }
 
@@ -16,9 +26,11 @@ const defaultContext: TimezoneContextValue = {
   formatDateTime: () => '—',
   getTodayBounds: () => {
     const now = new Date();
-    const start = new Date(now); start.setHours(0, 0, 0, 0);
-    const end = new Date(now); end.setHours(23, 59, 59, 999);
-    return {fechaInicio: start, fechaFin: end};
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+    return { fechaInicio: start, fechaFin: end };
   },
   setTimezone: async () => {},
 };
@@ -73,7 +85,8 @@ function partsInTz(date: Date, ianaName: string) {
       minute: '2-digit',
       hour12: false,
     }).formatToParts(date);
-    const get = (type: string) => parts.find(p => p.type === type)?.value ?? '00';
+    const get = (type: string) =>
+      parts.find(p => p.type === type)?.value ?? '00';
     return {
       day: get('day'),
       month: get('month'),
@@ -95,11 +108,17 @@ function partsInTz(date: Date, ianaName: string) {
 
 function buildFormatDate(iana: string) {
   return (date: Date | string | null | undefined): string => {
-    if (date == null) { return '—'; }
+    if (date == null) {
+      return '—';
+    }
     // Guard against {isNitroSQLiteNull: true} or other non-Date objects from DB
-    if (typeof date !== 'string' && !(date instanceof Date)) { return '—'; }
+    if (typeof date !== 'string' && !(date instanceof Date)) {
+      return '—';
+    }
     const d = typeof date === 'string' ? new Date(date) : date;
-    if (isNaN(d.getTime())) { return '—'; }
+    if (isNaN(d.getTime())) {
+      return '—';
+    }
     const p = partsInTz(d, iana);
     return `${p.day}/${p.month}/${p.year}`;
   };
@@ -107,11 +126,17 @@ function buildFormatDate(iana: string) {
 
 function buildFormatDateTime(iana: string) {
   return (date: Date | string | null | undefined): string => {
-    if (date == null) { return '—'; }
+    if (date == null) {
+      return '—';
+    }
     // Guard against {isNitroSQLiteNull: true} or other non-Date objects from DB
-    if (typeof date !== 'string' && !(date instanceof Date)) { return '—'; }
+    if (typeof date !== 'string' && !(date instanceof Date)) {
+      return '—';
+    }
     const d = typeof date === 'string' ? new Date(date) : date;
-    if (isNaN(d.getTime())) { return '—'; }
+    if (isNaN(d.getTime())) {
+      return '—';
+    }
     const p = partsInTz(d, iana);
     return `${p.day}/${p.month}/${p.year}   ${p.hour}:${p.minute}`;
   };
@@ -120,7 +145,7 @@ function buildFormatDateTime(iana: string) {
 // ─── Today bounds ─────────────────────────────────────────────────────────────
 
 function buildGetTodayBounds(iana: string) {
-  return (): {fechaInicio: Date; fechaFin: Date} => {
+  return (): { fechaInicio: Date; fechaFin: Date } => {
     const now = new Date();
     const offsetMs = getUTCOffsetMs(iana, now);
 
@@ -134,18 +159,22 @@ function buildGetTodayBounds(iana: string) {
     const fechaInicio = new Date(Date.UTC(y, mo, d, 0, 0, 0, 0) - offsetMs);
     const fechaFin = new Date(fechaInicio.getTime() + 24 * 60 * 60 * 1000 - 1);
 
-    return {fechaInicio, fechaFin};
+    return { fechaInicio, fechaFin };
   };
 }
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
-export const TimezoneProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+export const TimezoneProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [ianaTimezone, setIanaTimezone] = useState(DEFAULT_TIMEZONE);
 
   useEffect(() => {
     getConfigurationByKey(KEY_TIMEZONE).then(config => {
-      if (config?.value) { setIanaTimezone(config.value); }
+      if (config?.value) {
+        setIanaTimezone(config.value);
+      }
     });
   }, []);
 
@@ -154,13 +183,16 @@ export const TimezoneProvider: React.FC<{children: React.ReactNode}> = ({childre
     setIanaTimezone(ianaName);
   }, []);
 
-  const value = useMemo<TimezoneContextValue>(() => ({
-    ianaTimezone,
-    formatDate: buildFormatDate(ianaTimezone),
-    formatDateTime: buildFormatDateTime(ianaTimezone),
-    getTodayBounds: buildGetTodayBounds(ianaTimezone),
-    setTimezone,
-  }), [ianaTimezone, setTimezone]);
+  const value = useMemo<TimezoneContextValue>(
+    () => ({
+      ianaTimezone,
+      formatDate: buildFormatDate(ianaTimezone),
+      formatDateTime: buildFormatDateTime(ianaTimezone),
+      getTodayBounds: buildGetTodayBounds(ianaTimezone),
+      setTimezone,
+    }),
+    [ianaTimezone, setTimezone],
+  );
 
   return (
     <TimezoneContext.Provider value={value}>
@@ -169,4 +201,5 @@ export const TimezoneProvider: React.FC<{children: React.ReactNode}> = ({childre
   );
 };
 
-export const useTimezone = (): TimezoneContextValue => useContext(TimezoneContext);
+export const useTimezone = (): TimezoneContextValue =>
+  useContext(TimezoneContext);

@@ -60,12 +60,14 @@ export interface MovementReportData {
  *
  * Requirements: 2.1, 2.2, 2.3, 2.6
  */
-export async function getCriticalReportData(lowStockThreshold = 5): Promise<CriticalReportData> {
+export async function getCriticalReportData(
+  lowStockThreshold = 5,
+): Promise<CriticalReportData> {
   try {
     // Low stock products (stock <= threshold)
     const lowStockEntities = await ProductRepository.find({
-      where: {stock: LessThanOrEqual(lowStockThreshold)},
-      order: {stock: 'ASC'},
+      where: { stock: LessThanOrEqual(lowStockThreshold) },
+      order: { stock: 'ASC' },
     });
 
     const lowStockProducts: LowStockProduct[] = lowStockEntities.map(p => ({
@@ -76,8 +78,8 @@ export async function getCriticalReportData(lowStockThreshold = 5): Promise<Crit
 
     // Zero stock products (stock === 0)
     const zeroStockEntities = await ProductRepository.find({
-      where: {stock: Equal(0)},
-      order: {name: 'ASC'},
+      where: { stock: Equal(0) },
+      order: { name: 'ASC' },
     });
 
     const zeroStockProducts: LowStockProduct[] = zeroStockEntities.map(p => ({
@@ -125,7 +127,9 @@ export async function getCriticalReportData(lowStockThreshold = 5): Promise<Crit
  *
  * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
  */
-export async function getSummaryReportData(lowStockThreshold = 5): Promise<SummaryReportData> {
+export async function getSummaryReportData(
+  lowStockThreshold = 5,
+): Promise<SummaryReportData> {
   try {
     const products = await ProductRepository.find();
 
@@ -154,7 +158,10 @@ export async function getSummaryReportData(lowStockThreshold = 5): Promise<Summa
         stockDistribution.low++;
       } else if (stock > lowStockThreshold && stock <= lowStockThreshold * 4) {
         stockDistribution.medium++;
-      } else if (stock > lowStockThreshold * 4 && stock <= lowStockThreshold * 10) {
+      } else if (
+        stock > lowStockThreshold * 4 &&
+        stock <= lowStockThreshold * 10
+      ) {
         stockDistribution.high++;
       } else {
         stockDistribution.veryHigh++;
@@ -202,7 +209,7 @@ export async function getMovementReportData(): Promise<MovementReportData> {
     // Group by type and isInput
     const typeMap = new Map<
       string,
-      {totalQuantity: number; isInput: boolean}
+      { totalQuantity: number; isInput: boolean }
     >();
 
     for (const header of logHeaders) {
@@ -211,10 +218,7 @@ export async function getMovementReportData(): Promise<MovementReportData> {
         `Tipo ${header.type}`;
       const details = header.logDetails || [];
 
-      const headerQuantity = details.reduce(
-        (sum, d) => sum + d.quantity,
-        0,
-      );
+      const headerQuantity = details.reduce((sum, d) => sum + d.quantity, 0);
 
       if (header.isInput) {
         totalEntryQuantity += headerQuantity;
@@ -235,13 +239,13 @@ export async function getMovementReportData(): Promise<MovementReportData> {
       }
     }
 
-    const movementsByType: MovementByType[] = Array.from(
-      typeMap.entries(),
-    ).map(([key, value]) => ({
-      typeName: key.replace(/_true$|_false$/, ''),
-      totalQuantity: value.totalQuantity,
-      isInput: value.isInput,
-    }));
+    const movementsByType: MovementByType[] = Array.from(typeMap.entries()).map(
+      ([key, value]) => ({
+        typeName: key.replace(/_true$|_false$/, ''),
+        totalQuantity: value.totalQuantity,
+        isInput: value.isInput,
+      }),
+    );
 
     // Sort by totalQuantity descending
     movementsByType.sort((a, b) => b.totalQuantity - a.totalQuantity);

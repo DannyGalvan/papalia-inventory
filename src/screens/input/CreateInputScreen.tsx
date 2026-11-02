@@ -24,9 +24,14 @@ export const CreateInputScreen = ({}: CreateInputScreenProps) => {
   const { theme } = useTheme();
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  );
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
+  const showToast = (
+    message: string,
+    type: 'success' | 'error' | 'warning',
+  ) => {
     setToastMessage(message);
     setToastType(type);
     setToastVisible(true);
@@ -46,7 +51,8 @@ export const CreateInputScreen = ({}: CreateInputScreenProps) => {
     <KeyboardAvoidingView
       style={[styles.screen, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
       <Toast
         message={toastMessage}
         type={toastType}
@@ -56,9 +62,14 @@ export const CreateInputScreen = ({}: CreateInputScreenProps) => {
       <Text
         style={[
           styles.title,
-          { color: theme.colors.text, fontSize: theme.typography.h2.fontSize, fontWeight: theme.typography.h2.fontWeight },
+          {
+            color: theme.colors.text,
+            fontSize: theme.typography.h2.fontSize,
+            fontWeight: theme.typography.h2.fontWeight,
+          },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Crear entrada de producto
       </Text>
       <LogForm

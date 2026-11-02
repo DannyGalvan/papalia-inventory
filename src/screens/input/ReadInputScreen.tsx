@@ -6,9 +6,9 @@ import { getLogById } from '../../database/repository/LogHeaderRepository';
 import { useTheme } from '../../hooks/useTheme';
 import { ReadInputScreenProps } from '../../interfaces/IInputNavigation';
 
-export const ReadInputScreen = ({route}: ReadInputScreenProps) => {
-  const {theme} = useTheme();
-  const {id} = route.params;
+export const ReadInputScreen = ({ route }: ReadInputScreenProps) => {
+  const { theme } = useTheme();
+  const { id } = route.params;
   const [log, setLog] = useState<LogHeader | null>(null);
 
   useEffect(() => {
@@ -17,7 +17,9 @@ export const ReadInputScreen = ({route}: ReadInputScreenProps) => {
 
   if (!log) {
     return (
-      <View style={[styles.centered, {backgroundColor: theme.colors.background}]}>
+      <View
+        style={[styles.centered, { backgroundColor: theme.colors.background }]}
+      >
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
@@ -27,5 +29,5 @@ export const ReadInputScreen = ({route}: ReadInputScreenProps) => {
 };
 
 const styles = StyleSheet.create({
-  centered: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

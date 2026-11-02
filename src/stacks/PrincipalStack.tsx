@@ -21,15 +21,15 @@ const Tab = createMaterialTopTabNavigator();
 // ---------------------------------------------------------------------------
 
 const TABS = [
-  {key: 'Productos', label: 'Productos', Component: ProductStack},
-  {key: 'Entradas', label: 'Entradas', Component: InputStack},
-  {key: 'Salidas', label: 'Salidas', Component: OutputStack},
+  { key: 'Productos', label: 'Productos', Component: ProductStack },
+  { key: 'Entradas', label: 'Entradas', Component: InputStack },
+  { key: 'Salidas', label: 'Salidas', Component: OutputStack },
 ];
 
 const ANIMATION_DURATION = 250;
 
 const IOSPrincipalStack = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState(0);
   const [tabWidth, setTabWidth] = useState(0);
 
@@ -73,8 +73,9 @@ const IOSPrincipalStack = () => {
     <View style={styles.container}>
       {/* Tab bar */}
       <View
-        style={[styles.tabBar, {backgroundColor: theme.colors.surface}]}
-        onLayout={onTabBarLayout}>
+        style={[styles.tabBar, { backgroundColor: theme.colors.surface }]}
+        onLayout={onTabBarLayout}
+      >
         {TABS.map((tab, index) => {
           const isActive = index === activeTab;
           return (
@@ -83,8 +84,9 @@ const IOSPrincipalStack = () => {
               style={styles.tabItem}
               onPress={() => switchTab(index)}
               accessibilityRole="tab"
-              accessibilityState={{selected: isActive}}
-              accessibilityLabel={tab.label}>
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={tab.label}
+            >
               <Text
                 style={[
                   styles.tabLabel,
@@ -92,10 +94,13 @@ const IOSPrincipalStack = () => {
                     color: isActive
                       ? theme.colors.secondary
                       : theme.colors.textSecondary,
-                    fontWeight: isActive ? '700' : theme.typography.caption.fontWeight,
+                    fontWeight: isActive
+                      ? '700'
+                      : theme.typography.caption.fontWeight,
                     fontSize: theme.typography.caption.fontSize,
                   },
-                ]}>
+                ]}
+              >
                 {tab.label}
               </Text>
             </Pressable>
@@ -109,15 +114,14 @@ const IOSPrincipalStack = () => {
               {
                 width: tabWidth,
                 backgroundColor: theme.colors.secondary,
-                transform: [{translateX: indicatorX}],
+                transform: [{ translateX: indicatorX }],
               },
             ]}
           />
         )}
       </View>
       {/* Animated content */}
-      <Animated.View
-        style={[styles.content, {transform: [{translateX}]}]}>
+      <Animated.View style={[styles.content, { transform: [{ translateX }] }]}>
         <ActiveComponent />
       </Animated.View>
     </View>
@@ -129,7 +133,7 @@ const IOSPrincipalStack = () => {
 // ---------------------------------------------------------------------------
 
 const AndroidPrincipalStack = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Tab.Navigator
@@ -141,9 +145,10 @@ const AndroidPrincipalStack = () => {
           fontSize: theme.typography.caption.fontSize,
           fontWeight: theme.typography.caption.fontWeight,
         },
-        tabBarStyle: {backgroundColor: theme.colors.surface},
-        tabBarIndicatorStyle: {backgroundColor: theme.colors.secondary},
-      }}>
+        tabBarStyle: { backgroundColor: theme.colors.surface },
+        tabBarIndicatorStyle: { backgroundColor: theme.colors.secondary },
+      }}
+    >
       <Tab.Screen name="Productos" component={ProductStack} />
       <Tab.Screen name="Entradas" component={InputStack} />
       <Tab.Screen name="Salidas" component={OutputStack} />
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
     height: 48,
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },

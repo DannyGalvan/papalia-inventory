@@ -9,7 +9,7 @@ import { appColors } from '../../styles/globalStyles';
 
 export const HeaderRight = ({}: NativeStackHeaderItemProps) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
-  const {isDark, toggleTheme} = useTheme();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <View style={styles.container} accessible={false}>
@@ -18,7 +18,10 @@ export const HeaderRight = ({}: NativeStackHeaderItemProps) => {
         style={styles.button}
         accessibilityRole="button"
         accessibilityLabel="Cambiar tema"
-        accessibilityHint={isDark ? 'Cambia al tema claro' : 'Cambia al tema oscuro'}>
+        accessibilityHint={
+          isDark ? 'Cambia al tema claro' : 'Cambia al tema oscuro'
+        }
+      >
         <Icon
           name={isDark ? 'sunny' : 'moon'}
           size={24}
@@ -30,7 +33,8 @@ export const HeaderRight = ({}: NativeStackHeaderItemProps) => {
         style={styles.button}
         accessibilityRole="button"
         accessibilityLabel="Abrir configuración"
-        accessibilityHint="Abre la pantalla de configuración">
+        accessibilityHint="Abre la pantalla de configuración"
+      >
         <Icon name="settings" size={24} color={appColors.warning} />
       </TouchableOpacity>
     </View>

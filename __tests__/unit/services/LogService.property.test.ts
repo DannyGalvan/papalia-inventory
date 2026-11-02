@@ -81,7 +81,11 @@ const technicalFragmentArbitrary: fc.Arbitrary<string> = fc.oneof(
     .map(([fn, file]) => `at ${fn} (${file}.js:10:5)`),
   // File paths with line numbers (.ts / .tsx).
   fc
-    .tuple(identifierArbitrary, fc.constantFrom('ts', 'tsx'), fc.integer({min: 1, max: 9999}))
+    .tuple(
+      identifierArbitrary,
+      fc.constantFrom('ts', 'tsx'),
+      fc.integer({ min: 1, max: 9999 }),
+    )
     .map(([file, ext, line]) => `${file}.${ext}:${line}`),
   // Error class names.
   fc
@@ -106,7 +110,7 @@ const cleanMessageArbitrary: fc.Arbitrary<string> = fc
       'No hay inventario disponible',
     ),
     // Arbitrary unicode text, restricted to non-technical content below.
-    fc.string({minLength: 0, maxLength: 80}),
+    fc.string({ minLength: 0, maxLength: 80 }),
   )
   .filter(message => !hasTechnicalContent(message));
 
@@ -116,7 +120,12 @@ const cleanMessageArbitrary: fc.Arbitrary<string> = fc
  */
 const leakyMessageArbitrary: fc.Arbitrary<string> = fc
   .tuple(
-    fc.constantFrom('', 'No se pudo guardar el producto. ', 'Detalle: ', 'Fallo: '),
+    fc.constantFrom(
+      '',
+      'No se pudo guardar el producto. ',
+      'Detalle: ',
+      'Fallo: ',
+    ),
     technicalFragmentArbitrary,
     fc.constantFrom('', ' Intente nuevamente.', ' al ejecutar la consulta.'),
   )
@@ -177,16 +186,20 @@ describe('sanitizeErrorMessage — technical-detail examples', () => {
 describe('Feature: app-modernization, Property 12: User-facing error messages exclude technical details', () => {
   it('replaces any message containing technical details with the Spanish fallback', () => {
     fc.assert(
-      fc.property(leakyMessageArbitrary, fallbackArbitrary, (leaky, fallback) => {
-        const result = sanitizeErrorMessage(new Error(leaky), fallback);
+      fc.property(
+        leakyMessageArbitrary,
+        fallbackArbitrary,
+        (leaky, fallback) => {
+          const result = sanitizeErrorMessage(new Error(leaky), fallback);
 
-        // The leaked technical message must be suppressed in favor of the
-        // safe Spanish fallback.
-        expect(result).toBe(fallback);
-        // And the surfaced message must carry no technical-detail patterns.
-        expect(hasTechnicalContent(result)).toBe(false);
-      }),
-      {numRuns: 100},
+          // The leaked technical message must be suppressed in favor of the
+          // safe Spanish fallback.
+          expect(result).toBe(fallback);
+          // And the surfaced message must carry no technical-detail patterns.
+          expect(hasTechnicalContent(result)).toBe(false);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 
@@ -203,19 +216,23 @@ describe('Feature: app-modernization, Property 12: User-facing error messages ex
           expect(hasTechnicalContent(result)).toBe(false);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('passes clean Spanish messages through unchanged', () => {
     fc.assert(
-      fc.property(cleanMessageArbitrary, fallbackArbitrary, (clean, fallback) => {
-        const result = sanitizeErrorMessage(new Error(clean), fallback);
+      fc.property(
+        cleanMessageArbitrary,
+        fallbackArbitrary,
+        (clean, fallback) => {
+          const result = sanitizeErrorMessage(new Error(clean), fallback);
 
-        // A non-technical message must be preserved verbatim.
-        expect(result).toBe(clean);
-      }),
-      {numRuns: 100},
+          // A non-technical message must be preserved verbatim.
+          expect(result).toBe(clean);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 });

@@ -64,7 +64,7 @@ export class ErrorBoundary extends Component<
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = {hasError: false, error: null};
+    this.state = { hasError: false, error: null };
   }
 
   /**
@@ -72,7 +72,7 @@ export class ErrorBoundary extends Component<
    * the next render.
    */
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return {hasError: true, error};
+    return { hasError: true, error };
   }
 
   /**
@@ -88,7 +88,6 @@ export class ErrorBoundary extends Component<
     });
 
     if (__DEV__) {
-      // eslint-disable-next-line no-console
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
@@ -98,7 +97,7 @@ export class ErrorBoundary extends Component<
    * (Requirement 10.1).
    */
   private handleRestart = (): void => {
-    this.setState({hasError: false, error: null});
+    this.setState({ hasError: false, error: null });
   };
 
   render(): ReactNode {
@@ -116,10 +115,9 @@ export class ErrorBoundary extends Component<
         style={styles.container}
         accessible
         accessibilityRole="alert"
-        accessibilityLabel={`${RECOVERY_TITLE}. ${RECOVERY_DESCRIPTION}`}>
-        <Text
-          accessibilityRole="header"
-          style={styles.title}>
+        accessibilityLabel={`${RECOVERY_TITLE}. ${RECOVERY_DESCRIPTION}`}
+      >
+        <Text accessibilityRole="header" style={styles.title}>
           {RECOVERY_TITLE}
         </Text>
         <Text style={styles.description}>{RECOVERY_DESCRIPTION}</Text>
@@ -127,7 +125,8 @@ export class ErrorBoundary extends Component<
           onPress={this.handleRestart}
           accessibilityRole="button"
           accessibilityLabel={RECOVERY_BUTTON_LABEL}
-          style={styles.button}>
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>{RECOVERY_BUTTON_LABEL}</Text>
         </TouchableOpacity>
       </View>

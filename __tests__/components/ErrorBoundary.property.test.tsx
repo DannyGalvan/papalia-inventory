@@ -40,7 +40,7 @@ const RECOVERY_BUTTON_LABEL = 'Reintentar';
  * A child component that always throws the supplied error message during
  * render, simulating an unhandled JavaScript error in the child tree.
  */
-const Bomb: React.FC<{message: string}> = ({message}) => {
+const Bomb: React.FC<{ message: string }> = ({ message }) => {
   throw new Error(message);
 };
 
@@ -60,7 +60,7 @@ const collectTextStrings = (
   renderer.root
     .findAllByType(Text)
     .flatMap(node => {
-      const {children} = node.props;
+      const { children } = node.props;
       return Array.isArray(children) ? children : [children];
     })
     .filter((child): child is string => typeof child === 'string');
@@ -71,9 +71,7 @@ describe('Feature: app-modernization, Property 11: Error boundary catches and re
   beforeEach(() => {
     // Silence React's render-phase error logging and the boundary's own
     // __DEV__ console.error mirror — both are expected for caught errors.
-    consoleErrorSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -102,7 +100,9 @@ describe('Feature: app-modernization, Property 11: Error boundary catches and re
         );
         expect(buttons.length).toBeGreaterThan(0);
         expect(
-          buttons.some(b => b.props.accessibilityLabel === RECOVERY_BUTTON_LABEL),
+          buttons.some(
+            b => b.props.accessibilityLabel === RECOVERY_BUTTON_LABEL,
+          ),
         ).toBe(true);
 
         // The recovery screen must show the Spanish error description and the
@@ -116,7 +116,7 @@ describe('Feature: app-modernization, Property 11: Error boundary catches and re
           renderer.unmount();
         });
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -138,7 +138,7 @@ describe('Feature: app-modernization, Property 11: Error boundary catches and re
           renderer.unmount();
         });
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });

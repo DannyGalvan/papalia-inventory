@@ -3,18 +3,18 @@ import React, { useCallback, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ReportCard } from '../../components/ReportCard';
 import {
-    DEFAULT_LOW_STOCK_THRESHOLD,
-    KEY_LOW_STOCK_THRESHOLD,
+  DEFAULT_LOW_STOCK_THRESHOLD,
+  KEY_LOW_STOCK_THRESHOLD,
 } from '../../config/constants';
 import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { useTheme } from '../../hooks/useTheme';
 import {
-    CriticalReportData,
-    getCriticalReportData,
+  CriticalReportData,
+  getCriticalReportData,
 } from '../../services/ReportService';
 
 export function CriticalReportScreen() {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const [data, setData] = useState<CriticalReportData>({
     lowStockProducts: [],
     zeroStockProducts: [],
@@ -29,7 +29,9 @@ export function CriticalReportScreen() {
     }
     isLoadingRef.current = true;
     try {
-      const thresholdConfig = await getConfigurationByKey(KEY_LOW_STOCK_THRESHOLD);
+      const thresholdConfig = await getConfigurationByKey(
+        KEY_LOW_STOCK_THRESHOLD,
+      );
       const resolvedThreshold = thresholdConfig
         ? parseInt(thresholdConfig.value, 10) || DEFAULT_LOW_STOCK_THRESHOLD
         : DEFAULT_LOW_STOCK_THRESHOLD;
@@ -51,8 +53,9 @@ export function CriticalReportScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-      contentContainerStyle={styles.content}>
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
+    >
       <Text
         style={[
           styles.title,
@@ -63,7 +66,8 @@ export function CriticalReportScreen() {
             lineHeight: theme.typography.h1.lineHeight,
           },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Reporte Crítico
       </Text>
 
@@ -77,7 +81,8 @@ export function CriticalReportScreen() {
                 fontSize: theme.typography.body.fontSize,
                 lineHeight: theme.typography.body.lineHeight,
               },
-            ]}>
+            ]}
+          >
             No hay productos con stock bajo
           </Text>
         ) : (
@@ -86,8 +91,9 @@ export function CriticalReportScreen() {
               key={product.code}
               style={[
                 styles.productRow,
-                {borderBottomColor: theme.colors.border},
-              ]}>
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
               <Text
                 style={[
                   styles.productName,
@@ -97,7 +103,8 @@ export function CriticalReportScreen() {
                     lineHeight: theme.typography.body.lineHeight,
                   },
                 ]}
-                numberOfLines={1}>
+                numberOfLines={1}
+              >
                 {product.name}
               </Text>
               <Text
@@ -109,7 +116,8 @@ export function CriticalReportScreen() {
                     fontWeight: theme.typography.caption.fontWeight,
                     lineHeight: theme.typography.caption.lineHeight,
                   },
-                ]}>
+                ]}
+              >
                 Stock: {product.stock}
               </Text>
             </View>
@@ -127,7 +135,8 @@ export function CriticalReportScreen() {
                 fontSize: theme.typography.body.fontSize,
                 lineHeight: theme.typography.body.lineHeight,
               },
-            ]}>
+            ]}
+          >
             No hay productos sin stock
           </Text>
         ) : (
@@ -136,8 +145,9 @@ export function CriticalReportScreen() {
               key={product.code}
               style={[
                 styles.productRow,
-                {borderBottomColor: theme.colors.border},
-              ]}>
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
               <Text
                 style={[
                   styles.productName,
@@ -147,7 +157,8 @@ export function CriticalReportScreen() {
                     lineHeight: theme.typography.body.lineHeight,
                   },
                 ]}
-                numberOfLines={1}>
+                numberOfLines={1}
+              >
                 {product.name}
               </Text>
               <Text
@@ -159,7 +170,8 @@ export function CriticalReportScreen() {
                     fontWeight: theme.typography.caption.fontWeight,
                     lineHeight: theme.typography.caption.lineHeight,
                   },
-                ]}>
+                ]}
+              >
                 Stock: 0
               </Text>
             </View>
@@ -177,7 +189,8 @@ export function CriticalReportScreen() {
                 fontSize: theme.typography.body.fontSize,
                 lineHeight: theme.typography.body.lineHeight,
               },
-            ]}>
+            ]}
+          >
             No hay productos con movimientos
           </Text>
         ) : (
@@ -186,8 +199,9 @@ export function CriticalReportScreen() {
               key={product.code}
               style={[
                 styles.productRow,
-                {borderBottomColor: theme.colors.border},
-              ]}>
+                { borderBottomColor: theme.colors.border },
+              ]}
+            >
               <Text
                 style={[
                   styles.productName,
@@ -197,7 +211,8 @@ export function CriticalReportScreen() {
                     lineHeight: theme.typography.body.lineHeight,
                   },
                 ]}
-                numberOfLines={1}>
+                numberOfLines={1}
+              >
                 {index + 1}. {product.name}
               </Text>
               <Text
@@ -209,7 +224,8 @@ export function CriticalReportScreen() {
                     fontWeight: theme.typography.caption.fontWeight,
                     lineHeight: theme.typography.caption.lineHeight,
                   },
-                ]}>
+                ]}
+              >
                 {product.totalQuantity} uds
               </Text>
             </View>

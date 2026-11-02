@@ -10,8 +10,8 @@ import { getDashboardOutputs } from '../../database/repository/LogHeaderReposito
 import { useTheme } from '../../hooks/useTheme';
 
 export const DashboardOutputScreen = () => {
-  const {theme} = useTheme();
-  const {getTodayBounds} = useTimezone();
+  const { theme } = useTheme();
+  const { getTodayBounds } = useTimezone();
   const todayBounds = useMemo(() => getTodayBounds(), [getTodayBounds]);
   const [initialDate, setInitialDate] = useState(todayBounds.fechaInicio);
   const [finalDate, setFinalDate] = useState(todayBounds.fechaFin);
@@ -20,7 +20,9 @@ export const DashboardOutputScreen = () => {
   const isLoadingRef = useRef(false);
 
   const loadData = useCallback(async () => {
-    if (isLoadingRef.current) {return;}
+    if (isLoadingRef.current) {
+      return;
+    }
     isLoadingRef.current = true;
     setIsLoading(true);
     try {
@@ -41,7 +43,7 @@ export const DashboardOutputScreen = () => {
   );
 
   return (
-    <View style={[styles.screen, {backgroundColor: theme.colors.background}]}>
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Text
         style={[
           styles.title,
@@ -52,7 +54,8 @@ export const DashboardOutputScreen = () => {
             lineHeight: theme.typography.h2.lineHeight,
           },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Dashboard de salidas
       </Text>
 
@@ -70,15 +73,22 @@ export const DashboardOutputScreen = () => {
       />
 
       <Text
-        style={[styles.resultText, {color: theme.colors.textSecondary, fontSize: theme.typography.body.fontSize}]}
-        accessibilityLabel={`Total de tipos: ${response.length}`}>
+        style={[
+          styles.resultText,
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.body.fontSize,
+          },
+        ]}
+        accessibilityLabel={`Total de tipos: ${response.length}`}
+      >
         Tipos de movimiento: {response.length}
       </Text>
 
       <FlatList
         style={styles.list}
         data={response}
-        renderItem={({item}) => <DashboardItem item={item} />}
+        renderItem={({ item }) => <DashboardItem item={item} />}
         refreshing={isLoading}
         onRefresh={loadData}
         keyExtractor={item => item.tipo}
@@ -99,7 +109,7 @@ export const DashboardOutputScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  screen: {flex: 1},
+  screen: { flex: 1 },
   title: {
     textAlign: 'center',
     paddingVertical: 10,

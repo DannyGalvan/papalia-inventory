@@ -13,12 +13,14 @@ interface Props {
   typeCatalog?: MovementType[];
 }
 
-export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
-  const {theme} = useTheme();
-  const {formatDateTime} = useTimezone();
+export const LogItems = ({ logHeader, navigation, typeCatalog }: Props) => {
+  const { theme } = useTheme();
+  const { formatDateTime } = useTimezone();
   const typeLabel = typeCatalog
-    ? typeCatalog.find(t => t.id === logHeader.type)?.name ?? `Tipo ${logHeader.type}`
-    : ALL_IN_OUT_ENUM[logHeader.type as keyof typeof ALL_IN_OUT_ENUM] ?? `Tipo ${logHeader.type}`;
+    ? typeCatalog.find(t => t.id === logHeader.type)?.name ??
+      `Tipo ${logHeader.type}`
+    : ALL_IN_OUT_ENUM[logHeader.type as keyof typeof ALL_IN_OUT_ENUM] ??
+      `Tipo ${logHeader.type}`;
   const isInput = logHeader.isInput;
   const badgeColor = isInput ? theme.colors.success : theme.colors.error;
   const badgeIcon = isInput ? 'arrow-down-circle' : 'arrow-up-circle';
@@ -28,44 +30,79 @@ export const LogItems = ({logHeader, navigation, typeCatalog}: Props) => {
     <TouchableOpacity
       style={[
         styles.container,
-        {backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md},
+        {
+          backgroundColor: theme.colors.surface,
+          borderRadius: theme.borderRadius.md,
+        },
         theme.elevation.low,
       ]}
       onPress={() => navigation(logHeader.id)}
       accessibilityRole="button"
-      accessibilityLabel={`${badgeLabel}: ${typeLabel}. ${logHeader.comments || 'sin comentarios'}`}
-      accessibilityHint="Toca para ver el detalle completo del movimiento">
-
+      accessibilityLabel={`${badgeLabel}: ${typeLabel}. ${
+        logHeader.comments || 'sin comentarios'
+      }`}
+      accessibilityHint="Toca para ver el detalle completo del movimiento"
+    >
       {/* Top row: badge + type + chevron */}
       <View style={styles.topRow}>
-        <View style={[styles.badge, {backgroundColor: badgeColor + '22', borderColor: badgeColor}]}>
+        <View
+          style={[
+            styles.badge,
+            { backgroundColor: badgeColor + '22', borderColor: badgeColor },
+          ]}
+        >
           <Icon name={badgeIcon} size={13} color={badgeColor} />
-          <Text style={[styles.badgeText, {color: badgeColor}]}>{badgeLabel}</Text>
+          <Text style={[styles.badgeText, { color: badgeColor }]}>
+            {badgeLabel}
+          </Text>
         </View>
         <Text
-          style={[styles.typeText, {color: theme.colors.text, fontSize: theme.typography.body.fontSize}]}
-          numberOfLines={1}>
+          style={[
+            styles.typeText,
+            {
+              color: theme.colors.text,
+              fontSize: theme.typography.body.fontSize,
+            },
+          ]}
+          numberOfLines={1}
+        >
           {typeLabel}
         </Text>
-        <Icon name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+        <Icon
+          name="chevron-forward"
+          size={16}
+          color={theme.colors.textSecondary}
+        />
       </View>
 
       {/* Date */}
       <View style={styles.metaRow}>
-        <Icon name="calendar-outline" size={13} color={theme.colors.textSecondary} />
-        <Text style={[styles.metaText, {color: theme.colors.textSecondary}]}>
+        <Icon
+          name="calendar-outline"
+          size={13}
+          color={theme.colors.textSecondary}
+        />
+        <Text style={[styles.metaText, { color: theme.colors.textSecondary }]}>
           {formatDateTime(logHeader.createdAt)}
         </Text>
       </View>
 
       {/* Comments preview */}
-      {typeof logHeader.comments === 'string' && logHeader.comments.length > 0 && (
-        <Text
-          style={[styles.comment, {color: theme.colors.textSecondary, fontSize: theme.typography.caption.fontSize}]}
-          numberOfLines={1}>
-          {logHeader.comments}
-        </Text>
-      )}
+      {typeof logHeader.comments === 'string' &&
+        logHeader.comments.length > 0 && (
+          <Text
+            style={[
+              styles.comment,
+              {
+                color: theme.colors.textSecondary,
+                fontSize: theme.typography.caption.fontSize,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            {logHeader.comments}
+          </Text>
+        )}
     </TouchableOpacity>
   );
 };

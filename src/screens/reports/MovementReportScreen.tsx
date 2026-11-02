@@ -4,12 +4,12 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ReportCard } from '../../components/ReportCard';
 import { useTheme } from '../../hooks/useTheme';
 import {
-    getMovementReportData,
-    MovementReportData,
+  getMovementReportData,
+  MovementReportData,
 } from '../../services/ReportService';
 
 export function MovementReportScreen() {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const [data, setData] = useState<MovementReportData | null>(null);
   const isLoadingRef = useRef(false);
 
@@ -42,8 +42,9 @@ export function MovementReportScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-      contentContainerStyle={styles.content}>
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
+    >
       <Text
         style={[
           styles.title,
@@ -54,12 +55,13 @@ export function MovementReportScreen() {
             lineHeight: theme.typography.h2.lineHeight,
           },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Reporte de Movimientos
       </Text>
 
       {!hasData ? (
-        <Text style={[styles.emptyText, {color: theme.colors.textSecondary}]}>
+        <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
           No hay movimientos registrados
         </Text>
       ) : (
@@ -70,11 +72,14 @@ export function MovementReportScreen() {
                 <Text
                   style={[
                     styles.comparisonLabel,
-                    {color: theme.colors.textSecondary},
-                  ]}>
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
                   Entradas
                 </Text>
-                <Text style={[styles.comparisonValue, {color: theme.colors.text}]}>
+                <Text
+                  style={[styles.comparisonValue, { color: theme.colors.text }]}
+                >
                   {data.totalEntryQuantity}
                 </Text>
               </View>
@@ -82,11 +87,14 @@ export function MovementReportScreen() {
                 <Text
                   style={[
                     styles.comparisonLabel,
-                    {color: theme.colors.textSecondary},
-                  ]}>
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
                   Salidas
                 </Text>
-                <Text style={[styles.comparisonValue, {color: theme.colors.text}]}>
+                <Text
+                  style={[styles.comparisonValue, { color: theme.colors.text }]}
+                >
                   {data.totalExitQuantity}
                 </Text>
               </View>
@@ -95,20 +103,24 @@ export function MovementReportScreen() {
 
           <ReportCard title="Movimientos por Tipo">
             {data.movementsByType.map((movement, index) => (
-              <View key={`${movement.typeName}-${movement.isInput}-${index}`} style={styles.row}>
+              <View
+                key={`${movement.typeName}-${movement.isInput}-${index}`}
+                style={styles.row}
+              >
                 <View style={styles.rowLeft}>
-                  <Text style={[styles.rowLabel, {color: theme.colors.text}]}>
+                  <Text style={[styles.rowLabel, { color: theme.colors.text }]}>
                     {movement.typeName}
                   </Text>
                   <Text
                     style={[
                       styles.rowBadge,
-                      {color: theme.colors.textSecondary},
-                    ]}>
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
                     {movement.isInput ? 'Entrada' : 'Salida'}
                   </Text>
                 </View>
-                <Text style={[styles.rowValue, {color: theme.colors.text}]}>
+                <Text style={[styles.rowValue, { color: theme.colors.text }]}>
                   {movement.totalQuantity}
                 </Text>
               </View>
@@ -117,20 +129,24 @@ export function MovementReportScreen() {
 
           <ReportCard title="Top 5 Categorías">
             {data.topCategories.map((category, index) => (
-              <View key={`top-${category.typeName}-${index}`} style={styles.row}>
+              <View
+                key={`top-${category.typeName}-${index}`}
+                style={styles.row}
+              >
                 <View style={styles.rowLeft}>
-                  <Text style={[styles.rowLabel, {color: theme.colors.text}]}>
+                  <Text style={[styles.rowLabel, { color: theme.colors.text }]}>
                     {category.typeName}
                   </Text>
                   <Text
                     style={[
                       styles.rowBadge,
-                      {color: theme.colors.textSecondary},
-                    ]}>
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
                     {category.isInput ? 'Entrada' : 'Salida'}
                   </Text>
                 </View>
-                <Text style={[styles.rowValue, {color: theme.colors.text}]}>
+                <Text style={[styles.rowValue, { color: theme.colors.text }]}>
                   {category.totalQuantity}
                 </Text>
               </View>

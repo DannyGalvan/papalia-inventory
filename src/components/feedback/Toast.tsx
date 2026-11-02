@@ -23,13 +23,13 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
-    AccessibilityInfo,
-    Animated,
-    PanResponder,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
+  AccessibilityInfo,
+  Animated,
+  PanResponder,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -98,7 +98,7 @@ export const Toast = ({
   onDismiss,
   duration = DEFAULT_DURATION,
 }: ToastProps) => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const topInset = DEFAULT_TOP_INSET;
 
   // -translation hides the toast above the top edge; 0 shows it.
@@ -128,7 +128,7 @@ export const Toast = ({
           duration: ANIMATION_DURATION,
           useNativeDriver: true,
         }),
-      ]).start(({finished}) => {
+      ]).start(({ finished }) => {
         if (finished && notify) {
           onDismiss();
         }
@@ -176,8 +176,7 @@ export const Toast = ({
   // (Requirement 8.8).
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_evt, gesture) =>
-        Math.abs(gesture.dy) > 5,
+      onMoveShouldSetPanResponder: (_evt, gesture) => Math.abs(gesture.dy) > 5,
       onPanResponderGrant: () => clearDismissTimer(),
       onPanResponderMove: (_evt, gesture) => {
         if (gesture.dy < 0) {
@@ -216,8 +215,9 @@ export const Toast = ({
 
   return (
     <View
-      style={[styles.container, {top: topInset + theme.spacing.sm}]}
-      pointerEvents="box-none">
+      style={[styles.container, { top: topInset + theme.spacing.sm }]}
+      pointerEvents="box-none"
+    >
       <Animated.View
         {...panResponder.panHandlers}
         accessible
@@ -232,10 +232,11 @@ export const Toast = ({
             borderRadius: theme.borderRadius.md,
             paddingVertical: theme.spacing.md,
             paddingHorizontal: theme.spacing.md,
-            transform: [{translateY}],
+            transform: [{ translateY }],
             opacity,
           },
-        ]}>
+        ]}
+      >
         <Text
           style={[
             styles.message,
@@ -246,7 +247,8 @@ export const Toast = ({
               lineHeight: theme.typography.body.lineHeight,
             },
           ]}
-          numberOfLines={3}>
+          numberOfLines={3}
+        >
           {message}
         </Text>
       </Animated.View>

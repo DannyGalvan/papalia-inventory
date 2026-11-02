@@ -63,17 +63,17 @@ const filterZeroStock = (products: TestProduct[]) =>
   products.filter(p => p.stock === 0);
 
 const rankMostMoved = (details: TestLogDetail[]) => {
-  const map = new Map<string, {name: string; total: number}>();
+  const map = new Map<string, { name: string; total: number }>();
   for (const d of details) {
     const existing = map.get(d.productCode);
     if (existing) {
       existing.total += d.quantity;
     } else {
-      map.set(d.productCode, {name: d.name, total: d.quantity});
+      map.set(d.productCode, { name: d.name, total: d.quantity });
     }
   }
   return Array.from(map.entries())
-    .map(([code, {name, total}]) => ({code, name, totalQuantity: total}))
+    .map(([code, { name, total }]) => ({ code, name, totalQuantity: total }))
     .sort((a, b) => b.totalQuantity - a.totalQuantity)
     .slice(0, 10);
 };
@@ -85,15 +85,29 @@ const computeSummary = (products: TestProduct[]) => ({
 });
 
 const getBucket = (stock: number): keyof StockDistribution => {
-  if (stock === 0) {return 'zero';}
-  if (stock <= 5) {return 'low';}
-  if (stock <= 20) {return 'medium';}
-  if (stock <= 50) {return 'high';}
+  if (stock === 0) {
+    return 'zero';
+  }
+  if (stock <= 5) {
+    return 'low';
+  }
+  if (stock <= 20) {
+    return 'medium';
+  }
+  if (stock <= 50) {
+    return 'high';
+  }
   return 'veryHigh';
 };
 
 const computeDistribution = (products: TestProduct[]): StockDistribution => {
-  const dist: StockDistribution = {zero: 0, low: 0, medium: 0, high: 0, veryHigh: 0};
+  const dist: StockDistribution = {
+    zero: 0,
+    low: 0,
+    medium: 0,
+    high: 0,
+    veryHigh: 0,
+  };
   for (const p of products) {
     dist[getBucket(p.stock)]++;
   }
@@ -103,7 +117,10 @@ const computeDistribution = (products: TestProduct[]): StockDistribution => {
 const aggregateMovements = (headers: TestLogHeader[]) => {
   let totalEntry = 0;
   let totalExit = 0;
-  const typeMap = new Map<string, {type: number; totalQuantity: number; isInput: boolean}>();
+  const typeMap = new Map<
+    string,
+    { type: number; totalQuantity: number; isInput: boolean }
+  >();
 
   for (const header of headers) {
     const qty = header.logDetails.reduce((s, d) => s + d.quantity, 0);
@@ -117,7 +134,11 @@ const aggregateMovements = (headers: TestLogHeader[]) => {
     if (existing) {
       existing.totalQuantity += qty;
     } else {
-      typeMap.set(key, {type: header.type, totalQuantity: qty, isInput: header.isInput});
+      typeMap.set(key, {
+        type: header.type,
+        totalQuantity: qty,
+        isInput: header.isInput,
+      });
     }
   }
 
@@ -138,10 +159,10 @@ const aggregateMovements = (headers: TestLogHeader[]) => {
 // ---------------------------------------------------------------------------
 
 const productArbitrary = fc.record({
-  code: fc.string({minLength: 1, maxLength: 10}),
-  name: fc.string({minLength: 1, maxLength: 20}),
-  price: fc.nat({max: 100_000}),
-  stock: fc.nat({max: 1_000}),
+  code: fc.string({ minLength: 1, maxLength: 10 }),
+  name: fc.string({ minLength: 1, maxLength: 20 }),
+  price: fc.nat({ max: 100_000 }),
+  stock: fc.nat({ max: 1_000 }),
 });
 
 const productListArbitrary = fc.array(productArbitrary, {
@@ -151,17 +172,26 @@ const productListArbitrary = fc.array(productArbitrary, {
 
 const logDetailArbitrary = fc.record({
   productCode: fc.constantFrom(
-    'P001', 'P002', 'P003', 'P004', 'P005',
-    'P006', 'P007', 'P008', 'P009', 'P010', 'P011',
+    'P001',
+    'P002',
+    'P003',
+    'P004',
+    'P005',
+    'P006',
+    'P007',
+    'P008',
+    'P009',
+    'P010',
+    'P011',
   ),
-  name: fc.string({minLength: 1, maxLength: 10}),
-  quantity: fc.nat({max: 100}),
+  name: fc.string({ minLength: 1, maxLength: 10 }),
+  quantity: fc.nat({ max: 100 }),
 });
 
 const logHeaderArbitrary = fc.record({
-  type: fc.integer({min: 1, max: 10}),
+  type: fc.integer({ min: 1, max: 10 }),
   isInput: fc.boolean(),
-  logDetails: fc.array(logDetailArbitrary, {minLength: 0, maxLength: 5}),
+  logDetails: fc.array(logDetailArbitrary, { minLength: 0, maxLength: 5 }),
 });
 
 const logHeadersArbitrary = fc.array(logHeaderArbitrary, {
@@ -182,7 +212,7 @@ describe('Feature: dashboard-reports, Property 1: Stock threshold filtering corr
         expect(lowStock.every(p => p.stock <= 5)).toBe(true);
         expect(lowStock.length).toBe(products.filter(p => p.stock <= 5).length);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -191,20 +221,24 @@ describe('Feature: dashboard-reports, Property 1: Stock threshold filtering corr
       fc.property(productListArbitrary, products => {
         const zeroStock = filterZeroStock(products);
         expect(zeroStock.every(p => p.stock === 0)).toBe(true);
-        expect(zeroStock.length).toBe(products.filter(p => p.stock === 0).length);
+        expect(zeroStock.length).toBe(
+          products.filter(p => p.stock === 0).length,
+        );
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('zero stock is always a subset of low stock', () => {
     fc.assert(
       fc.property(productListArbitrary, products => {
-        const lowStockCodes = new Set(filterLowStock(products).map(p => p.code));
+        const lowStockCodes = new Set(
+          filterLowStock(products).map(p => p.code),
+        );
         const zeroStock = filterZeroStock(products);
         expect(zeroStock.every(p => lowStockCodes.has(p.code))).toBe(true);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -225,7 +259,7 @@ describe('Feature: dashboard-reports, Property 2: Most moved products ranking is
       fc.property(detailsArbitrary, details => {
         expect(rankMostMoved(details).length).toBeLessThanOrEqual(10);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -239,7 +273,7 @@ describe('Feature: dashboard-reports, Property 2: Most moved products ranking is
           );
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -253,7 +287,10 @@ describe('Feature: dashboard-reports, Property 2: Most moved products ranking is
 
         const allTotals = new Map<string, number>();
         for (const d of details) {
-          allTotals.set(d.productCode, (allTotals.get(d.productCode) ?? 0) + d.quantity);
+          allTotals.set(
+            d.productCode,
+            (allTotals.get(d.productCode) ?? 0) + d.quantity,
+          );
         }
 
         const inResultCodes = new Set(ranked.map(p => p.code));
@@ -265,7 +302,7 @@ describe('Feature: dashboard-reports, Property 2: Most moved products ranking is
           }
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -281,31 +318,31 @@ describe('Feature: dashboard-reports, Property 3: Inventory summary computations
       fc.property(productListArbitrary, products => {
         expect(computeSummary(products).totalProducts).toBe(products.length);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('totalInventoryValue equals sum of (price × stock)', () => {
     fc.assert(
       fc.property(productListArbitrary, products => {
-        const {totalInventoryValue} = computeSummary(products);
+        const { totalInventoryValue } = computeSummary(products);
         const expected = products
           .map(p => p.price * p.stock)
           .reduce((a, b) => a + b, 0);
         expect(totalInventoryValue).toBe(expected);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('totalUnitsInStock equals sum of stock', () => {
     fc.assert(
       fc.property(productListArbitrary, products => {
-        const {totalUnitsInStock} = computeSummary(products);
+        const { totalUnitsInStock } = computeSummary(products);
         const expected = products.reduce((s, p) => s + p.stock, 0);
         expect(totalUnitsInStock).toBe(expected);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -330,7 +367,7 @@ describe('Feature: dashboard-reports, Property 4: Stock distribution bucketing i
           expect(activeBuckets).toBe(1);
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -338,10 +375,11 @@ describe('Feature: dashboard-reports, Property 4: Stock distribution bucketing i
     fc.assert(
       fc.property(productListArbitrary, products => {
         const dist = computeDistribution(products);
-        const total = dist.zero + dist.low + dist.medium + dist.high + dist.veryHigh;
+        const total =
+          dist.zero + dist.low + dist.medium + dist.high + dist.veryHigh;
         expect(total).toBe(products.length);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -352,14 +390,14 @@ describe('Feature: dashboard-reports, Property 4: Stock distribution bucketing i
 // ---------------------------------------------------------------------------
 
 describe('Feature: dashboard-reports, Property 5: Monetary formatting produces valid output', () => {
-  const nonNegativeArbitrary = fc.nat({max: 10_000_000});
+  const nonNegativeArbitrary = fc.nat({ max: 10_000_000 });
 
   it('output starts with "Q"', () => {
     fc.assert(
       fc.property(nonNegativeArbitrary, value => {
         expect(formatCurrency(value)).toMatch(/^Q/);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -368,7 +406,7 @@ describe('Feature: dashboard-reports, Property 5: Monetary formatting produces v
       fc.property(nonNegativeArbitrary, value => {
         expect(formatCurrency(value)).toMatch(/^Q\d+\.\d{2}$/);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -382,44 +420,46 @@ describe('Feature: dashboard-reports, Property 6: Movement aggregation correctly
   it('totalEntryQuantity equals sum of quantities for input headers', () => {
     fc.assert(
       fc.property(logHeadersArbitrary, headers => {
-        const {totalEntry} = aggregateMovements(headers);
+        const { totalEntry } = aggregateMovements(headers);
         const expected = headers
           .filter(h => h.isInput)
           .flatMap(h => h.logDetails)
           .reduce((s, d) => s + d.quantity, 0);
         expect(totalEntry).toBe(expected);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('totalExitQuantity equals sum of quantities for output headers', () => {
     fc.assert(
       fc.property(logHeadersArbitrary, headers => {
-        const {totalExit} = aggregateMovements(headers);
+        const { totalExit } = aggregateMovements(headers);
         const expected = headers
           .filter(h => !h.isInput)
           .flatMap(h => h.logDetails)
           .reduce((s, d) => s + d.quantity, 0);
         expect(totalExit).toBe(expected);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it("each type's totalQuantity equals sum of its detail quantities", () => {
     fc.assert(
       fc.property(logHeadersArbitrary, headers => {
-        const {movementsByType} = aggregateMovements(headers);
+        const { movementsByType } = aggregateMovements(headers);
         for (const movement of movementsByType) {
           const expected = headers
-            .filter(h => h.type === movement.type && h.isInput === movement.isInput)
+            .filter(
+              h => h.type === movement.type && h.isInput === movement.isInput,
+            )
             .flatMap(h => h.logDetails)
             .reduce((s, d) => s + d.quantity, 0);
           expect(movement.totalQuantity).toBe(expected);
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -433,39 +473,42 @@ describe('Feature: dashboard-reports, Property 7: Top categories ranking is corr
   // At least 6 headers with 6 distinct possible types to ensure ≥5 categories appear
   const manyTypesArbitrary = fc.array(
     fc.record({
-      type: fc.integer({min: 1, max: 6}),
+      type: fc.integer({ min: 1, max: 6 }),
       isInput: fc.boolean(),
       logDetails: fc.array(
         fc.record({
           productCode: fc.constant('P001'),
           name: fc.constant('Producto'),
-          quantity: fc.integer({min: 1, max: 100}),
+          quantity: fc.integer({ min: 1, max: 100 }),
         }),
-        {minLength: 1, maxLength: 3},
+        { minLength: 1, maxLength: 3 },
       ),
     }),
-    {minLength: 6, maxLength: 30},
+    { minLength: 6, maxLength: 30 },
   );
 
   it('top 5 are ordered by descending total quantity', () => {
     fc.assert(
       fc.property(manyTypesArbitrary, headers => {
-        const {topCategories} = aggregateMovements(headers);
+        const { topCategories } = aggregateMovements(headers);
         for (let i = 0; i < topCategories.length - 1; i++) {
           expect(topCategories[i].totalQuantity).toBeGreaterThanOrEqual(
             topCategories[i + 1].totalQuantity,
           );
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
   it('every category in top 5 has total ≥ any category not in top 5', () => {
     fc.assert(
       fc.property(manyTypesArbitrary, headers => {
-        const {movementsByType, topCategories} = aggregateMovements(headers);
-        if (topCategories.length === 0 || topCategories.length >= movementsByType.length) {
+        const { movementsByType, topCategories } = aggregateMovements(headers);
+        if (
+          topCategories.length === 0 ||
+          topCategories.length >= movementsByType.length
+        ) {
           return; // all categories are already in top 5, nothing excluded to compare
         }
 
@@ -476,7 +519,7 @@ describe('Feature: dashboard-reports, Property 7: Top categories ranking is corr
           expect(minTop5).toBeGreaterThanOrEqual(category.totalQuantity);
         }
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });

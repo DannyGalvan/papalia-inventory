@@ -32,5 +32,5 @@ export const useInputs = (initialDate: Date, finalDate: Date) => {
     }, [loadData]),
   );
 
-  return {inputs, loadData, isLoading};
+  return { inputs, loadData, isLoading };
 };

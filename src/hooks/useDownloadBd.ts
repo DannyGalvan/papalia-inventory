@@ -1,7 +1,7 @@
 import {
-    DocumentDirectoryPath,
-    DownloadDirectoryPath,
-    copyFile,
+  DocumentDirectoryPath,
+  DownloadDirectoryPath,
+  copyFile,
 } from '@dr.pogodin/react-native-fs';
 import { useState } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
@@ -39,7 +39,8 @@ const ensureWritePermission = async (): Promise<boolean> => {
     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
     {
       title: 'Permiso de almacenamiento',
-      message: 'Se necesita permiso para guardar la base de datos en Descargas.',
+      message:
+        'Se necesita permiso para guardar la base de datos en Descargas.',
       buttonPositive: 'Permitir',
       buttonNegative: 'Cancelar',
     },
@@ -48,7 +49,9 @@ const ensureWritePermission = async (): Promise<boolean> => {
 };
 
 export const useDownloadBd = () => {
-  const [downloadResult, setDownloadResult] = useState<DownloadResult | null>(null);
+  const [downloadResult, setDownloadResult] = useState<DownloadResult | null>(
+    null,
+  );
 
   const save = async () => {
     try {
@@ -56,7 +59,8 @@ export const useDownloadBd = () => {
       if (!permitted) {
         setDownloadResult({
           success: false,
-          message: 'Permiso de almacenamiento denegado. Habilítalo desde Configuración del dispositivo.',
+          message:
+            'Permiso de almacenamiento denegado. Habilítalo desde Configuración del dispositivo.',
         });
         return;
       }

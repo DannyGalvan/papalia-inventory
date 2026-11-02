@@ -50,7 +50,7 @@ export const dateNow = (ianaTimezone: string = DEFAULT_TIMEZONE) => {
   const fechaInicio = new Date(Date.UTC(y, mo, d, 0, 0, 0, 0) - offsetMs);
   const fechaFin = new Date(fechaInicio.getTime() + 24 * 60 * 60 * 1000 - 1);
 
-  return {fechaInicio, fechaFin};
+  return { fechaInicio, fechaFin };
 };
 
 /**

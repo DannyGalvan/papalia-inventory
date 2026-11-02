@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-    KeyboardType,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  KeyboardType,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { appColors } from '../../styles/globalStyles';
 
@@ -52,9 +52,7 @@ export const InputForm = ({
 }: Props) => {
   return (
     <View style={[styles.container, containerStyles]}>
-      <Text
-        style={[styles.label, colorText]}
-        accessibilityRole="text">
+      <Text style={[styles.label, colorText]} accessibilityRole="text">
         {label}
       </Text>
       <TextInput
@@ -76,13 +74,14 @@ export const InputForm = ({
         readOnly={readonly}
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityHint={accessibilityHint ?? placeholder}
-        accessibilityState={{disabled: readonly}}
+        accessibilityState={{ disabled: readonly }}
       />
       {!!errors && (
         <Text
           style={styles.errorText}
           accessibilityLiveRegion="assertive"
-          accessibilityRole="alert">
+          accessibilityRole="alert"
+        >
           {errors}
         </Text>
       )}

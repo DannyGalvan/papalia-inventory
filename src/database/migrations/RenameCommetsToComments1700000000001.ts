@@ -8,7 +8,7 @@ export class RenameCommetsToComments1700000000001
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Check if the column is already named "comments" (migration already ran
     // or table was created fresh with the correct name).
-    const tableInfo: Array<{name: string}> = await queryRunner.query(
+    const tableInfo: Array<{ name: string }> = await queryRunner.query(
       `PRAGMA table_info("log_header")`,
     );
     const hasCommets = tableInfo.some(col => col.name === 'commets');
@@ -44,7 +44,7 @@ export class RenameCommetsToComments1700000000001
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const tableInfo: Array<{name: string}> = await queryRunner.query(
+    const tableInfo: Array<{ name: string }> = await queryRunner.query(
       `PRAGMA table_info("log_header")`,
     );
     const hasComments = tableInfo.some(col => col.name === 'comments');

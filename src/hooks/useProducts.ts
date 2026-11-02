@@ -26,9 +26,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { Product } from '../database/models/Product';
 import {
-    getProductsPaged,
-    getTotalProducts,
-    searchProductsByCodeOrName,
+  getProductsPaged,
+  getTotalProducts,
+  searchProductsByCodeOrName,
 } from '../database/repository/ProductRepository';
 import { logService } from '../services/LogService';
 import { withRetry } from '../utils/withRetry';
@@ -165,7 +165,8 @@ export const useProducts = () => {
         setError(null);
 
         const data = await withRetry(
-          () => getProductsPaged(nextPage * PRODUCTS_PAGE_SIZE, PRODUCTS_PAGE_SIZE),
+          () =>
+            getProductsPaged(nextPage * PRODUCTS_PAGE_SIZE, PRODUCTS_PAGE_SIZE),
           operation,
         );
 

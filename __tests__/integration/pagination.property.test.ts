@@ -48,13 +48,13 @@ jest.mock('../../src/services/LogService', () => ({
 }));
 
 import {
-    getProductsPaged,
-    getTotalProducts,
+  getProductsPaged,
+  getTotalProducts,
 } from '../../src/database/repository/ProductRepository';
 import {
-    PAGINATION_THRESHOLD,
-    PRODUCTS_PAGE_SIZE,
-    useProducts,
+  PAGINATION_THRESHOLD,
+  PRODUCTS_PAGE_SIZE,
+  useProducts,
 } from '../../src/hooks/useProducts';
 
 const mockGetProductsPaged = getProductsPaged as jest.Mock;
@@ -142,11 +142,13 @@ describe('Pagination — example cases', () => {
     expect(expectedPages).toBe(4);
 
     mockGetTotalProducts.mockResolvedValue(total);
-    mockGetProductsPaged.mockImplementation(async (skip: number, take: number) => {
-      const remaining = total - skip;
-      const count = Math.min(take, remaining);
-      return makeProducts(count, skip);
-    });
+    mockGetProductsPaged.mockImplementation(
+      async (skip: number, take: number) => {
+        const remaining = total - skip;
+        const count = Math.min(take, remaining);
+        return makeProducts(count, skip);
+      },
+    );
 
     const hook = renderUseProducts();
     await flush();
@@ -176,7 +178,7 @@ describe('Feature: app-modernization, Property 8: Pagination returns bounded pag
       fc.asyncProperty(
         // Generate total product counts > PAGINATION_THRESHOLD (51..300)
         fc.integer({ min: PAGINATION_THRESHOLD + 1, max: 300 }),
-        async (totalItems) => {
+        async totalItems => {
           jest.clearAllMocks();
           mockGetProductsPaged.mockReset();
           mockGetTotalProducts.mockReset();
@@ -241,12 +243,13 @@ describe('Feature: app-modernization, Property 8: Pagination returns bounded pag
     await fc.assert(
       fc.asyncProperty(
         fc.integer({ min: PAGINATION_THRESHOLD + 1, max: 200 }),
-        async (totalItems) => {
+        async totalItems => {
           jest.clearAllMocks();
           mockGetProductsPaged.mockReset();
           mockGetTotalProducts.mockReset();
 
-          const expectedLastPageSize = totalItems % PRODUCTS_PAGE_SIZE || PRODUCTS_PAGE_SIZE;
+          const expectedLastPageSize =
+            totalItems % PRODUCTS_PAGE_SIZE || PRODUCTS_PAGE_SIZE;
 
           mockGetTotalProducts.mockResolvedValue(totalItems);
           mockGetProductsPaged.mockImplementation(

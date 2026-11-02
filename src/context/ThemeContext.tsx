@@ -15,19 +15,14 @@
  * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.7
  */
 
-import React, {
-    createContext,
-    ReactNode,
-    useEffect,
-    useState,
-} from 'react';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { KEY_THEME_PREFERENCE } from '../config/constants';
 import {
-    ConfigurationRepository,
-    createConfiguration,
-    getConfigurationByKey,
-    updateConfiguration,
+  ConfigurationRepository,
+  createConfiguration,
+  getConfigurationByKey,
+  updateConfiguration,
 } from '../database/repository/ConfigurationRepository';
 import { darkTheme, lightTheme, Theme } from '../design-system/themes';
 
@@ -44,7 +39,7 @@ export const ThemeContext = createContext({} as ThemeContextValue);
 const resolveTheme = (preference: ThemePreference): Theme =>
   preference === 'dark' ? darkTheme : lightTheme;
 
-export const ThemeProvider = ({children}: {children: ReactNode}) => {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   // Default to light theme (Requirements 2.5, 2.7).
   const [preference, setPreference] = useState<ThemePreference>('light');
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +99,8 @@ export const ThemeProvider = ({children}: {children: ReactNode}) => {
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: lightTheme.colors.background,
-        }}>
+        }}
+      >
         <ActivityIndicator size="large" color={lightTheme.colors.primary} />
       </View>
     );
@@ -118,7 +114,8 @@ export const ThemeProvider = ({children}: {children: ReactNode}) => {
         theme,
         isDark: preference === 'dark',
         toggleTheme,
-      }}>
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

@@ -3,16 +3,16 @@ import React, { useCallback, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ReportCard } from '../../components/ReportCard';
 import {
-    DEFAULT_CURRENCY_SYMBOL,
-    DEFAULT_LOW_STOCK_THRESHOLD,
-    KEY_CURRENCY_SYMBOL,
-    KEY_LOW_STOCK_THRESHOLD,
+  DEFAULT_CURRENCY_SYMBOL,
+  DEFAULT_LOW_STOCK_THRESHOLD,
+  KEY_CURRENCY_SYMBOL,
+  KEY_LOW_STOCK_THRESHOLD,
 } from '../../config/constants';
 import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { useTheme } from '../../hooks/useTheme';
 import {
-    getSummaryReportData,
-    SummaryReportData,
+  getSummaryReportData,
+  SummaryReportData,
 } from '../../services/ReportService';
 import { formatCurrency } from '../../utils/formatCurrency';
 
@@ -30,7 +30,7 @@ const INITIAL_DATA: SummaryReportData = {
 };
 
 export function SummaryReportScreen() {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const [data, setData] = useState<SummaryReportData>(INITIAL_DATA);
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const [threshold, setThreshold] = useState(DEFAULT_LOW_STOCK_THRESHOLD);
@@ -69,8 +69,9 @@ export function SummaryReportScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-      contentContainerStyle={styles.content}>
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
+    >
       <Text
         style={[
           styles.title,
@@ -81,30 +82,36 @@ export function SummaryReportScreen() {
             lineHeight: theme.typography.h2.lineHeight,
           },
         ]}
-        accessibilityRole="header">
+        accessibilityRole="header"
+      >
         Resumen General
       </Text>
 
       <ReportCard title="Total de productos">
         <Text
-          style={[styles.value, {color: theme.colors.text}]}
-          accessibilityLabel={`Total de productos: ${data.totalProducts}`}>
+          style={[styles.value, { color: theme.colors.text }]}
+          accessibilityLabel={`Total de productos: ${data.totalProducts}`}
+        >
           {data.totalProducts}
         </Text>
       </ReportCard>
 
       <ReportCard title="Valor total del inventario">
         <Text
-          style={[styles.value, {color: theme.colors.text}]}
-          accessibilityLabel={`Valor total del inventario: ${formatCurrency(data.totalInventoryValue)}`}>
+          style={[styles.value, { color: theme.colors.text }]}
+          accessibilityLabel={`Valor total del inventario: ${formatCurrency(
+            data.totalInventoryValue,
+          )}`}
+        >
           {formatCurrency(data.totalInventoryValue, currencySymbol)}
         </Text>
       </ReportCard>
 
       <ReportCard title="Total de unidades en stock">
         <Text
-          style={[styles.value, {color: theme.colors.text}]}
-          accessibilityLabel={`Total de unidades en stock: ${data.totalUnitsInStock}`}>
+          style={[styles.value, { color: theme.colors.text }]}
+          accessibilityLabel={`Total de unidades en stock: ${data.totalUnitsInStock}`}
+        >
           {data.totalUnitsInStock}
         </Text>
       </ReportCard>
@@ -112,42 +119,62 @@ export function SummaryReportScreen() {
       <ReportCard title="Distribución de stock">
         <View style={styles.distributionContainer}>
           <View style={styles.distributionRow}>
-            <Text style={[styles.distributionLabel, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionLabel, { color: theme.colors.text }]}
+            >
               0 unidades
             </Text>
-            <Text style={[styles.distributionValue, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionValue, { color: theme.colors.text }]}
+            >
               {data.stockDistribution.zero}
             </Text>
           </View>
           <View style={styles.distributionRow}>
-            <Text style={[styles.distributionLabel, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionLabel, { color: theme.colors.text }]}
+            >
               1-{threshold} unidades
             </Text>
-            <Text style={[styles.distributionValue, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionValue, { color: theme.colors.text }]}
+            >
               {data.stockDistribution.low}
             </Text>
           </View>
           <View style={styles.distributionRow}>
-            <Text style={[styles.distributionLabel, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionLabel, { color: theme.colors.text }]}
+            >
               {threshold + 1}-{threshold * 4} unidades
             </Text>
-            <Text style={[styles.distributionValue, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionValue, { color: theme.colors.text }]}
+            >
               {data.stockDistribution.medium}
             </Text>
           </View>
           <View style={styles.distributionRow}>
-            <Text style={[styles.distributionLabel, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionLabel, { color: theme.colors.text }]}
+            >
               {threshold * 4 + 1}-{threshold * 10} unidades
             </Text>
-            <Text style={[styles.distributionValue, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionValue, { color: theme.colors.text }]}
+            >
               {data.stockDistribution.high}
             </Text>
           </View>
           <View style={styles.distributionRow}>
-            <Text style={[styles.distributionLabel, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionLabel, { color: theme.colors.text }]}
+            >
               {'>'} {threshold * 10} unidades
             </Text>
-            <Text style={[styles.distributionValue, {color: theme.colors.text}]}>
+            <Text
+              style={[styles.distributionValue, { color: theme.colors.text }]}
+            >
               {data.stockDistribution.veryHigh}
             </Text>
           </View>

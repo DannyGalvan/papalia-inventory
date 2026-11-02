@@ -26,24 +26,24 @@ import {
 // Arbitraries
 // ---------------------------------------------------------------------------
 
-const productNameArbitrary = fc.string({minLength: 1, maxLength: 30});
-const productCodeArbitrary = fc.string({minLength: 1, maxLength: 10});
-const stockArbitrary = fc.nat({max: 10_000});
+const productNameArbitrary = fc.string({ minLength: 1, maxLength: 30 });
+const productCodeArbitrary = fc.string({ minLength: 1, maxLength: 10 });
+const stockArbitrary = fc.nat({ max: 10_000 });
 
 /**
  * Generates a (quantity, stock) pair where quantity > stock (failing case).
  * Uses nat() for stock and adds an offset so quantity always exceeds it.
  */
 const exceedingPairArbitrary = fc
-  .tuple(stockArbitrary, fc.integer({min: 1, max: 1_000}))
-  .map(([stock, excess]) => ({stock, quantity: stock + excess}));
+  .tuple(stockArbitrary, fc.integer({ min: 1, max: 1_000 }))
+  .map(([stock, excess]) => ({ stock, quantity: stock + excess }));
 
 /**
  * Generates a (quantity, stock) pair where quantity <= stock (passing case).
  */
 const validPairArbitrary = fc
   .tuple(stockArbitrary, stockArbitrary)
-  .map(([a, b]) => ({stock: Math.max(a, b), quantity: Math.min(a, b)}));
+  .map(([a, b]) => ({ stock: Math.max(a, b), quantity: Math.min(a, b) }));
 
 // ---------------------------------------------------------------------------
 // Property 8: Stock validation correctly accepts or rejects based on stock
@@ -53,37 +53,59 @@ const validPairArbitrary = fc
 describe('Feature: dashboard-reports-inventory-validation, Property 8: Stock validation correctly accepts or rejects based on available stock', () => {
   it('rejects when quantity exceeds stock', () => {
     fc.assert(
-      fc.property(exceedingPairArbitrary, productCodeArbitrary, productNameArbitrary, ({quantity, stock}, code, name) => {
-        const details: OutputDetail[] = [{productCode: code, name, quantity}];
-        const stockMap = new Map([[code, stock]]);
-        const result = validateStockForOutput(details, stockMap);
-        expect(result.isValid).toBe(false);
-      }),
-      {numRuns: 100},
+      fc.property(
+        exceedingPairArbitrary,
+        productCodeArbitrary,
+        productNameArbitrary,
+        ({ quantity, stock }, code, name) => {
+          const details: OutputDetail[] = [
+            { productCode: code, name, quantity },
+          ];
+          const stockMap = new Map([[code, stock]]);
+          const result = validateStockForOutput(details, stockMap);
+          expect(result.isValid).toBe(false);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 
   it('accepts when quantity does not exceed stock', () => {
     fc.assert(
-      fc.property(validPairArbitrary, productCodeArbitrary, productNameArbitrary, ({quantity, stock}, code, name) => {
-        const details: OutputDetail[] = [{productCode: code, name, quantity}];
-        const stockMap = new Map([[code, stock]]);
-        const result = validateStockForOutput(details, stockMap);
-        expect(result.isValid).toBe(true);
-      }),
-      {numRuns: 100},
+      fc.property(
+        validPairArbitrary,
+        productCodeArbitrary,
+        productNameArbitrary,
+        ({ quantity, stock }, code, name) => {
+          const details: OutputDetail[] = [
+            { productCode: code, name, quantity },
+          ];
+          const stockMap = new Map([[code, stock]]);
+          const result = validateStockForOutput(details, stockMap);
+          expect(result.isValid).toBe(true);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 
   it('rejects if and only if quantity > stock', () => {
     fc.assert(
-      fc.property(stockArbitrary, stockArbitrary, productCodeArbitrary, productNameArbitrary, (stock, quantity, code, name) => {
-        const details: OutputDetail[] = [{productCode: code, name, quantity}];
-        const stockMap = new Map([[code, stock]]);
-        const result = validateStockForOutput(details, stockMap);
-        expect(result.isValid).toBe(quantity <= stock);
-      }),
-      {numRuns: 100},
+      fc.property(
+        stockArbitrary,
+        stockArbitrary,
+        productCodeArbitrary,
+        productNameArbitrary,
+        (stock, quantity, code, name) => {
+          const details: OutputDetail[] = [
+            { productCode: code, name, quantity },
+          ];
+          const stockMap = new Map([[code, stock]]);
+          const result = validateStockForOutput(details, stockMap);
+          expect(result.isValid).toBe(quantity <= stock);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 });
@@ -99,14 +121,14 @@ describe('Feature: dashboard-reports-inventory-validation, Property 9: Stock val
       fc.property(
         productNameArbitrary,
         exceedingPairArbitrary,
-        (productName, {quantity, stock}) => {
+        (productName, { quantity, stock }) => {
           const message = formatStockError(quantity, stock, productName);
           expect(message).toContain(String(quantity));
           expect(message).toContain(String(stock));
           expect(message).toContain(productName);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -116,8 +138,10 @@ describe('Feature: dashboard-reports-inventory-validation, Property 9: Stock val
         productCodeArbitrary,
         productNameArbitrary,
         exceedingPairArbitrary,
-        (code, name, {quantity, stock}) => {
-          const details: OutputDetail[] = [{productCode: code, name, quantity}];
+        (code, name, { quantity, stock }) => {
+          const details: OutputDetail[] = [
+            { productCode: code, name, quantity },
+          ];
           const stockMap = new Map([[code, stock]]);
           const result = validateStockForOutput(details, stockMap);
 
@@ -127,7 +151,7 @@ describe('Feature: dashboard-reports-inventory-validation, Property 9: Stock val
           expect(result.errorMessage).toContain(name);
         },
       ),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
@@ -140,23 +164,31 @@ describe('Feature: dashboard-reports-inventory-validation, Property 9: Stock val
 describe('Feature: dashboard-reports-inventory-validation, Property 10: Inline stock warning message format', () => {
   it('warning message equals "Stock disponible: [stock]" when quantity exceeds stock', () => {
     fc.assert(
-      fc.property(exceedingPairArbitrary, productNameArbitrary, ({quantity, stock}, name) => {
-        const warning = checkStockForProduct(quantity, stock, name);
-        expect(warning.hasWarning).toBe(true);
-        expect(warning.warningMessage).toBe(`Stock disponible: ${stock}`);
-      }),
-      {numRuns: 100},
+      fc.property(
+        exceedingPairArbitrary,
+        productNameArbitrary,
+        ({ quantity, stock }, name) => {
+          const warning = checkStockForProduct(quantity, stock, name);
+          expect(warning.hasWarning).toBe(true);
+          expect(warning.warningMessage).toBe(`Stock disponible: ${stock}`);
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 
   it('no warning when quantity does not exceed stock', () => {
     fc.assert(
-      fc.property(validPairArbitrary, productNameArbitrary, ({quantity, stock}, name) => {
-        const warning = checkStockForProduct(quantity, stock, name);
-        expect(warning.hasWarning).toBe(false);
-        expect(warning.warningMessage).toBe('');
-      }),
-      {numRuns: 100},
+      fc.property(
+        validPairArbitrary,
+        productNameArbitrary,
+        ({ quantity, stock }, name) => {
+          const warning = checkStockForProduct(quantity, stock, name);
+          expect(warning.hasWarning).toBe(false);
+          expect(warning.warningMessage).toBe('');
+        },
+      ),
+      { numRuns: 100 },
     );
   });
 });
@@ -177,10 +209,10 @@ describe('Feature: dashboard-reports-inventory-validation, Property 11: First-fa
       fc.record({
         code: productCodeArbitrary,
         name: productNameArbitrary,
-        excess: fc.integer({min: 1, max: 100}),
+        excess: fc.integer({ min: 1, max: 100 }),
         stock: stockArbitrary,
       }),
-      {minLength: 2, maxLength: 8},
+      { minLength: 2, maxLength: 8 },
     )
     .filter(items => {
       const codes = items.map(i => i.code);
@@ -209,7 +241,7 @@ describe('Feature: dashboard-reports-inventory-validation, Property 11: First-fa
         expect(result.errorMessage).toContain(String(firstStock));
         expect(result.errorMessage).toContain(items[0].name);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 
@@ -228,7 +260,7 @@ describe('Feature: dashboard-reports-inventory-validation, Property 11: First-fa
         // failedProductCode must be the first item's code, not any other
         expect(result.failedProductCode).toBe(details[0].productCode);
       }),
-      {numRuns: 100},
+      { numRuns: 100 },
     );
   });
 });
