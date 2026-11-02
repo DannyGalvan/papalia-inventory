@@ -123,8 +123,8 @@ export const TimezoneCatalogScreen = () => {
                       borderColor: isSelected
                         ? theme.colors.primary
                         : theme.colors.border,
-                      opacity: item.isActive ? 1 : 0.5,
                     },
+                    !item.isActive && styles.inactive,
                   ]}
                 >
                   <View style={styles.rowLeft}>
@@ -195,6 +195,7 @@ export const TimezoneCatalogScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  inactive: { opacity: 0.5 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: { textAlign: 'center', fontStyle: 'italic', paddingVertical: 10 },

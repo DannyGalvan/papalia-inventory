@@ -27,11 +27,11 @@ export const LOG_FORM_MESSAGES = {
 } as const;
 
 /** Shape of the errors object produced by {@link validateLogForm}. */
-export interface LogFormErrors {
+export type LogFormErrors = {
   comments?: string;
   type?: string;
   details?: string;
-}
+};
 
 /**
  * Validate an Input/Output log form.

@@ -51,6 +51,32 @@ const EMPTY_TOAST: ToastState = {
   type: 'success',
 };
 
+const ColorPicker = ({
+  selected,
+  onSelect,
+}: {
+  selected: string;
+  onSelect: (c: string) => void;
+}) => {
+  const { theme } = useTheme();
+  return (
+    <View style={styles.palette}>
+      {PALETTE.map(color => (
+        <TouchableOpacity
+          key={color}
+          style={[
+            styles.swatch,
+            { backgroundColor: color, borderColor: theme.colors.text },
+            selected === color && styles.swatchSelected,
+          ]}
+          onPress={() => onSelect(color)}
+          accessibilityLabel={`Color ${color}`}
+        />
+      ))}
+    </View>
+  );
+};
+
 export const CategoryCatalogScreen = () => {
   const { theme } = useTheme();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -162,32 +188,6 @@ export const CategoryCatalogScreen = () => {
     }
   };
 
-  const ColorPicker = ({
-    selected,
-    onSelect,
-  }: {
-    selected: string;
-    onSelect: (c: string) => void;
-  }) => (
-    <View style={styles.palette}>
-      {PALETTE.map(color => (
-        <TouchableOpacity
-          key={color}
-          style={[
-            styles.swatch,
-            {
-              backgroundColor: color,
-              borderWidth: selected === color ? 3 : 0,
-              borderColor: theme.colors.text,
-            },
-          ]}
-          onPress={() => onSelect(color)}
-          accessibilityLabel={`Color ${color}`}
-        />
-      ))}
-    </View>
-  );
-
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <ScrollView
@@ -225,8 +225,8 @@ export const CategoryCatalogScreen = () => {
                   backgroundColor: theme.colors.surface,
                   borderRadius: theme.borderRadius.md,
                   borderColor: theme.colors.border,
-                  opacity: item.isActive ? 1 : 0.5,
                 },
+                !item.isActive && styles.inactive,
               ]}
             >
               <View
@@ -499,6 +499,8 @@ export const CategoryCatalogScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  swatchSelected: { borderWidth: 3 },
+  inactive: { opacity: 0.5 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: {

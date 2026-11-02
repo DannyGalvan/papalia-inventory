@@ -13,6 +13,7 @@ import { useOutputs } from '../../hooks/useOutputs';
 import { useTheme } from '../../hooks/useTheme';
 import { OutputListScreenProps } from '../../interfaces/IOutputNavigation';
 import { excelService } from '../../services/ExcelService';
+import { sqliteBoolean } from '../../database/utils/sqliteBoolean';
 
 export const OutputListScreen = ({ navigation }: OutputListScreenProps) => {
   const { theme } = useTheme();
@@ -46,7 +47,7 @@ export const OutputListScreen = ({ navigation }: OutputListScreenProps) => {
     try {
       setIsLoadingDownload(true);
       const logs = await LogHeaderRepository.find({
-        where: { isInput: 0 as any },
+        where: { isInput: sqliteBoolean(false) },
         order: { id: 'DESC' },
         relations: ['logDetails'],
       });

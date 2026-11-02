@@ -191,10 +191,10 @@ export const LogDetailView = ({ log }: Props) => {
               <Text
                 style={[
                   styles.productName,
+                  styles.semibold,
                   {
                     color: theme.colors.text,
                     fontSize: theme.typography.body.fontSize,
-                    fontWeight: '600',
                   },
                 ]}
                 numberOfLines={2}
@@ -230,10 +230,10 @@ export const LogDetailView = ({ log }: Props) => {
             <Text
               style={[
                 styles.productSubtotal,
+                styles.bold,
                 {
                   color: theme.colors.text,
                   fontSize: theme.typography.body.fontSize,
-                  fontWeight: '700',
                 },
               ]}
             >
@@ -286,6 +286,8 @@ export const LogDetailView = ({ log }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  semibold: { fontWeight: '600' },
+  bold: { fontWeight: '700' },
   container: { flex: 1 },
   content: { padding: 16, paddingBottom: 40, gap: 12 },
   card: { padding: 14 },

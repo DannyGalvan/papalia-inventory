@@ -197,7 +197,9 @@ async function loadWorkbookFromStore(
   const base64 = mockFsStore.get(filePath);
   expect(base64).toBeDefined();
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(Buffer.from(base64 as string, 'base64') as any);
+  await workbook.xlsx.load(
+    Buffer.from(base64 as string, 'base64') as unknown as ExcelJS.Buffer,
+  );
   return workbook;
 }
 

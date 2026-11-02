@@ -31,7 +31,6 @@ module.exports = {
     'react/prop-types': 'off',
     // React Native loads static images and lazy native modules via require().
     '@typescript-eslint/no-require-imports': 'off',
-    // Legacy code still relies on `any`; surface it without failing lint.
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
   },
 };

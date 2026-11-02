@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardTypeOptions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Toast } from '../../components/feedback/Toast';
@@ -47,6 +48,53 @@ const EMPTY_TOAST: ToastState = {
   visible: false,
   message: '',
   type: 'success',
+};
+
+const SupplierField = ({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboard = 'default',
+}: {
+  label: string;
+  value: string;
+  onChangeText: (t: string) => void;
+  placeholder?: string;
+  keyboard?: KeyboardTypeOptions;
+}) => {
+  const { theme } = useTheme();
+  return (
+    <View style={styles.field}>
+      <Text
+        style={[
+          styles.fieldLabel,
+          {
+            color: theme.colors.textSecondary,
+            fontSize: theme.typography.caption.fontSize,
+          },
+        ]}
+      >
+        {label}
+      </Text>
+      <TextInput
+        style={[
+          styles.fieldInput,
+          {
+            color: theme.colors.text,
+            borderColor: theme.colors.border,
+            backgroundColor: theme.colors.background,
+          },
+        ]}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.textSecondary}
+        keyboardType={keyboard}
+        autoCapitalize="none"
+      />
+    </View>
+  );
 };
 
 export const SupplierCatalogScreen = () => {
@@ -168,52 +216,6 @@ export const SupplierCatalogScreen = () => {
     }
   };
 
-  const inputStyle = (focused = false) => [
-    styles.fieldInput,
-    {
-      color: theme.colors.text,
-      borderColor: focused ? theme.colors.primary : theme.colors.border,
-      backgroundColor: theme.colors.background,
-    },
-  ];
-
-  const SupplierField = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    keyboard = 'default',
-  }: {
-    label: string;
-    value: string;
-    onChangeText: (t: string) => void;
-    placeholder?: string;
-    keyboard?: any;
-  }) => (
-    <View style={styles.field}>
-      <Text
-        style={[
-          styles.fieldLabel,
-          {
-            color: theme.colors.textSecondary,
-            fontSize: theme.typography.caption.fontSize,
-          },
-        ]}
-      >
-        {label}
-      </Text>
-      <TextInput
-        style={inputStyle()}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={theme.colors.textSecondary}
-        keyboardType={keyboard}
-        autoCapitalize="none"
-      />
-    </View>
-  );
-
   return (
     <KeyboardAvoidingView
       style={[styles.screen, { backgroundColor: theme.colors.background }]}
@@ -255,8 +257,8 @@ export const SupplierCatalogScreen = () => {
                   backgroundColor: theme.colors.surface,
                   borderRadius: theme.borderRadius.md,
                   borderColor: theme.colors.border,
-                  opacity: item.isActive ? 1 : 0.5,
                 },
+                !item.isActive && styles.inactive,
               ]}
             >
               {/* Header row */}
@@ -376,10 +378,8 @@ export const SupplierCatalogScreen = () => {
                       <Text
                         style={[
                           styles.detailLine,
-                          {
-                            color: theme.colors.textSecondary,
-                            fontStyle: 'italic',
-                          },
+                          styles.italic,
+                          { color: theme.colors.textSecondary },
                         ]}
                       >
                         Sin información adicional
@@ -565,6 +565,8 @@ export const SupplierCatalogScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  italic: { fontStyle: 'italic' },
+  inactive: { opacity: 0.5 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: {

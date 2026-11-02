@@ -527,32 +527,33 @@ export const ConfigurationScreen = ({
                 },
               ]}
               buttonTextStyle={{
+                ...styles.dropdownButtonText,
                 color: theme.colors.text,
-                fontSize: 13,
-                textAlign: 'left',
               }}
               dropdownStyle={{ backgroundColor: theme.colors.surface }}
               rowStyle={{
                 backgroundColor: theme.colors.surface,
                 borderBottomColor: theme.colors.border,
               }}
-              rowTextStyle={{ color: theme.colors.text, fontSize: 13 }}
+              rowTextStyle={{
+                ...styles.dropdownRowText,
+                color: theme.colors.text,
+              }}
               selectedRowStyle={{
                 backgroundColor: theme.colors.primary + '22',
               }}
               selectedRowTextStyle={{
+                ...styles.selectedRowText,
                 color: theme.colors.primary,
-                fontWeight: '600',
               }}
               dropdownOverlayColor="transparent"
               search
               searchPlaceHolder="Buscar zona..."
               searchPlaceHolderColor={theme.colors.textSecondary}
               searchInputStyle={{
+                ...styles.searchInput,
                 backgroundColor: theme.colors.background,
                 borderColor: theme.colors.border,
-                borderWidth: 1,
-                borderRadius: 8,
               }}
               searchInputTxtStyle={{ color: theme.colors.text }}
               renderDropdownIcon={() => (
@@ -845,6 +846,10 @@ export const ConfigurationScreen = ({
 };
 
 const styles = StyleSheet.create({
+  dropdownButtonText: { fontSize: 13, textAlign: 'left' },
+  dropdownRowText: { fontSize: 13 },
+  selectedRowText: { fontWeight: '600' },
+  searchInput: { borderWidth: 1, borderRadius: 8 },
   screen: { flex: 1 },
   scrollContent: {
     paddingHorizontal: 16,

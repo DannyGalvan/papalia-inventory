@@ -19,7 +19,7 @@ import { UnitOfMeasure } from '../../database/models/UnitOfMeasure';
 import { getActiveCategories } from '../../database/repository/CategoryRepository';
 import { getActiveSuppliers } from '../../database/repository/SupplierRepository';
 import { getActiveUnits } from '../../database/repository/UnitOfMeasureRepository';
-import { useForm } from '../../hooks/useForm';
+import { FormErrors, useForm } from '../../hooks/useForm';
 import { useImages } from '../../hooks/useImages';
 import { useTheme } from '../../hooks/useTheme';
 import { TouchableButton } from '../button/TouchableButton';
@@ -39,7 +39,7 @@ const NO_SUPPLIER: NullableItem = { id: null, label: 'Sin proveedor' };
 const NO_UNIT: NullableItem = { id: null, label: 'Unidades (uds)' };
 
 const validateForm = (form: Product) => {
-  const errors: any = {};
+  const errors: FormErrors = {};
   if (!form.code) {
     errors.code = 'El codigo es requerido';
   }
@@ -227,9 +227,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
               buttonTextAfterSelection={item => item.label}
               buttonStyle={dropdownBtnStyle}
               buttonTextStyle={{
+                ...styles.dropdownButtonText,
                 color: theme.colors.text,
-                fontSize: 14,
-                textAlign: 'left',
               }}
               dropdownStyle={{ backgroundColor: theme.colors.surface }}
               rowStyle={{
@@ -241,8 +240,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
                 backgroundColor: theme.colors.primary + '22',
               }}
               selectedRowTextStyle={{
+                ...styles.selectedRowText,
                 color: theme.colors.primary,
-                fontWeight: '600',
               }}
               dropdownOverlayColor="transparent"
               renderDropdownIcon={() => (
@@ -278,9 +277,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
               buttonTextAfterSelection={item => item.label}
               buttonStyle={dropdownBtnStyle}
               buttonTextStyle={{
+                ...styles.dropdownButtonText,
                 color: theme.colors.text,
-                fontSize: 14,
-                textAlign: 'left',
               }}
               dropdownStyle={{ backgroundColor: theme.colors.surface }}
               rowStyle={{
@@ -292,8 +290,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
                 backgroundColor: theme.colors.primary + '22',
               }}
               selectedRowTextStyle={{
+                ...styles.selectedRowText,
                 color: theme.colors.primary,
-                fontWeight: '600',
               }}
               dropdownOverlayColor="transparent"
               renderDropdownIcon={() => (
@@ -307,10 +305,9 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
               searchPlaceHolder="Buscar proveedor..."
               searchPlaceHolderColor={theme.colors.textSecondary}
               searchInputStyle={{
+                ...styles.searchInput,
                 backgroundColor: theme.colors.background,
                 borderColor: theme.colors.border,
-                borderWidth: 1,
-                borderRadius: 8,
               }}
               searchInputTxtStyle={{ color: theme.colors.text }}
             />
@@ -337,9 +334,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
               buttonTextAfterSelection={item => item.label}
               buttonStyle={dropdownBtnStyle}
               buttonTextStyle={{
+                ...styles.dropdownButtonText,
                 color: theme.colors.text,
-                fontSize: 14,
-                textAlign: 'left',
               }}
               dropdownStyle={{ backgroundColor: theme.colors.surface }}
               rowStyle={{
@@ -351,8 +347,8 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
                 backgroundColor: theme.colors.primary + '22',
               }}
               selectedRowTextStyle={{
+                ...styles.selectedRowText,
                 color: theme.colors.primary,
-                fontWeight: '600',
               }}
               dropdownOverlayColor="transparent"
               renderDropdownIcon={() => (
@@ -426,6 +422,9 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  dropdownButtonText: { fontSize: 14, textAlign: 'left' },
+  selectedRowText: { fontWeight: '600' },
+  searchInput: { borderWidth: 1, borderRadius: 8 },
   flex: { flex: 1 },
   scrollContent: { flexGrow: 1, paddingBottom: 40 },
   container: { width: '100%', paddingHorizontal: 20 },

@@ -5,6 +5,8 @@ import { Response } from '../models/response/Response';
 
 export const ProductRepository = dataSource.getRepository(Product);
 
+type SqlParam = string | number | null;
+
 const PRODUCT_RELATIONS = ['category', 'unitOfMeasure', 'supplier'];
 
 // react-native-nitro-sqlite returns {isNitroSQLiteNull: true} instead of null/undefined
@@ -22,29 +24,29 @@ function isNitroNull(v: unknown): boolean {
 function normalizeProduct(p: Product): Product {
   // Direct columns: coerce nitro-null or wrong types to safe defaults
   if (isNitroNull(p.stock) || typeof p.stock !== 'number') {
-    (p as any).stock = 0;
+    p.stock = 0;
   }
   if (isNitroNull(p.price) || typeof p.price !== 'number') {
-    (p as any).price = 0;
+    p.price = 0;
   }
   if (isNitroNull(p.name) || typeof p.name !== 'string') {
-    (p as any).name = '';
+    p.name = '';
   }
   if (isNitroNull(p.description) || typeof p.description !== 'string') {
-    (p as any).description = '';
+    p.description = '';
   }
   if (isNitroNull(p.image) || typeof p.image !== 'string') {
-    (p as any).image = '';
+    p.image = '';
   }
   // Relations: partial hydrated objects with nitro-null fields → set to null
   if (isNitroNull(p.category)) {
-    (p as any).category = null;
+    p.category = null;
   }
   if (isNitroNull(p.supplier)) {
-    (p as any).supplier = null;
+    p.supplier = null;
   }
   if (isNitroNull(p.unitOfMeasure)) {
-    (p as any).unitOfMeasure = null;
+    p.unitOfMeasure = null;
   }
   return p;
 }
@@ -126,7 +128,7 @@ function appendNullableFk(
   col: string,
   value: number | null | undefined,
   sets: string[],
-  params: any[],
+  params: SqlParam[],
 ): void {
   if (value === undefined) {
     return;
@@ -153,7 +155,7 @@ export const createProduct = async (product: Product) => {
       '"stock"',
       '"image"',
     ];
-    const vals: any[] = [
+    const vals: SqlParam[] = [
       product.code,
       product.name,
       product.description,
@@ -230,7 +232,7 @@ export const updateProduct = async (product: Product) => {
     // Update nullable FK columns using SQL literal NULL when null to avoid
     // the nitro-sqlite null-parameter crash on Android.
     const fkSets: string[] = [];
-    const fkParams: any[] = [];
+    const fkParams: SqlParam[] = [];
     appendNullableFk('categoryId', product.categoryId, fkSets, fkParams);
     appendNullableFk('supplierId', product.supplierId, fkSets, fkParams);
     appendNullableFk('unitId', product.unitId, fkSets, fkParams);

@@ -94,11 +94,10 @@ const IOSPrincipalStack = () => {
                     color: isActive
                       ? theme.colors.secondary
                       : theme.colors.textSecondary,
-                    fontWeight: isActive
-                      ? '700'
-                      : theme.typography.caption.fontWeight,
+                    fontWeight: theme.typography.caption.fontWeight,
                     fontSize: theme.typography.caption.fontSize,
                   },
+                  isActive && styles.tabLabelActive,
                 ]}
               >
                 {tab.label}
@@ -166,6 +165,7 @@ const PrincipalStack =
 export default PrincipalStack;
 
 const styles = StyleSheet.create({
+  tabLabelActive: { fontWeight: '700' },
   container: {
     flex: 1,
   },

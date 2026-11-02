@@ -21,6 +21,9 @@ import {
 } from '../../database/repository/MovementTypeRepository';
 import { useTheme } from '../../hooks/useTheme';
 
+/** Text color drawn on top of the selected (accent) type button. */
+const ON_ACCENT_TEXT = '#fff';
+
 type EditingState = { id: number; name: string } | null;
 
 type ToastState = {
@@ -149,8 +152,8 @@ export const MovementTypeCatalogScreen = () => {
             backgroundColor: theme.colors.surface,
             borderRadius: theme.borderRadius.md,
             borderColor: theme.colors.border,
-            opacity: item.isActive ? 1 : 0.5,
           },
+          !item.isActive && styles.inactive,
         ]}
       >
         {isEditingThis ? (
@@ -398,7 +401,7 @@ export const MovementTypeCatalogScreen = () => {
                 <Text
                   style={[
                     styles.typeBtnText,
-                    { color: !newIsInput ? '#fff' : theme.colors.text },
+                    { color: !newIsInput ? ON_ACCENT_TEXT : theme.colors.text },
                   ]}
                 >
                   Salida
@@ -420,7 +423,7 @@ export const MovementTypeCatalogScreen = () => {
                 <Text
                   style={[
                     styles.typeBtnText,
-                    { color: newIsInput ? '#fff' : theme.colors.text },
+                    { color: newIsInput ? ON_ACCENT_TEXT : theme.colors.text },
                   ]}
                 >
                   Entrada
@@ -458,6 +461,7 @@ export const MovementTypeCatalogScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  inactive: { opacity: 0.5 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: {

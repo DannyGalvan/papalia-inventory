@@ -8,14 +8,19 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Permission,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../hooks/useTheme';
 import { PermissionsScreenProps } from '../../interfaces/IAppStartNavigation';
 
+/** Text color drawn on top of solid accent (success/primary) backgrounds. */
+const ON_ACCENT_TEXT = '#FFFFFF';
+const TRANSPARENT = 'transparent';
+
 interface PermissionItem {
   key: string;
-  permission: string;
+  permission: Permission;
   title: string;
   description: string;
   icon: string;
@@ -88,7 +93,7 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
     const defs = getRequiredPermissions();
     const withStatus: PermissionItem[] = await Promise.all(
       defs.map(async def => {
-        const granted = await PermissionsAndroid.check(def.permission as any);
+        const granted = await PermissionsAndroid.check(def.permission);
         return {
           ...def,
           status: granted ? 'granted' : 'unknown',
@@ -106,7 +111,7 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
     setIsRequesting(true);
     try {
       const defs = getRequiredPermissions();
-      const permissions = defs.map(d => d.permission as any);
+      const permissions = defs.map(d => d.permission);
       const results = await PermissionsAndroid.requestMultiple(permissions);
 
       setItems(prev =>
@@ -220,10 +225,10 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
                 <Text
                   style={[
                     styles.cardTitle,
+                    styles.semibold,
                     {
                       color: theme.colors.text,
                       fontSize: theme.typography.body.fontSize,
-                      fontWeight: '600',
                     },
                   ]}
                 >
@@ -306,7 +311,7 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
             borderColor: allGranted
               ? theme.colors.success
               : theme.colors.border,
-            backgroundColor: allGranted ? theme.colors.success : 'transparent',
+            backgroundColor: allGranted ? theme.colors.success : TRANSPARENT,
           },
         ]}
         onPress={proceed}
@@ -325,7 +330,7 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
         <Text
           style={[
             styles.secondaryBtnText,
-            { color: allGranted ? '#FFFFFF' : theme.colors.textSecondary },
+            { color: allGranted ? ON_ACCENT_TEXT : theme.colors.textSecondary },
           ]}
         >
           {allGranted ? 'Continuar' : 'Continuar de todos modos'}
@@ -336,6 +341,7 @@ export const PermissionsScreen = ({ navigation }: PermissionsScreenProps) => {
 };
 
 const styles = StyleSheet.create({
+  semibold: { fontWeight: '600' },
   container: {
     flex: 1,
   },

@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { LogDetail } from '../database/models/LogDetail';
 import { Alert } from 'react-native';
+import { UpdateFormField } from './useForm';
 
 export const useLogDetails = () => {
   const [details, setDetails] = useState<LogDetail[]>([]);
   const [lastGeneratedId, setLastGeneratedId] = useState<number[]>([]);
 
-  const addDetail = (
-    detail: LogDetail,
-    updateForm: (data: any, field: string) => void,
-  ) => {
+  const addDetail = (detail: LogDetail, updateForm: UpdateFormField) => {
     if (details.some(d => d.productCode === detail.productCode)) {
       Alert.alert('Error', 'Este producto ya fue agregado');
       return;
@@ -25,10 +23,7 @@ export const useLogDetails = () => {
     setDetails(newDetails);
   };
 
-  const removeDetail = (
-    id: number,
-    updateForm: (data: any, field: string) => void,
-  ) => {
+  const removeDetail = (id: number, updateForm: UpdateFormField) => {
     const newDetails = details.filter(d => d.id !== id);
     setDetails(newDetails);
     updateForm(newDetails, 'logDetails');

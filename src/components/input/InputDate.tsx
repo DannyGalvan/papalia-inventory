@@ -22,10 +22,10 @@ export const InputDate = ({ date, setDate, label, isFinal }: Props) => {
       <Text
         style={[
           styles.labelDate,
+          styles.semibold,
           {
             color: theme.colors.textSecondary,
             fontSize: theme.typography.caption.fontSize,
-            fontWeight: '600',
           },
         ]}
         accessibilityRole="header"
@@ -75,6 +75,7 @@ export const InputDate = ({ date, setDate, label, isFinal }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  semibold: { fontWeight: '600' },
   labelDate: {
     marginHorizontal: 20,
   },

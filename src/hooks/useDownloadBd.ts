@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import uuid from 'react-native-uuid';
 import { NAME_BD } from '../config/constants';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export interface DownloadResult {
   success: boolean;
@@ -80,10 +81,10 @@ export const useDownloadBd = () => {
         success: true,
         message: `Base de datos guardada en ${location} como: ${nameBdSave}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       setDownloadResult({
         success: false,
-        message: error?.message || 'Error al guardar la base de datos',
+        message: getErrorMessage(error, 'Error al guardar la base de datos'),
       });
     }
   };

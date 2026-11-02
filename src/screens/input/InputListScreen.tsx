@@ -13,6 +13,7 @@ import { useInputs } from '../../hooks/useInputs';
 import { useTheme } from '../../hooks/useTheme';
 import { InputListScreenProps } from '../../interfaces/IInputNavigation';
 import { excelService } from '../../services/ExcelService';
+import { sqliteBoolean } from '../../database/utils/sqliteBoolean';
 
 export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   const { theme } = useTheme();
@@ -46,7 +47,7 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
     try {
       setIsLoadingDownload(true);
       const logs = await LogHeaderRepository.find({
-        where: { isInput: 1 as any },
+        where: { isInput: sqliteBoolean(true) },
         order: { id: 'DESC' },
         relations: ['logDetails'],
       });

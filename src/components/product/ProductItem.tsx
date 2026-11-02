@@ -38,11 +38,11 @@ const ProductItemInner = ({
   const rawAbbrev = product.unitOfMeasure?.abbreviation;
   const unitAbbrev = typeof rawAbbrev === 'string' ? rawAbbrev : 'uds';
   const safeCategory =
-    product.category && typeof (product.category as any).id === 'number'
+    product.category && typeof product.category.id === 'number'
       ? product.category
       : null;
   const safeSupplier =
-    product.supplier && typeof (product.supplier as any).id === 'number'
+    product.supplier && typeof product.supplier.id === 'number'
       ? product.supplier
       : null;
 

@@ -35,9 +35,9 @@ import { InputForm } from '../input/InputForm';
 
 interface Props {
   initialForm: LogHeader;
-  onSubmit: (values: LogHeader) => Promise<Response<LogHeader>> | any;
+  onSubmit: (values: LogHeader) => Promise<Response<LogHeader>>;
   isReadonly: boolean;
-  navigate?: any;
+  navigate?: { goBack: () => void };
   selectData?: { id: number; value: string }[];
 }
 
@@ -154,7 +154,7 @@ export const LogForm = ({
         total: selectedItem.price,
         productCode: selectedItem.code,
         logHeaderId: null,
-        logHeader: null as any,
+        logHeader: null,
       },
       handleChange,
     );
@@ -207,8 +207,8 @@ export const LogForm = ({
             rowTextStyle={{ color: theme.colors.text }}
             selectedRowStyle={{ backgroundColor: theme.colors.primary + '22' }}
             selectedRowTextStyle={{
+              ...styles.selectedRowText,
               color: theme.colors.primary,
-              fontWeight: '600',
             }}
             dropdownOverlayColor="transparent"
             disabled={isReadonly}
@@ -290,14 +290,13 @@ export const LogForm = ({
                 backgroundColor: theme.colors.primary + '22',
               }}
               selectedRowTextStyle={{
+                ...styles.selectedRowText,
                 color: theme.colors.primary,
-                fontWeight: '600',
               }}
               searchInputStyle={{
+                ...styles.searchInput,
                 backgroundColor: theme.colors.background,
                 borderColor: theme.colors.border,
-                borderWidth: 1,
-                borderRadius: 8,
               }}
               searchInputTxtStyle={{ color: theme.colors.text }}
               searchPlaceHolderColor={theme.colors.textSecondary}
@@ -480,6 +479,8 @@ export const LogForm = ({
 };
 
 const styles = StyleSheet.create({
+  selectedRowText: { fontWeight: '600' },
+  searchInput: { borderWidth: 1, borderRadius: 8 },
   container: {
     width: '100%',
     paddingHorizontal: 20,

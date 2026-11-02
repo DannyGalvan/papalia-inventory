@@ -1,11 +1,16 @@
 import React from 'react';
 import {
+  ColorValue,
   KeyboardType,
   Platform,
+  StyleProp,
   StyleSheet,
   Text,
   TextInput,
+  TextInputProps,
+  TextStyle,
   View,
+  ViewStyle,
 } from 'react-native';
 import { appColors } from '../../styles/globalStyles';
 
@@ -13,18 +18,18 @@ interface Props {
   label: string;
   name?: string;
   placeholder: string;
-  onChangeText?: any;
+  onChangeText?: (text: string, name?: string) => void;
   value: string;
   errors?: string;
   secureTextEntry: boolean;
-  onFocus?: any;
-  colorText?: any;
-  colorInput?: any;
-  placeholderTextColor?: any;
-  containerStyles?: any;
+  onFocus?: TextInputProps['onFocus'];
+  colorText?: StyleProp<TextStyle>;
+  colorInput?: StyleProp<TextStyle>;
+  placeholderTextColor?: ColorValue;
+  containerStyles?: StyleProp<ViewStyle>;
   multiline?: boolean;
   keyboardType?: KeyboardType;
-  style?: any;
+  style?: StyleProp<TextStyle>;
   readonly?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;

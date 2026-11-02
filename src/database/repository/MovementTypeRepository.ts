@@ -1,6 +1,7 @@
 import { dataSource } from '../connection/DataSource';
 import { MovementType } from '../models/MovementType';
 import { Response } from '../models/response/Response';
+import { sqliteBoolean } from '../utils/sqliteBoolean';
 
 export const MovementTypeRepository = dataSource.getRepository(MovementType);
 
@@ -11,7 +12,7 @@ export const getMovementTypes = async (
     // Use explicit 1/0 — nitro-sqlite on Android maps boolean true → 'true' string,
     // which SQLite casts to 0, causing true to match nothing while false matches rows with isInput=0.
     return await MovementTypeRepository.find({
-      where: { isInput: (isInput ? 1 : 0) as any, isActive: 1 as any },
+      where: { isInput: sqliteBoolean(isInput), isActive: sqliteBoolean(true) },
       order: { name: 'ASC' },
     });
   } catch (error) {

@@ -119,13 +119,16 @@ function bytesToBase64(bytes: Uint8Array): string {
     const b1 = i + 1 < bytes.length ? bytes[i + 1] : 0;
     const b2 = i + 2 < bytes.length ? bytes[i + 2] : 0;
 
-    const triplet = (b0 << 16) | (b1 << 8) | b2;
+    // 24-bit group split into four 6-bit indexes (arithmetic, no bitwise ops).
+    const triplet = b0 * 65536 + b1 * 256 + b2;
 
-    output += BASE64_ALPHABET[(triplet >> 18) & 0x3f];
-    output += BASE64_ALPHABET[(triplet >> 12) & 0x3f];
+    output += BASE64_ALPHABET[Math.floor(triplet / 262144) % 64];
+    output += BASE64_ALPHABET[Math.floor(triplet / 4096) % 64];
     output +=
-      i + 1 < bytes.length ? BASE64_ALPHABET[(triplet >> 6) & 0x3f] : '=';
-    output += i + 2 < bytes.length ? BASE64_ALPHABET[triplet & 0x3f] : '=';
+      i + 1 < bytes.length
+        ? BASE64_ALPHABET[Math.floor(triplet / 64) % 64]
+        : '=';
+    output += i + 2 < bytes.length ? BASE64_ALPHABET[triplet % 64] : '=';
   }
   return output;
 }
@@ -145,12 +148,15 @@ function base64ToBytes(base64: string): Uint8Array {
     const e2 = BASE64_ALPHABET.indexOf(clean[i + 2]);
     const e3 = BASE64_ALPHABET.indexOf(clean[i + 3]);
 
+    // Rebuild the 24-bit group from four 6-bit values, then split into bytes.
     const triplet =
-      (e0 << 18) | (e1 << 12) | ((e2 < 0 ? 0 : e2) << 6) | (e3 < 0 ? 0 : e3);
+      e0 * 262144 + e1 * 4096 + (e2 < 0 ? 0 : e2) * 64 + (e3 < 0 ? 0 : e3);
 
-    if (byteIndex < length) bytes[byteIndex++] = (triplet >> 16) & 0xff;
-    if (byteIndex < length) bytes[byteIndex++] = (triplet >> 8) & 0xff;
-    if (byteIndex < length) bytes[byteIndex++] = triplet & 0xff;
+    if (byteIndex < length)
+      bytes[byteIndex++] = Math.floor(triplet / 65536) % 256;
+    if (byteIndex < length)
+      bytes[byteIndex++] = Math.floor(triplet / 256) % 256;
+    if (byteIndex < length) bytes[byteIndex++] = triplet % 256;
   }
   return bytes;
 }

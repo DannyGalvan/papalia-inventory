@@ -16,7 +16,7 @@
  */
 
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { KEY_THEME_PREFERENCE } from '../config/constants';
 import {
   ConfigurationRepository,
@@ -94,12 +94,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   if (isLoading) {
     return (
       <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: lightTheme.colors.background,
-        }}
+        style={[
+          styles.loading,
+          { backgroundColor: lightTheme.colors.background },
+        ]}
       >
         <ActivityIndicator size="large" color={lightTheme.colors.primary} />
       </View>
@@ -120,3 +118,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     </ThemeContext.Provider>
   );
 };
+
+const styles = StyleSheet.create({
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+});

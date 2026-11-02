@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Response } from '../database/models/response/Response';
+import { getErrorMessage } from '../utils/getErrorMessage';
+
+/** Validation errors keyed by form field name. */
+export type FormErrors = Partial<Record<string, string>>;
+
+/** Updates a single form field; values may be text, numbers or nested lists. */
+export type UpdateFormField = (value: unknown, field: string) => void;
 
 export const useForm = <T>(
   initialForm: T,
-  validateForm: (form: T) => any,
+  validateForm: (form: T) => FormErrors,
   peticion: (form: T) => Promise<Response<T>>,
 ) => {
   const [form, setForm] = useState<T>(initialForm);
-  const [errors, setErrors] = useState<any>([]);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<Response<T> | null>(null);
 
@@ -15,7 +22,7 @@ export const useForm = <T>(
     setForm(initialForm);
   }, [initialForm]);
 
-  const handleChange = (text: any, campo: string) => {
+  const handleChange: UpdateFormField = (text, campo) => {
     const newForm: T = {
       ...form,
       [campo]: text,
@@ -24,7 +31,7 @@ export const useForm = <T>(
     setErrors(validateForm(newForm));
   };
 
-  const handleBlur = (text: any, campo: string) => {
+  const handleBlur: UpdateFormField = (text, campo) => {
     handleChange(text, campo);
     setErrors(validateForm(form));
   };
@@ -44,23 +51,23 @@ export const useForm = <T>(
           }
 
           setResponse(result);
-        } catch (ex: any) {
+        } catch (ex: unknown) {
           setResponse({
             success: false,
-            message: ex?.message || 'No se pudo completar la operación',
-            data: null as any,
+            message: getErrorMessage(ex, 'No se pudo completar la operación'),
+            data: null,
           });
         }
       } else {
         setResponse(null);
       }
       setLoading(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setLoading(false);
       setResponse({
         success: false,
-        message: error?.message || 'No se pudo completar la operación',
-        data: null as any,
+        message: getErrorMessage(error, 'No se pudo completar la operación'),
+        data: null,
       });
     }
   };

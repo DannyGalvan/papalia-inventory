@@ -14,6 +14,8 @@ import { ProductContext } from '../context/ProductContext';
 import { logService } from '../services/LogService';
 import { resolveImageUri, toFsPath } from '../utils/filePaths';
 import { useStoragePermissions } from './useStoragePermissions';
+import { UpdateFormField } from './useForm';
+import { getErrorMessage, getErrorName } from '../utils/getErrorMessage';
 
 /**
  * Resolves the base directory for storing product images.
@@ -33,7 +35,7 @@ export const useImages = () => {
     nameImage,
     afterImage,
   }: {
-    updateForm: (data: any, field: string) => void;
+    updateForm: UpdateFormField;
     nameImage: string;
     afterImage: string;
   }) => {
@@ -100,18 +102,23 @@ export const useImages = () => {
 
       setIsLoading(false);
       Alert.alert('Éxito', 'Imagen guardada correctamente');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // User dismissed the picker — silently return without an error dialog.
-      if (error && 'code' in error && error.code === 'OPERATION_CANCELED') {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'OPERATION_CANCELED'
+      ) {
         setIsLoading(false);
         return;
       }
 
       logService.logError({
-        errorType: error?.name || 'ImageUploadError',
+        errorType: getErrorName(error, 'ImageUploadError'),
         source: 'useImages',
         operation: 'uploadImage',
-        message: error?.message || 'Error al subir imagen',
+        message: getErrorMessage(error, 'Error al subir imagen'),
       });
 
       Alert.alert(

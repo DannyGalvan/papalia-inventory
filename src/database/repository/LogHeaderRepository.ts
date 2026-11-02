@@ -12,6 +12,7 @@ import { Response } from '../models/response/Response';
 import { LogDetailRepository } from './LogDetailRepository';
 import { getAllMovementTypes } from './MovementTypeRepository';
 import { getProductById, updateProduct } from './ProductRepository';
+import { sqliteBoolean } from '../utils/sqliteBoolean';
 
 // react-native-nitro-sqlite on Android can return {isNitroSQLiteNull: true} even
 // for NOT NULL columns when the value is falsy (e.g. boolean false stored as 0).
@@ -25,13 +26,13 @@ function isNitroNull(v: unknown): boolean {
 
 function normalizeLogHeader(h: LogHeader): LogHeader {
   if (isNitroNull(h.comments) || typeof h.comments !== 'string') {
-    (h as any).comments = '';
+    h.comments = '';
   }
   if (isNitroNull(h.type) || typeof h.type !== 'number') {
-    (h as any).type = 0;
+    h.type = 0;
   }
   if (isNitroNull(h.isInput)) {
-    (h as any).isInput = false;
+    h.isInput = false;
   }
   return h;
 }
@@ -60,7 +61,7 @@ export const getAllLogsByDate = async (
   const rows = await LogHeaderRepository.find({
     where: {
       createdAt: Between(initialDate, finalDate),
-      isInput: (isInput ? 1 : 0) as any,
+      isInput: sqliteBoolean(isInput),
     },
     order: { id: 'DESC' },
   });
@@ -74,7 +75,7 @@ export const getDashboardInputs = async (
   const [logs, typeNameMap] = await Promise.all([
     LogHeaderRepository.find({
       where: {
-        isInput: 1 as any,
+        isInput: sqliteBoolean(true),
         ...(initialDate && finalDate
           ? { createdAt: Between(initialDate, finalDate) }
           : {}),
@@ -112,7 +113,7 @@ export const getDashboardInputs = async (
 export const getAllInputLogs = async () => {
   const logs = await LogHeaderRepository.find({
     where: {
-      isInput: 1 as any,
+      isInput: sqliteBoolean(true),
     },
     order: { id: 'DESC' },
     relations: ['logDetails'],
@@ -149,7 +150,7 @@ export const getDashboardOutputs = async (
   const [logs, typeNameMap] = await Promise.all([
     LogHeaderRepository.find({
       where: {
-        isInput: 0 as any,
+        isInput: sqliteBoolean(false),
         ...(initialDate && finalDate
           ? { createdAt: Between(initialDate, finalDate) }
           : {}),
@@ -187,7 +188,7 @@ export const getDashboardOutputs = async (
 export const getAllOutputLogs = async () => {
   const logs = await LogHeaderRepository.find({
     where: {
-      isInput: 0 as any,
+      isInput: sqliteBoolean(false),
     },
     order: { id: 'DESC' },
     relations: ['logDetails'],

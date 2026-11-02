@@ -185,8 +185,8 @@ export const UnitOfMeasureCatalogScreen = () => {
                   backgroundColor: theme.colors.surface,
                   borderRadius: theme.borderRadius.md,
                   borderColor: theme.colors.border,
-                  opacity: item.isActive ? 1 : 0.5,
                 },
+                !item.isActive && styles.inactive,
               ]}
             >
               {isEditingThis ? (
@@ -442,6 +442,7 @@ export const UnitOfMeasureCatalogScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  inactive: { opacity: 0.5 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: {
