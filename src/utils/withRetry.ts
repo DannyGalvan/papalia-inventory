@@ -45,7 +45,7 @@ export async function withRetry<T>(
 ): Promise<T> {
   try {
     return await operation();
-  } catch (firstError) {
+  } catch {
     // Wait briefly, then retry the operation exactly once.
     await delay(RETRY_DELAY_MS);
 

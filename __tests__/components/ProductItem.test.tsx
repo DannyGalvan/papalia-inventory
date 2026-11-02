@@ -29,8 +29,8 @@ jest.mock('@react-navigation/native', () => ({
 // Mock useTheme to provide real light theme tokens without requiring a
 // ThemeProvider (which depends on the database via ConfigurationRepository).
 jest.mock('../../src/hooks/useTheme', () => {
-  const {lightTheme: theme} = require('../../src/design-system/themes');
-  const value = {theme, isDark: false, toggleTheme: jest.fn()};
+  const { lightTheme: theme } = require('../../src/design-system/themes');
+  const value = { theme, isDark: false, toggleTheme: jest.fn() };
   return {
     useTheme: () => value,
     default: () => value,
@@ -55,9 +55,8 @@ import { Product } from '../../src/database/models/Product';
 // Expected accessibility hint for zero-stock products (Req 4.4).
 // Kept in sync with src/components/product/ProductItem.tsx.
 // ---------------------------------------------------------------------------
-const ZERO_STOCK_HINT =
-  'Producto sin inventario disponible. Toca dos veces para editar el producto.';
-const NON_ZERO_STOCK_HINT = 'Toca dos veces para editar el producto.';
+const ZERO_STOCK_HINT = 'Sin stock. Toca para editar.';
+const NON_ZERO_STOCK_HINT = 'Toca para editar.';
 
 // ---------------------------------------------------------------------------
 // Generators
@@ -155,7 +154,7 @@ describe('Feature: app-modernization, Property 3: Zero-stock products carry acce
         const hint = buttons[0].props.accessibilityHint;
         // Non-zero stock should NOT carry the depleted hint.
         expect(hint).toBe(NON_ZERO_STOCK_HINT);
-        expect(hint).not.toContain('sin inventario');
+        expect(hint).not.toContain('Sin stock');
 
         ReactTestRenderer.act(() => {
           renderer.unmount();

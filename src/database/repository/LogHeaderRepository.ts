@@ -1,8 +1,8 @@
 import { Between } from 'typeorm';
 import {
-    ALL_IN_OUT_ENUM,
-    ALL_IN_OUT_TYPES,
-    INPUT_ENUM,
+  ALL_IN_OUT_ENUM,
+  ALL_IN_OUT_TYPES,
+  INPUT_ENUM,
 } from '../../config/constants';
 import { dataSource } from '../connection/DataSource';
 import { LogHeader } from '../models/LogHeader';
@@ -16,21 +16,36 @@ import { getProductById, updateProduct } from './ProductRepository';
 // react-native-nitro-sqlite on Android can return {isNitroSQLiteNull: true} even
 // for NOT NULL columns when the value is falsy (e.g. boolean false stored as 0).
 function isNitroNull(v: unknown): boolean {
-  return v !== null && typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'isNitroSQLiteNull');
+  return (
+    v !== null &&
+    typeof v === 'object' &&
+    Object.prototype.hasOwnProperty.call(v, 'isNitroSQLiteNull')
+  );
 }
 
 function normalizeLogHeader(h: LogHeader): LogHeader {
-  if (isNitroNull(h.comments) || typeof h.comments !== 'string') { (h as any).comments = ''; }
-  if (isNitroNull(h.type) || typeof h.type !== 'number') { (h as any).type = 0; }
-  if (isNitroNull(h.isInput)) { (h as any).isInput = false; }
+  if (isNitroNull(h.comments) || typeof h.comments !== 'string') {
+    (h as any).comments = '';
+  }
+  if (isNitroNull(h.type) || typeof h.type !== 'number') {
+    (h as any).type = 0;
+  }
+  if (isNitroNull(h.isInput)) {
+    (h as any).isInput = false;
+  }
   return h;
 }
 
 const buildTypeNameMap = async (): Promise<Record<number, string>> => {
-  const map: Record<number, string> = {...ALL_IN_OUT_ENUM} as Record<number, string>;
+  const map: Record<number, string> = { ...ALL_IN_OUT_ENUM } as Record<
+    number,
+    string
+  >;
   try {
     const dbTypes = await getAllMovementTypes();
-    dbTypes.forEach(t => { map[t.id] = t.name; });
+    dbTypes.forEach(t => {
+      map[t.id] = t.name;
+    });
   } catch {}
   return map;
 };
@@ -52,12 +67,17 @@ export const getAllLogsByDate = async (
   return rows.map(normalizeLogHeader);
 };
 
-export const getDashboardInputs = async (initialDate?: Date, finalDate?: Date) => {
+export const getDashboardInputs = async (
+  initialDate?: Date,
+  finalDate?: Date,
+) => {
   const [logs, typeNameMap] = await Promise.all([
     LogHeaderRepository.find({
       where: {
         isInput: 1 as any,
-        ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
+        ...(initialDate && finalDate
+          ? { createdAt: Between(initialDate, finalDate) }
+          : {}),
       },
       order: { id: 'DESC' },
       relations: ['logDetails', 'logDetails.product'],
@@ -67,15 +87,14 @@ export const getDashboardInputs = async (initialDate?: Date, finalDate?: Date) =
 
   const inputDetails: DashboardResponse[] = [];
 
-  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce(
-    (acc, item) => {
-      const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
-      if (!acc[typeName]) { acc[typeName] = []; }
-      acc[typeName].push(item);
-      return acc;
-    },
-    {},
-  );
+  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce((acc, item) => {
+    const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
+    if (!acc[typeName]) {
+      acc[typeName] = [];
+    }
+    acc[typeName].push(item);
+    return acc;
+  }, {});
 
   for (const key in grouped) {
     const element = grouped[key];
@@ -123,12 +142,17 @@ export const getAllInputLogs = async () => {
   return DetailResponses;
 };
 
-export const getDashboardOutputs = async (initialDate?: Date, finalDate?: Date) => {
+export const getDashboardOutputs = async (
+  initialDate?: Date,
+  finalDate?: Date,
+) => {
   const [logs, typeNameMap] = await Promise.all([
     LogHeaderRepository.find({
       where: {
         isInput: 0 as any,
-        ...(initialDate && finalDate ? {createdAt: Between(initialDate, finalDate)} : {}),
+        ...(initialDate && finalDate
+          ? { createdAt: Between(initialDate, finalDate) }
+          : {}),
       },
       order: { id: 'DESC' },
       relations: ['logDetails', 'logDetails.product'],
@@ -138,15 +162,14 @@ export const getDashboardOutputs = async (initialDate?: Date, finalDate?: Date) 
 
   const outputDetails: DashboardResponse[] = [];
 
-  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce(
-    (acc, item) => {
-      const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
-      if (!acc[typeName]) { acc[typeName] = []; }
-      acc[typeName].push(item);
-      return acc;
-    },
-    {},
-  );
+  const grouped: { [tipo: string]: LogHeader[] } = logs.reduce((acc, item) => {
+    const typeName = typeNameMap[item.type] ?? `Tipo ${item.type}`;
+    if (!acc[typeName]) {
+      acc[typeName] = [];
+    }
+    acc[typeName].push(item);
+    return acc;
+  }, {});
 
   for (const key in grouped) {
     const element = grouped[key];
@@ -225,10 +248,8 @@ export const createLog = async (log: LogHeader) => {
     const logCreated = await LogHeaderRepository.save(logHeader);
 
     const details = log.logDetails.map(detail => {
-      {
-        detail.logHeaderId = logCreated.id;
-        return detail;
-      }
+      detail.logHeaderId = logCreated.id;
+      return detail;
     });
 
     await LogDetailRepository.save(details);

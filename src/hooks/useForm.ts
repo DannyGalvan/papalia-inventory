@@ -39,7 +39,9 @@ export const useForm = <T>(
         try {
           const result = await peticion(form);
 
-          result.success && setForm(initialForm);
+          if (result.success) {
+            setForm(initialForm);
+          }
 
           setResponse(result);
         } catch (ex: any) {
