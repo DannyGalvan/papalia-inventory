@@ -46,6 +46,7 @@ const NO_SELECTION: MovementType = {
   name: 'Seleccione una opción',
   isInput: false,
   isActive: true,
+  isSale: false,
 };
 
 const validateForm = validateLogForm;
@@ -153,6 +154,7 @@ export const LogForm = ({
         price: selectedItem.price,
         total: selectedItem.price,
         productCode: selectedItem.code,
+        unitCost: Number(selectedItem.cost) || 0,
         logHeaderId: null,
         logHeader: null,
       },

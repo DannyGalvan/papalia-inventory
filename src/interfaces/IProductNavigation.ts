@@ -7,6 +7,7 @@ export type ProductStackParamList = {
   CriticalReport: undefined;
   SummaryReport: undefined;
   MovementReport: undefined;
+  ProfitReport: undefined;
 };
 
 export type ProductListScreenProps = NativeStackScreenProps<
@@ -37,4 +38,9 @@ export type SummaryReportScreenProps = NativeStackScreenProps<
 export type MovementReportScreenProps = NativeStackScreenProps<
   ProductStackParamList,
   'MovementReport'
+>;
+
+export type ProfitReportScreenProps = NativeStackScreenProps<
+  ProductStackParamList,
+  'ProfitReport'
 >;

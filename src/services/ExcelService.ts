@@ -8,7 +8,7 @@
  * equivalent (Requirements 5.2, 5.3, 5.5):
  *
  *  - `exportProducts` writes a single sheet named **"Productos"** with the
- *    columns `code, name, description, price, stock, image` (the `Product`
+ *    columns `code, name, description, price, cost, stock, image` (the `Product`
  *    model fields, in model order), to `Productos_<uuid>.xlsx`.
  *  - `exportLogs` writes a single sheet named **"Entradas"** (inputs) or
  *    **"Salidas"** (outputs) with the joined header/detail columns
@@ -17,7 +17,7 @@
  *    `Salidas_<uuid>.xlsx` (outputs) — matching the legacy file naming.
  *  - `importProducts` reads the first worksheet of a workbook and maps each row
  *    back into a `Product` using the same field mapping
- *    (`code, name, description, price, stock, image`).
+ *    (`code, name, description, price, cost, stock, image`).
  *
  * Path resolution and file writing are delegated to {@link fileService} so the
  * platform-appropriate downloads directory is used and the written file is
@@ -58,9 +58,84 @@ export const PRODUCT_COLUMNS = [
   'name',
   'description',
   'price',
+  'cost',
   'stock',
   'image',
 ] as const;
+
+interface RangeValidations {
+  dataValidations: {
+    add(range: string, validation: ExcelJS.DataValidation): void;
+  };
+}
+
+type ProductColumn = (typeof PRODUCT_COLUMNS)[number];
+
+/** Name of the instructions sheet in the bulk-upload template. */
+export const TEMPLATE_HELP_SHEET_NAME = 'Instrucciones';
+
+/** Rows of the template that carry Excel data validation. */
+const TEMPLATE_VALIDATED_ROWS = 1000;
+
+/** Per-column guidance shown in the template header notes and help sheet. */
+const TEMPLATE_COLUMN_HELP: Record<
+  ProductColumn,
+  { required: boolean; description: string; example: string; width: number }
+> = {
+  code: {
+    required: true,
+    description:
+      'Código único del producto. No debe repetirse ni existir ya en la app.',
+    example: 'P-0001',
+    width: 14,
+  },
+  name: {
+    required: true,
+    description: 'Nombre del producto.',
+    example: 'Café molido 500 g',
+    width: 28,
+  },
+  description: {
+    required: true,
+    description: 'Descripción breve del producto.',
+    example: 'Bolsa de café tostado',
+    width: 34,
+  },
+  price: {
+    required: true,
+    description:
+      'Precio de venta unitario. Número mayor a 0, sin símbolo de moneda.',
+    example: '45.50',
+    width: 12,
+  },
+  cost: {
+    required: false,
+    description:
+      'Costo unitario de compra. Número mayor o igual a 0; si se deja vacío se guarda 0.',
+    example: '30.00',
+    width: 12,
+  },
+  stock: {
+    required: true,
+    description: 'Existencia inicial. Número entero mayor o igual a 0.',
+    example: '20',
+    width: 10,
+  },
+  image: {
+    required: false,
+    description: 'Dejar vacío; la imagen se agrega desde la app.',
+    example: '',
+    width: 12,
+  },
+};
+
+const TEMPLATE_TIPS = [
+  'Llena los productos en la hoja "Productos", una fila por producto, empezando en la fila 2.',
+  'No cambies, muevas ni borres los encabezados de la fila 1.',
+  'No agregues filas de totales ni notas en la hoja "Productos".',
+  'Usa punto como separador decimal y no incluyas el símbolo de moneda.',
+  'Guarda el archivo como .xlsx e impórtalo desde "Crear producto" con el botón de importar.',
+];
 
 /**
  * Column keys for the log sheets, matching the `LogDetailResponse` shape the
@@ -87,6 +162,12 @@ export interface ExcelService {
    */
   exportProducts(products: Product[]): Promise<string>;
   /**
+   * Write an empty bulk-upload template (`Plantilla_Productos.xlsx`): a
+   * "Productos" sheet with the import headers and an "Instrucciones" sheet.
+   * Returns the absolute path of the written file.
+   */
+  exportProductTemplate(): Promise<string>;
+  /**
    * Export the given log headers and details to an XLSX file. When `isInput`
    * is `true` the sheet is named "Entradas" and the file `Ingresos_*.xlsx`;
    * otherwise the sheet is "Salidas" and the file `Salidas_*.xlsx`.
@@ -99,7 +180,7 @@ export interface ExcelService {
   ): Promise<string>;
   /**
    * Parse the first worksheet of the XLSX file at `filePath` into `Product`
-   * records using the `code, name, description, price, stock, image` mapping.
+   * records using the `code, name, description, price, cost, stock, image` mapping.
    */
   importProducts(filePath: string): Promise<Product[]>;
 }
@@ -199,12 +280,95 @@ export class ExcelServiceImpl implements ExcelService {
         name: product.name,
         description: product.description,
         price: product.price,
+        cost: Number(product.cost) || 0,
         stock: product.stock,
         image: product.image ?? '',
       });
     }
 
     return this.writeWorkbook(workbook, `Productos_${uuid.v4()}.xlsx`);
+  }
+
+  async exportProductTemplate(): Promise<string> {
+    const workbook = new ExcelJS.Workbook();
+
+    // Data sheet first: importProducts reads the first worksheet.
+    const sheet = workbook.addWorksheet(PRODUCTS_SHEET_NAME, {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
+    sheet.columns = PRODUCT_COLUMNS.map(key => ({
+      header: key,
+      key,
+      width: TEMPLATE_COLUMN_HELP[key].width,
+    }));
+    const header = sheet.getRow(1);
+    header.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    header.eachCell(cell => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0688B1' },
+      };
+      const help = TEMPLATE_COLUMN_HELP[String(cell.value) as ProductColumn];
+      cell.note = `${help.required ? 'Obligatorio' : 'Opcional'}. ${
+        help.description
+      } Ej.: ${help.example}`;
+    });
+
+    // Reject negative / non-numeric values directly in Excel. Range-based
+    // validations exist at runtime but are missing from exceljs' typings;
+    // unlike per-cell validation they do not create empty rows.
+    const validations = (sheet as unknown as RangeValidations).dataValidations;
+    const lastRow = TEMPLATE_VALIDATED_ROWS + 1;
+    const columnLetter = (key: ProductColumn) =>
+      String.fromCharCode(65 + PRODUCT_COLUMNS.indexOf(key));
+    for (const key of ['price', 'cost'] as const) {
+      const col = columnLetter(key);
+      validations.add(`${col}2:${col}${lastRow}`, {
+        type: 'decimal',
+        operator: 'greaterThanOrEqual',
+        formulae: [0],
+        allowBlank: key === 'cost',
+        showErrorMessage: true,
+        errorTitle: 'Valor inválido',
+        error: 'Ingresa un número mayor o igual a 0.',
+      });
+    }
+    const stockCol = columnLetter('stock');
+    validations.add(`${stockCol}2:${stockCol}${lastRow}`, {
+      type: 'whole',
+      operator: 'greaterThanOrEqual',
+      formulae: [0],
+      allowBlank: false,
+      showErrorMessage: true,
+      errorTitle: 'Valor inválido',
+      error: 'Ingresa un número entero mayor o igual a 0.',
+    });
+
+    const help = workbook.addWorksheet(TEMPLATE_HELP_SHEET_NAME);
+    help.columns = [
+      { header: 'Columna', key: 'column', width: 14 },
+      { header: 'Obligatorio', key: 'required', width: 12 },
+      { header: 'Descripción', key: 'description', width: 60 },
+      { header: 'Ejemplo', key: 'example', width: 22 },
+    ];
+    help.getRow(1).font = { bold: true };
+    for (const key of PRODUCT_COLUMNS) {
+      const h = TEMPLATE_COLUMN_HELP[key];
+      help.addRow({
+        column: key,
+        required: h.required ? 'Sí' : 'No',
+        description: h.description,
+        example: h.example,
+      });
+    }
+    help.addRow({});
+    for (const tip of TEMPLATE_TIPS) {
+      help.addRow({ column: '•', description: tip });
+    }
+    help.getColumn('description').alignment = { wrapText: true };
+
+    return this.writeWorkbook(workbook, 'Plantilla_Productos.xlsx');
   }
 
   async exportLogs(
@@ -329,7 +493,7 @@ export class ExcelServiceImpl implements ExcelService {
 
   /**
    * Map a parsed spreadsheet row to a `Product`, preserving the legacy field
-   * mapping (`code, name, description, price, stock, image`).
+   * mapping (`code, name, description, price, cost, stock, image`).
    */
   private recordToProduct(record: Record<string, unknown>): Product {
     const product = new Product();
@@ -337,6 +501,8 @@ export class ExcelServiceImpl implements ExcelService {
     product.name = this.toStringValue(record.name);
     product.description = this.toStringValue(record.description);
     product.price = this.toNumberValue(record.price);
+    // Files exported before cost tracking have no `cost` column → 0.
+    product.cost = this.toNumberValue(record.cost);
     product.stock = this.toNumberValue(record.stock);
     product.image = this.toStringValue(record.image);
     return product;

@@ -30,6 +30,10 @@ export class LogDetail {
   @Column('decimal')
   total: number;
 
+  /** Unit cost when the movement was registered; null for legacy rows. */
+  @Column('decimal', { nullable: true, default: null })
+  unitCost: number | null;
+
   @ManyToOne(() => LogHeader, logHeader => logHeader.logDetails, {
     onDelete: 'CASCADE',
   })

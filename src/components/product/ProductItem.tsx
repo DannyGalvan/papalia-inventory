@@ -13,6 +13,11 @@ import { Product } from '../../database/models/Product';
 import { useTheme } from '../../hooks/useTheme';
 import { ProductStackParamList } from '../../interfaces/IProductNavigation';
 import { resolveImageUri } from '../../utils/filePaths';
+import {
+  calculateMarginPct,
+  formatPct,
+  LOW_MARGIN_THRESHOLD_PCT,
+} from '../../utils/profit';
 
 interface Props {
   product: Product;
@@ -31,6 +36,9 @@ const ProductItemInner = ({
 
   const safeStock = typeof product.stock === 'number' ? product.stock : 0;
   const safePrice = typeof product.price === 'number' ? product.price : 0;
+  const safeCost = Number(product.cost) || 0;
+  const marginPct =
+    safeCost > 0 ? calculateMarginPct(safePrice, safeCost) : null;
   const nonExistentProduct = safeStock === 0;
   const statusColor = nonExistentProduct
     ? theme.colors.stockDepleted
@@ -130,6 +138,23 @@ const ProductItemInner = ({
         <Text style={[styles.price, { color: theme.colors.primary }]}>
           {currencySymbol} {safePrice.toFixed(2)}
         </Text>
+        {marginPct !== null && (
+          <Text
+            style={[
+              styles.costLabel,
+              {
+                color:
+                  marginPct < LOW_MARGIN_THRESHOLD_PCT
+                    ? theme.colors.warning
+                    : theme.colors.textSecondary,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            Costo {currencySymbol} {safeCost.toFixed(2)} ·{' '}
+            {formatPct(marginPct)}
+          </Text>
+        )}
         {nonExistentProduct && (
           <Text
             style={[
@@ -187,6 +212,7 @@ const ProductItemInner = ({
 };
 
 const styles = StyleSheet.create({
+  costLabel: { fontSize: 12, marginLeft: 8 },
   container: {
     marginHorizontal: 4,
     marginVertical: 6,

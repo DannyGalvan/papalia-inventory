@@ -17,6 +17,8 @@ import {
   deleteMovementType,
   getAllMovementTypes,
   toggleMovementTypeActive,
+  toggleMovementTypeSale,
+  toBool,
   updateMovementType,
 } from '../../database/repository/MovementTypeRepository';
 import { useTheme } from '../../hooks/useTheme';
@@ -44,6 +46,7 @@ export const MovementTypeCatalogScreen = () => {
   const [editing, setEditing] = useState<EditingState>(null);
   const [newName, setNewName] = useState('');
   const [newIsInput, setNewIsInput] = useState(false);
+  const [newIsSale, setNewIsSale] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [toast, setToast] = useState<ToastState>(EMPTY_TOAST);
 
@@ -68,6 +71,20 @@ export const MovementTypeCatalogScreen = () => {
       setTypes(prev =>
         prev.map(t => (t.id === item.id ? { ...t, isActive: !t.isActive } : t)),
       );
+    } else {
+      showToast(result.message, 'error');
+    }
+  };
+
+  const handleToggleSale = async (item: MovementType) => {
+    const result = await toggleMovementTypeSale(item.id);
+    if (result.success) {
+      setTypes(prev =>
+        prev.map(t =>
+          t.id === item.id ? { ...t, isSale: !toBool(t.isSale) } : t,
+        ),
+      );
+      showToast(result.message, 'success');
     } else {
       showToast(result.message, 'error');
     }
@@ -127,10 +144,11 @@ export const MovementTypeCatalogScreen = () => {
       showToast('El nombre no puede estar vacío', 'error');
       return;
     }
-    const result = await createMovementType(newName, newIsInput);
+    const result = await createMovementType(newName, newIsInput, newIsSale);
     if (result.success) {
       setTypes(prev => [...prev, result.data!]);
       setNewName('');
+      setNewIsSale(false);
       setShowAddForm(false);
       showToast('Tipo creado', 'success');
     } else {
@@ -227,6 +245,48 @@ export const MovementTypeCatalogScreen = () => {
                   item.isActive ? 'Desactivar' : 'Activar'
                 } ${item.name}`}
               />
+              {!toBool(item.isInput) && (
+                <TouchableOpacity
+                  onPress={() => handleToggleSale(item)}
+                  style={[
+                    styles.saleBadge,
+                    {
+                      borderColor: toBool(item.isSale)
+                        ? theme.colors.success
+                        : theme.colors.border,
+                    },
+                    toBool(item.isSale) && {
+                      backgroundColor: theme.colors.success,
+                    },
+                  ]}
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: toBool(item.isSale) }}
+                  accessibilityLabel={`${item.name} cuenta como venta`}
+                  accessibilityHint="Toca para cambiar si este tipo suma a las ganancias"
+                >
+                  <Icon
+                    name="cash-outline"
+                    size={14}
+                    color={
+                      toBool(item.isSale)
+                        ? ON_ACCENT_TEXT
+                        : theme.colors.textSecondary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.saleBadgeText,
+                      {
+                        color: toBool(item.isSale)
+                          ? ON_ACCENT_TEXT
+                          : theme.colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    Venta
+                  </Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 onPress={() => handleStartEdit(item)}
                 style={styles.iconBtn}
@@ -431,6 +491,39 @@ export const MovementTypeCatalogScreen = () => {
               </TouchableOpacity>
             </View>
 
+            {!newIsInput && (
+              <View style={styles.saleSwitchRow}>
+                <View style={styles.saleSwitchText}>
+                  <Text
+                    style={[styles.typeBtnText, { color: theme.colors.text }]}
+                  >
+                    Es venta
+                  </Text>
+                  <Text
+                    style={[
+                      styles.saleSwitchHint,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Las salidas de este tipo suman ingresos en el reporte de
+                    ganancias.
+                  </Text>
+                </View>
+                <Switch
+                  value={newIsSale}
+                  onValueChange={setNewIsSale}
+                  thumbColor={
+                    newIsSale ? theme.colors.success : theme.colors.disabled
+                  }
+                  trackColor={{
+                    false: theme.colors.border,
+                    true: theme.colors.success + '66',
+                  }}
+                  accessibilityLabel="Es venta"
+                />
+              </View>
+            )}
+
             <TouchableOpacity
               style={[
                 styles.saveAddBtn,
@@ -462,6 +555,27 @@ export const MovementTypeCatalogScreen = () => {
 
 const styles = StyleSheet.create({
   inactive: { opacity: 0.5 },
+  saleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginHorizontal: 4,
+    minHeight: 28,
+  },
+  saleBadgeText: { fontSize: 12, fontWeight: '600' },
+  saleSwitchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    gap: 12,
+  },
+  saleSwitchText: { flex: 1 },
+  saleSwitchHint: { fontSize: 12, marginTop: 2 },
   screen: { flex: 1 },
   content: { padding: 16, paddingBottom: 48 },
   title: {

@@ -25,6 +25,11 @@ import { useTheme } from '../../hooks/useTheme';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
 import { resolveImageUri } from '../../utils/filePaths';
+import {
+  calculateMarginPct,
+  formatPct,
+  LOW_MARGIN_THRESHOLD_PCT,
+} from '../../utils/profit';
 
 interface Props {
   initialForm: Product;
@@ -51,6 +56,12 @@ const validateForm = (form: Product) => {
   }
   if (!form.price) {
     errors.price = 'El precio es requerido';
+  }
+  const costText = String(form.cost ?? '').trim();
+  if (costText === '') {
+    errors.cost = 'El costo es requerido';
+  } else if (!Number.isFinite(Number(costText)) || Number(costText) < 0) {
+    errors.cost = 'El costo debe ser un número mayor o igual a 0';
   }
   if (form.stock === undefined || form.stock === null) {
     errors.stock = 'El stock es requerido';
@@ -96,6 +107,12 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
     validateForm,
     onSubmit,
   );
+
+  const marginPct =
+    String(form.price ?? '').trim() !== '' &&
+    String(form.cost ?? '').trim() !== ''
+      ? calculateMarginPct(Number(form.price), Number(form.cost))
+      : null;
 
   const handleSelectImage = async () => {
     uploadImage({
@@ -182,6 +199,41 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
             colorText={{ color: theme.colors.text }}
             keyboardType="decimal-pad"
           />
+          <InputForm
+            label="Costo"
+            placeholder="Ingresa el costo unitario"
+            placeholderTextColor={theme.colors.disabled}
+            value={String(form.cost ?? '')}
+            errors={errors.cost}
+            onChangeText={text => handleChange(text, 'cost')}
+            secureTextEntry={false}
+            style={inputStyle}
+            colorText={{ color: theme.colors.text }}
+            keyboardType="decimal-pad"
+            accessibilityHint="Costo de adquisición de una unidad del producto"
+          />
+          {marginPct !== null && (
+            <Text
+              style={[
+                styles.marginHint,
+                {
+                  color:
+                    marginPct < 0
+                      ? theme.colors.error
+                      : marginPct < LOW_MARGIN_THRESHOLD_PCT
+                      ? theme.colors.warning
+                      : theme.colors.textSecondary,
+                },
+              ]}
+              accessibilityLiveRegion="polite"
+            >
+              {marginPct < 0
+                ? `El costo es mayor que el precio (margen ${formatPct(
+                    marginPct,
+                  )})`
+                : `Margen estimado: ${formatPct(marginPct)}`}
+            </Text>
+          )}
 
           {!update ? (
             <InputForm
@@ -422,6 +474,7 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  marginHint: { fontSize: 12, marginTop: -2, marginBottom: 6 },
   dropdownButtonText: { fontSize: 14, textAlign: 'left' },
   selectedRowText: { fontWeight: '600' },
   searchInput: { borderWidth: 1, borderRadius: 8 },

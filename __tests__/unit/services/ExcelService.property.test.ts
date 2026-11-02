@@ -140,6 +140,7 @@ const productArbitrary: fc.Arbitrary<Product> = fc
     name: requiredString(40),
     description: safeString(0, 60),
     price: priceArbitrary,
+    cost: priceArbitrary,
     stock: stockArbitrary,
     image: safeString(0, 30),
   })
@@ -149,6 +150,7 @@ const productArbitrary: fc.Arbitrary<Product> = fc
     product.name = fields.name;
     product.description = fields.description;
     product.price = fields.price;
+    product.cost = fields.cost;
     product.stock = fields.stock;
     product.image = fields.image;
     return product;
@@ -186,6 +188,7 @@ function expectEquivalentProducts(
     expect(typeof actual.price).toBe('number');
     expect(typeof actual.stock).toBe('number');
     expect(actual.price).toBeCloseTo(expected.price, 2);
+    expect(actual.cost).toBeCloseTo(Number(expected.cost) || 0, 2);
     expect(actual.stock).toBe(expected.stock);
   });
 }
@@ -273,6 +276,78 @@ describe('ExcelService — round-trip examples', () => {
 
     expect(imported[0].code).toBe('0012345');
     expect(imported[0].price).toBeCloseTo(75.25, 2);
+  });
+
+  it('writes a bulk-upload template that imports as empty', async () => {
+    const filePath = await excelService.exportProductTemplate();
+    expect(filePath.endsWith('/Plantilla_Productos.xlsx')).toBe(true);
+
+    const workbook = await loadWorkbookFromStore(filePath);
+    expect(workbook.worksheets.map(w => w.name)).toEqual([
+      'Productos',
+      'Instrucciones',
+    ]);
+    const headers = (workbook.worksheets[0].getRow(1).values as unknown[])
+      .slice(1)
+      .map(String);
+    expect(headers).toEqual([...PRODUCT_COLUMNS]);
+
+    await expect(excelService.importProducts(filePath)).resolves.toEqual([]);
+  });
+
+  it('imports a filled-in template', async () => {
+    const filePath = await excelService.exportProductTemplate();
+    const workbook = await loadWorkbookFromStore(filePath);
+    // Column keys are not persisted in the file; add the row by position.
+    workbook.worksheets[0].addRow([
+      'T-1',
+      'Desde plantilla',
+      'Prueba',
+      45.5,
+      30,
+      20,
+      '',
+    ]);
+    const buffer = await workbook.xlsx.writeBuffer();
+    mockFsStore.set(filePath, Buffer.from(buffer).toString('base64'));
+
+    const imported = await excelService.importProducts(filePath);
+
+    expect(imported).toHaveLength(1);
+    expect(imported[0].code).toBe('T-1');
+    expect(imported[0].price).toBeCloseTo(45.5, 2);
+    expect(imported[0].cost).toBeCloseTo(30, 2);
+    expect(imported[0].stock).toBe(20);
+  });
+
+  it('imports files exported before cost tracking with cost 0', async () => {
+    const legacy = new ExcelJS.Workbook();
+    const sheet = legacy.addWorksheet('Productos');
+    sheet.columns = [
+      'code',
+      'name',
+      'description',
+      'price',
+      'stock',
+      'image',
+    ].map(key => ({ header: key, key }));
+    sheet.addRow({
+      code: 'L-1',
+      name: 'Legado',
+      description: '',
+      price: 12,
+      stock: 3,
+      image: '',
+    });
+    const buffer = await legacy.xlsx.writeBuffer();
+    const path = '/legacy/Productos_viejo.xlsx';
+    mockFsStore.set(path, Buffer.from(buffer).toString('base64'));
+
+    const imported = await excelService.importProducts(path);
+
+    expect(imported).toHaveLength(1);
+    expect(imported[0].price).toBeCloseTo(12, 2);
+    expect(imported[0].cost).toBe(0);
   });
 
   it('writes a workbook containing the "Productos" sheet with model columns', async () => {

@@ -2,7 +2,7 @@ import { DEFAULT_TIMEZONE } from '../config/constants';
 
 // Uses Intl.DateTimeFormat.formatToParts — reliable on Hermes and JSC.
 // Avoids new Date(localeString) which returns Invalid Date on React Native.
-function getUTCOffsetMs(ianaName: string, at: Date): number {
+export function getUTCOffsetMs(ianaName: string, at: Date): number {
   try {
     const fmt = new Intl.DateTimeFormat('en-US', {
       timeZone: ianaName,

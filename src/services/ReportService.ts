@@ -35,6 +35,8 @@ export interface StockDistribution {
 export interface SummaryReportData {
   totalProducts: number;
   totalInventoryValue: number;
+  /** Σ cost × stock: money invested in current inventory. */
+  totalInventoryCost: number;
   totalUnitsInStock: number;
   stockDistribution: StockDistribution;
 }
@@ -140,6 +142,11 @@ export async function getSummaryReportData(
       0,
     );
 
+    const totalInventoryCost = products.reduce(
+      (sum, p) => sum + (Number(p.cost) || 0) * p.stock,
+      0,
+    );
+
     const totalUnitsInStock = products.reduce((sum, p) => sum + p.stock, 0);
 
     const stockDistribution: StockDistribution = {
@@ -171,6 +178,7 @@ export async function getSummaryReportData(
     return {
       totalProducts,
       totalInventoryValue,
+      totalInventoryCost,
       totalUnitsInStock,
       stockDistribution,
     };
@@ -179,6 +187,7 @@ export async function getSummaryReportData(
     return {
       totalProducts: 0,
       totalInventoryValue: 0,
+      totalInventoryCost: 0,
       totalUnitsInStock: 0,
       stockDistribution: {
         zero: 0,

@@ -29,6 +29,9 @@ function normalizeProduct(p: Product): Product {
   if (isNitroNull(p.price) || typeof p.price !== 'number') {
     p.price = 0;
   }
+  if (isNitroNull(p.cost) || typeof p.cost !== 'number') {
+    p.cost = Number(p.cost) || 0;
+  }
   if (isNitroNull(p.name) || typeof p.name !== 'string') {
     p.name = '';
   }
@@ -95,6 +98,7 @@ export const getProductById = async (id: string) => {
     product.code = '0000';
     product.name = 'Sin Datos';
     product.price = 0;
+    product.cost = 0;
     product.description = 'No se encontraron datos';
     product.stock = 0;
     return product;
@@ -152,6 +156,7 @@ export const createProduct = async (product: Product) => {
       '"name"',
       '"description"',
       '"price"',
+      '"cost"',
       '"stock"',
       '"image"',
     ];
@@ -160,6 +165,7 @@ export const createProduct = async (product: Product) => {
       product.name,
       product.description,
       product.price,
+      Number(product.cost) || 0,
       product.stock,
       product.image ?? '',
     ];
@@ -218,6 +224,9 @@ export const updateProduct = async (product: Product) => {
     }
     if (product.price != null) {
       base.price = product.price;
+    }
+    if (product.cost != null) {
+      base.cost = Number(product.cost) || 0;
     }
     if (product.stock != null) {
       base.stock = product.stock;

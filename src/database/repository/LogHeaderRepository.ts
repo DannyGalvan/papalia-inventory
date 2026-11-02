@@ -248,10 +248,21 @@ export const createLog = async (log: LogHeader) => {
 
     const logCreated = await LogHeaderRepository.save(logHeader);
 
-    const details = log.logDetails.map(detail => {
-      detail.logHeaderId = logCreated.id;
-      return detail;
-    });
+    const details = await Promise.all(
+      log.logDetails.map(async detail => {
+        detail.logHeaderId = logCreated.id;
+        // Snapshot the unit cost so later cost edits do not rewrite the
+        // profit of past movements. Never persist NULL (nitro-sqlite crashes
+        // on null params on Android).
+        if (detail.unitCost == null || Number.isNaN(Number(detail.unitCost))) {
+          const product = await getProductById(detail.productCode);
+          detail.unitCost = Number(product?.cost) || 0;
+        } else {
+          detail.unitCost = Number(detail.unitCost);
+        }
+        return detail;
+      }),
+    );
 
     await LogDetailRepository.save(details);
 

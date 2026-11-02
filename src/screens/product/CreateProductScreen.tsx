@@ -1,6 +1,6 @@
 import { pick, types } from '@react-native-documents/picker';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
 import { Fab } from '../../components/button/Fab';
 import { ProductForm } from '../../components/form/ProductForm';
 import { Product } from '../../database/models/Product';
@@ -18,6 +18,7 @@ const initialForm = ProductRepository.create({
   name: '',
   description: '',
   price: 0.0,
+  cost: 0,
   stock: 0,
   image: '',
 });
@@ -26,6 +27,7 @@ export const CreateProductScreen = ({
   navigation,
 }: ProductCreateScreenProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
   const { theme } = useTheme();
 
   const onSubmit = async (product: Product) => {
@@ -38,6 +40,31 @@ export const CreateProductScreen = ({
     }
 
     return response;
+  };
+
+  const downloadTemplate = async () => {
+    try {
+      setIsDownloadingTemplate(true);
+      const filePath = await excelService.exportProductTemplate();
+      const fileName = filePath.split('/').pop() ?? filePath;
+      const location =
+        Platform.OS === 'ios'
+          ? 'la app Archivos (En mi iPhone › Papalia Inventory)'
+          : 'Descargas';
+      Alert.alert(
+        'Plantilla descargada',
+        `Se guardó "${fileName}" en ${location}. Llena la hoja "Productos" y luego impórtala con el botón verde.`,
+      );
+    } catch (error: unknown) {
+      Alert.alert(
+        'Error al descargar',
+        error instanceof Error
+          ? error.message
+          : 'No se pudo guardar la plantilla.',
+      );
+    } finally {
+      setIsDownloadingTemplate(false);
+    }
   };
 
   const uploadFile = async () => {
@@ -111,6 +138,14 @@ export const CreateProductScreen = ({
       </Text>
       <ProductForm initialForm={initialForm} onSubmit={onSubmit} />
       <Fab
+        style={styles.fabTemplate}
+        iconName="download-outline"
+        onPress={downloadTemplate}
+        isLoading={isDownloadingTemplate}
+        accessibilityLabel="Descargar plantilla de carga masiva"
+        accessibilityHint="Guarda un archivo Excel vacío con las columnas para importar productos"
+      />
+      <Fab
         style={styles.fabR}
         iconName="document-attach-outline"
         onPress={uploadFile}
@@ -132,6 +167,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 10,
+  },
+  fabTemplate: {
+    bottom: 90,
+    right: 20,
+    position: 'absolute',
+    backgroundColor: appColors.primary,
   },
   fabR: {
     bottom: 20,

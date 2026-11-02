@@ -1,6 +1,7 @@
 import { typeORMDriver } from 'react-native-nitro-sqlite';
 import { DataSource } from 'typeorm';
 import { NAME_BD } from '../../config/constants';
+import { AddCostAndProfit1700000000005 } from '../migrations/AddCostAndProfit1700000000005';
 import { AddDomainEntities1700000000003 } from '../migrations/AddDomainEntities1700000000003';
 import { AddTimezonesCatalog1700000000004 } from '../migrations/AddTimezonesCatalog1700000000004';
 import { AddMovementTypeCatalog1700000000002 } from '../migrations/AddMovementTypeCatalog1700000000002';
@@ -40,6 +41,7 @@ export const dataSource = new DataSource({
     AddMovementTypeCatalog1700000000002,
     AddDomainEntities1700000000003,
     AddTimezonesCatalog1700000000004,
+    AddCostAndProfit1700000000005,
   ],
 });
 

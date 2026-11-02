@@ -285,7 +285,10 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.reportButton}
+            style={[
+              styles.reportButton,
+              { borderBottomColor: theme.colors.border },
+            ]}
             onPress={() => navigation.navigate('MovementReport')}
             accessibilityRole="button"
             accessibilityLabel="Reporte de Movimientos"
@@ -299,6 +302,24 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
               style={[styles.reportButtonText, { color: theme.colors.text }]}
             >
               Reporte de Movimientos
+            </Text>
+            <Icon
+              name="chevron-forward"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => navigation.navigate('ProfitReport')}
+            accessibilityRole="button"
+            accessibilityLabel="Reporte de Ganancias"
+          >
+            <Icon name="cash-outline" size={20} color={theme.colors.success} />
+            <Text
+              style={[styles.reportButtonText, { color: theme.colors.text }]}
+            >
+              Reporte de Ganancias
             </Text>
             <Icon
               name="chevron-forward"

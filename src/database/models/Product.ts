@@ -17,6 +17,7 @@ export class Product {
   @Column('varchar') name: string;
   @Column('varchar') description: string;
   @Column('decimal') price: number;
+  @Column('decimal', { default: 0 }) cost: number;
   @Column('integer') stock: number;
   @Column('varchar', { nullable: false, default: '' }) image: string;
 

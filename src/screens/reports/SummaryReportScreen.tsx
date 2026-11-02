@@ -19,6 +19,7 @@ import { formatCurrency } from '../../utils/formatCurrency';
 const INITIAL_DATA: SummaryReportData = {
   totalProducts: 0,
   totalInventoryValue: 0,
+  totalInventoryCost: 0,
   totalUnitsInStock: 0,
   stockDistribution: {
     zero: 0,
@@ -104,6 +105,17 @@ export function SummaryReportScreen() {
           )}`}
         >
           {formatCurrency(data.totalInventoryValue, currencySymbol)}
+        </Text>
+      </ReportCard>
+
+      <ReportCard title="Costo del inventario">
+        <Text
+          style={[styles.value, { color: theme.colors.text }]}
+          accessibilityLabel={`Costo total del inventario: ${formatCurrency(
+            data.totalInventoryCost,
+          )}`}
+        >
+          {formatCurrency(data.totalInventoryCost, currencySymbol)}
         </Text>
       </ReportCard>
 

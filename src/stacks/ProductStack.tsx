@@ -7,6 +7,7 @@ import { ProductListScreen } from '../screens/product/ProductListScreen';
 import { UpdateProductScreen } from '../screens/product/UpdateProductScreen';
 import { CriticalReportScreen } from '../screens/reports/CriticalReportScreen';
 import { MovementReportScreen } from '../screens/reports/MovementReportScreen';
+import { ProfitReportScreen } from '../screens/reports/ProfitReportScreen';
 import { SummaryReportScreen } from '../screens/reports/SummaryReportScreen';
 import { appColors } from '../styles/globalStyles';
 
@@ -36,6 +37,7 @@ function ProductStack() {
       <Stack.Screen name="CriticalReport" component={CriticalReportScreen} />
       <Stack.Screen name="SummaryReport" component={SummaryReportScreen} />
       <Stack.Screen name="MovementReport" component={MovementReportScreen} />
+      <Stack.Screen name="ProfitReport" component={ProfitReportScreen} />
     </Stack.Navigator>
   );
 }
