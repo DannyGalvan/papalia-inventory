@@ -379,7 +379,7 @@ export const LogForm = ({
         {!isReadonly ? (
           <View>
             {details.map((detail, index) => (
-              <View key={index}>
+              <View key={detail.id ?? index}>
                 <DetailsItem
                   index={index}
                   detail={detail}
@@ -387,6 +387,8 @@ export const LogForm = ({
                     removeDetail(id, handleChange);
                   }}
                   updateDetail={handleUpdateDetail}
+                  editablePrice={isOutput}
+                  currencySymbol={currencySymbol}
                 />
                 {isOutput && !!stockWarnings[index] && (
                   <Text
@@ -418,9 +420,28 @@ export const LogForm = ({
                 }}
                 updateDetail={updateDetail}
                 readonly={isReadonly}
+                currencySymbol={currencySymbol}
               />
             ))}
           </View>
+        )}
+        {!isReadonly && details.length > 0 && (
+          <Text
+            style={[
+              styles.saleTotal,
+              {
+                color: theme.colors.text,
+                fontSize: theme.typography.body.fontSize,
+              },
+            ]}
+            accessibilityLiveRegion="polite"
+          >
+            Total:{' '}
+            {formatCurrency(
+              details.reduce((sum, d) => sum + (Number(d.total) || 0), 0),
+              currencySymbol,
+            )}
+          </Text>
         )}
         {!!errors.details && (
           <Text
@@ -481,6 +502,7 @@ export const LogForm = ({
 };
 
 const styles = StyleSheet.create({
+  saleTotal: { textAlign: 'right', fontWeight: '700', marginVertical: 8 },
   selectedRowText: { fontWeight: '600' },
   searchInput: { borderWidth: 1, borderRadius: 8 },
   container: {

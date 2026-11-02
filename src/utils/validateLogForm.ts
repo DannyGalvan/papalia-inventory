@@ -15,6 +15,7 @@
  */
 
 import { LogHeader } from '../database/models/LogHeader';
+import { isValidPrice } from './salePrice';
 
 /** Value representing the unselected ("no seleccionado") type option. */
 export const UNSELECTED_TYPE = 0;
@@ -24,6 +25,8 @@ export const LOG_FORM_MESSAGES = {
   comments: 'Los comentarios son requeridos',
   type: 'Debe seleccionar un tipo',
   details: 'Debes agregar al menos un producto',
+  price:
+    'Revisa el precio de los productos: debe ser un número mayor o igual a 0',
 } as const;
 
 /** Shape of the errors object produced by {@link validateLogForm}. */
@@ -60,6 +63,8 @@ export const validateLogForm = (form: LogHeader): LogFormErrors => {
 
   if (!form.logDetails || form.logDetails.length === 0) {
     errors.details = LOG_FORM_MESSAGES.details;
+  } else if (form.logDetails.some(d => !isValidPrice(d.price))) {
+    errors.details = LOG_FORM_MESSAGES.price;
   }
 
   return errors;
