@@ -2,6 +2,7 @@ import { dataSource } from '../connection/DataSource';
 import { MovementType } from '../models/MovementType';
 import { Response } from '../models/response/Response';
 import { sqliteBoolean } from '../utils/sqliteBoolean';
+import { toBool } from '../utils/nitroValues';
 
 export const MovementTypeRepository = dataSource.getRepository(MovementType);
 
@@ -124,9 +125,9 @@ export const deleteMovementType = async (
 
 /**
  * nitro-sqlite may return booleans as 0/1, 'true'/'false' or a null marker.
+ * Re-exported for existing consumers; the implementation lives in nitroValues.
  */
-export const toBool = (value: unknown): boolean =>
-  value === true || value === 1 || value === '1' || value === 'true';
+export { toBool };
 
 /** Flip whether an output movement type counts as a sale (revenue). */
 export const toggleMovementTypeSale = async (

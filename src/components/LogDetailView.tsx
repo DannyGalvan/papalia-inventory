@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
   DimensionValue,
   Image,
@@ -23,6 +23,10 @@ import { resolveImageUri } from '../utils/filePaths';
 
 interface Props {
   log: LogHeader;
+  /** Rendered right below the header card (e.g. cancellation notice). */
+  banner?: ReactNode;
+  /** Rendered at the end of the scroll content (e.g. actions). */
+  footer?: ReactNode;
 }
 
 const resolveTypeName = (typeId: number, catalog: MovementType[]): string => {
@@ -30,7 +34,7 @@ const resolveTypeName = (typeId: number, catalog: MovementType[]): string => {
   return found?.name ?? `Tipo ${typeId}`;
 };
 
-export const LogDetailView = ({ log }: Props) => {
+export const LogDetailView = ({ log, banner, footer }: Props) => {
   const { theme } = useTheme();
   const { formatDateTime } = useTimezone();
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
@@ -50,6 +54,7 @@ export const LogDetailView = ({ log }: Props) => {
   }, []);
 
   const isInput = log.isInput;
+  const isCancelled = log.isCancelled === true;
   const badgeColor = isInput ? theme.colors.success : theme.colors.error;
   const badgeIcon = isInput ? 'arrow-down-circle' : 'arrow-up-circle';
   const badgeLabel = isInput ? 'Entrada' : 'Salida';
@@ -144,6 +149,8 @@ export const LogDetailView = ({ log }: Props) => {
           </View>
         )}
       </View>
+
+      {banner}
 
       {/* ── Products section ── */}
       <Text
@@ -270,17 +277,28 @@ export const LogDetailView = ({ log }: Props) => {
             style={[
               styles.totalValue,
               {
-                color: isInput ? theme.colors.success : theme.colors.error,
+                color: isCancelled
+                  ? theme.colors.textSecondary
+                  : isInput
+                  ? theme.colors.success
+                  : theme.colors.error,
                 fontSize: theme.typography.h2.fontSize,
                 fontWeight: theme.typography.h2.fontWeight,
               },
+              isCancelled && styles.struck,
             ]}
+            accessibilityLabel={
+              isCancelled
+                ? `Total anulado ${formatCurrency(total, currencySymbol)}`
+                : undefined
+            }
           >
             {isInput ? '+' : '-'}
             {formatCurrency(total, currencySymbol)}
           </Text>
         </View>
       )}
+      {footer}
     </ScrollView>
   );
 };
@@ -354,4 +372,5 @@ const styles = StyleSheet.create({
   },
   totalLabel: {},
   totalValue: {},
+  struck: { textDecorationLine: 'line-through' },
 });

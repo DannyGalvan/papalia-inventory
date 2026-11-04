@@ -2,6 +2,7 @@ import { Between } from 'typeorm';
 import { ALL_IN_OUT_ENUM } from '../config/constants';
 import { LogHeader } from '../database/models/LogHeader';
 import { LogHeaderRepository } from '../database/repository/LogHeaderRepository';
+import { activeMovementsWhere } from '../database/utils/movementFilters';
 import {
   getAllMovementTypes,
   toBool,
@@ -304,7 +305,10 @@ export async function getProfitReportData(
   const prev = previousRange(range);
   const [headers, movementTypes, products] = await Promise.all([
     LogHeaderRepository.find({
-      where: { createdAt: Between(prev.from, range.to) },
+      where: {
+        createdAt: Between(prev.from, range.to),
+        ...activeMovementsWhere(),
+      },
       relations: ['logDetails'],
     }),
     getAllMovementTypes(),

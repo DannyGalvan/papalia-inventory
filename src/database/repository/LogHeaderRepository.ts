@@ -13,16 +13,8 @@ import { LogDetailRepository } from './LogDetailRepository';
 import { getAllMovementTypes } from './MovementTypeRepository';
 import { getProductById, updateProduct } from './ProductRepository';
 import { sqliteBoolean } from '../utils/sqliteBoolean';
-
-// react-native-nitro-sqlite on Android can return {isNitroSQLiteNull: true} even
-// for NOT NULL columns when the value is falsy (e.g. boolean false stored as 0).
-function isNitroNull(v: unknown): boolean {
-  return (
-    v !== null &&
-    typeof v === 'object' &&
-    Object.prototype.hasOwnProperty.call(v, 'isNitroSQLiteNull')
-  );
-}
+import { activeMovementsWhere } from '../utils/movementFilters';
+import { isNitroNull, toBool } from '../utils/nitroValues';
 
 function normalizeLogHeader(h: LogHeader): LogHeader {
   if (isNitroNull(h.comments) || typeof h.comments !== 'string') {
@@ -33,6 +25,13 @@ function normalizeLogHeader(h: LogHeader): LogHeader {
   }
   if (isNitroNull(h.isInput)) {
     h.isInput = false;
+  }
+  h.isCancelled = toBool(h.isCancelled);
+  if (isNitroNull(h.cancelReason) || typeof h.cancelReason !== 'string') {
+    h.cancelReason = '';
+  }
+  if (isNitroNull(h.cancelledAt) || !(h.cancelledAt instanceof Date)) {
+    h.cancelledAt = null;
   }
   return h;
 }
@@ -76,6 +75,7 @@ export const getDashboardInputs = async (
     LogHeaderRepository.find({
       where: {
         isInput: sqliteBoolean(true),
+        ...activeMovementsWhere(),
         ...(initialDate && finalDate
           ? { createdAt: Between(initialDate, finalDate) }
           : {}),
@@ -114,6 +114,7 @@ export const getAllInputLogs = async () => {
   const logs = await LogHeaderRepository.find({
     where: {
       isInput: sqliteBoolean(true),
+      ...activeMovementsWhere(),
     },
     order: { id: 'DESC' },
     relations: ['logDetails'],
@@ -151,6 +152,7 @@ export const getDashboardOutputs = async (
     LogHeaderRepository.find({
       where: {
         isInput: sqliteBoolean(false),
+        ...activeMovementsWhere(),
         ...(initialDate && finalDate
           ? { createdAt: Between(initialDate, finalDate) }
           : {}),
@@ -189,6 +191,7 @@ export const getAllOutputLogs = async () => {
   const logs = await LogHeaderRepository.find({
     where: {
       isInput: sqliteBoolean(false),
+      ...activeMovementsWhere(),
     },
     order: { id: 'DESC' },
     relations: ['logDetails'],
@@ -226,8 +229,7 @@ export const getLogById = async (id: number) => {
       },
       relations: ['logDetails', 'logDetails.product'],
     });
-    console.log('log found', log);
-    return log;
+    return log ? normalizeLogHeader(log) : null;
   } catch (error) {
     console.log(error);
     const log = new LogHeader();
@@ -237,6 +239,9 @@ export const getLogById = async (id: number) => {
     log.comments = 'No se encontraron datos';
     log.type = ALL_IN_OUT_TYPES.no_seleccionado;
     log.isInput = false;
+    log.isCancelled = false;
+    log.cancelledAt = null;
+    log.cancelReason = '';
     return log;
   }
 };

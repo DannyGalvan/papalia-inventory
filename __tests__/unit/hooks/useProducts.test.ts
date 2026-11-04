@@ -130,7 +130,7 @@ describe('useProducts', () => {
     const hook = renderUseProducts();
     await flush();
 
-    expect(mockGetProductsPaged).toHaveBeenCalledWith(0, 10);
+    expect(mockGetProductsPaged).toHaveBeenCalledWith(0, 10, 'all');
     expect(hook.value.products).toHaveLength(10);
     expect(hook.value.total).toBe(10);
     expect(hook.value.isPaginated).toBe(false);
@@ -144,7 +144,11 @@ describe('useProducts', () => {
     const hook = renderUseProducts();
     await flush();
 
-    expect(mockGetProductsPaged).toHaveBeenCalledWith(0, PRODUCTS_PAGE_SIZE);
+    expect(mockGetProductsPaged).toHaveBeenCalledWith(
+      0,
+      PRODUCTS_PAGE_SIZE,
+      'all',
+    );
     expect(hook.value.products).toHaveLength(PRODUCTS_PAGE_SIZE);
     expect(hook.value.isPaginated).toBe(true);
     expect(hook.value.hasMore).toBe(true);
@@ -168,6 +172,7 @@ describe('useProducts', () => {
     expect(mockGetProductsPaged).toHaveBeenLastCalledWith(
       PRODUCTS_PAGE_SIZE,
       PRODUCTS_PAGE_SIZE,
+      'all',
     );
     expect(hook.value.products).toHaveLength(2 * PRODUCTS_PAGE_SIZE);
   });
@@ -229,7 +234,7 @@ describe('useProducts', () => {
     await flush();
 
     expect(mockSearch).toHaveBeenCalledTimes(1);
-    expect(mockSearch).toHaveBeenCalledWith('abc');
+    expect(mockSearch).toHaveBeenCalledWith('abc', 'all');
     expect(hook.value.products).toHaveLength(3);
   });
 

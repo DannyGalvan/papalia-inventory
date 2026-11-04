@@ -30,6 +30,7 @@ import {
   getTotalProducts,
   searchProductsByCodeOrName,
 } from '../database/repository/ProductRepository';
+import { ProductStatusFilter } from '../database/repository/productStatus';
 import { logService } from '../services/LogService';
 import { withRetry } from '../utils/withRetry';
 import { DEFAULT_DEBOUNCE_DELAY, useDebounce } from './useDebounce';
@@ -63,6 +64,7 @@ export const useProducts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<ProductStatusFilter>('all');
 
   // Raw search term updated by the UI; the debounced copy is what actually
   // drives database queries (Requirement 9.2).
@@ -109,7 +111,7 @@ export const useProducts = () => {
         setError(null);
 
         const totalProducts = await withRetry(
-          () => getTotalProducts(),
+          () => getTotalProducts(statusFilter),
           'No se pudo obtener el total de productos',
         );
         setTotal(totalProducts);
@@ -119,17 +121,17 @@ export const useProducts = () => {
 
         if (term.length > 0) {
           data = await withRetry(
-            () => searchProductsByCodeOrName(term),
+            () => searchProductsByCodeOrName(term, statusFilter),
             'No se pudo realizar la búsqueda de productos',
           );
         } else if (totalProducts > PAGINATION_THRESHOLD) {
           data = await withRetry(
-            () => getProductsPaged(0, PRODUCTS_PAGE_SIZE),
+            () => getProductsPaged(0, PRODUCTS_PAGE_SIZE, statusFilter),
             operation,
           );
         } else if (totalProducts > 0) {
           data = await withRetry(
-            () => getProductsPaged(0, totalProducts),
+            () => getProductsPaged(0, totalProducts, statusFilter),
             operation,
           );
         } else {
@@ -144,7 +146,7 @@ export const useProducts = () => {
         setIsLoading(false);
       }
     })();
-  }, [debouncedSearch, handleError]);
+  }, [debouncedSearch, statusFilter, handleError]);
 
   /**
    * Append the next page of products. Guarded so it is a no-op while a load is
@@ -166,7 +168,11 @@ export const useProducts = () => {
 
         const data = await withRetry(
           () =>
-            getProductsPaged(nextPage * PRODUCTS_PAGE_SIZE, PRODUCTS_PAGE_SIZE),
+            getProductsPaged(
+              nextPage * PRODUCTS_PAGE_SIZE,
+              PRODUCTS_PAGE_SIZE,
+              statusFilter,
+            ),
           operation,
         );
 
@@ -180,7 +186,7 @@ export const useProducts = () => {
         setIsLoadingMore(false);
       }
     })();
-  }, [isLoading, isLoadingMore, hasMore, page, handleError]);
+  }, [isLoading, isLoadingMore, hasMore, page, statusFilter, handleError]);
 
   // Reload on focus and whenever the debounced search term settles. Because
   // `loadFirstPage` depends on `debouncedSearch`, a settled search re-runs this
@@ -213,6 +219,8 @@ export const useProducts = () => {
     isPaginated,
     error,
     search,
+    statusFilter,
+    setStatusFilter,
     loadData: loadFirstPage,
     loadMore,
     searchProducts,

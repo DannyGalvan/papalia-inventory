@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Category } from '../../database/models/Category';
@@ -18,17 +11,19 @@ import { getActiveCategories } from '../../database/repository/CategoryRepositor
 import { getActiveSuppliers } from '../../database/repository/SupplierRepository';
 import { getActiveUnits } from '../../database/repository/UnitOfMeasureRepository';
 import { FormErrors, useForm } from '../../hooks/useForm';
-import { useImages } from '../../hooks/useImages';
+import { useProductImage } from '../../hooks/useProductImage';
 import { useTheme } from '../../hooks/useTheme';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
-import { resolveImageUri } from '../../utils/filePaths';
+import { ImageSourceKind } from '../../services/image/types';
 import {
   calculateMarginPct,
   formatPct,
   LOW_MARGIN_THRESHOLD_PCT,
 } from '../../utils/profit';
 import { KeyboardAwareScrollView } from '../layout/KeyboardAwareScrollView';
+import { ProductActiveSwitch } from '../product/ProductActiveSwitch';
+import { ProductImagePicker } from '../product/ProductImagePicker';
 
 interface Props {
   initialForm: Product;
@@ -70,8 +65,7 @@ const validateForm = (form: Product) => {
 
 export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
   const { theme } = useTheme();
-  const { uploadImage } = useImages();
-  const noImage = require('../../assets/sin_imagen.png');
+  const { acquireImage, discardImage, isProcessing } = useProductImage();
 
   const [categories, setCategories] = useState<NullableItem[]>([NO_CATEGORY]);
   const [suppliers, setSuppliers] = useState<NullableItem[]>([NO_SUPPLIER]);
@@ -101,10 +95,25 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
     });
   }, []);
 
+  // Image stored in the database before this edit session.
+  const persistedImage = initialForm.image ?? '';
+
+  const submit = useCallback(
+    async (values: Product) => {
+      const result = await onSubmit(values);
+      // The replaced photo is removed only once the new one is persisted.
+      if (result.success && persistedImage && values.image !== persistedImage) {
+        discardImage(persistedImage);
+      }
+      return result;
+    },
+    [onSubmit, persistedImage, discardImage],
+  );
+
   const { form, errors, handleChange, handleSubmit, response } = useForm(
     initialForm,
     validateForm,
-    onSubmit,
+    submit,
   );
 
   const marginPct =
@@ -113,12 +122,16 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
       ? calculateMarginPct(Number(form.price), Number(form.cost))
       : null;
 
-  const handleSelectImage = async () => {
-    uploadImage({
-      updateForm: handleChange,
-      nameImage: form.code,
-      afterImage: form.image,
+  const handlePickImage = async (source: ImageSourceKind) => {
+    const storedUri = await acquireImage({
+      source,
+      productCode: form.code,
+      currentImage: form.image,
+      persistedImage,
     });
+    if (storedUri) {
+      handleChange(storedUri, 'image');
+    }
   };
 
   const inputStyle = [
@@ -405,25 +418,18 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
           />
         </View>
 
+        <ProductActiveSwitch
+          value={form.isActive !== false}
+          onChange={value => handleChange(value, 'isActive')}
+        />
+
         {/* ── Imagen ── */}
-        <TouchableOpacity
-          style={styles.imageContainer}
-          onPress={handleSelectImage}
-          accessibilityRole="button"
-          accessibilityLabel="Seleccionar imagen del producto"
-          accessibilityHint="Abre la galería para elegir una imagen del producto"
-        >
-          <Image
-            style={[styles.image, { backgroundColor: theme.colors.border }]}
-            source={form.image ? { uri: resolveImageUri(form.image) } : noImage}
-            accessibilityRole="image"
-            accessibilityLabel={
-              form.name
-                ? `Imagen del producto ${form.name}`
-                : 'Sin imagen seleccionada'
-            }
-          />
-        </TouchableOpacity>
+        <ProductImagePicker
+          image={form.image}
+          productName={form.name}
+          isProcessing={isProcessing}
+          onPick={handlePickImage}
+        />
 
         <TouchableButton
           onPress={handleSubmit}
@@ -494,8 +500,6 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 16, fontWeight: 'bold', color: '#FFFFFF' },
   stock: { marginVertical: 16 },
   stockText: { fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
-  imageContainer: { alignItems: 'center', marginVertical: 16 },
-  image: { width: 180, height: 180, resizeMode: 'contain', borderRadius: 8 },
   responseContainer: { marginVertical: 8 },
   responseText: { textAlign: 'center', fontSize: 16, fontWeight: 'bold' },
   selectorBlock: { marginTop: 16, gap: 6 },

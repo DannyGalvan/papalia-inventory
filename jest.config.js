@@ -1,5 +1,7 @@
 module.exports = {
   preset: 'react-native',
+  // Shared test utilities live in __tests__/helpers and are not suites.
+  testPathIgnorePatterns: ['/node_modules/', '/__tests__/helpers/'],
   // exceljs (and its nested `uuid` dependency) ships ES module syntax that
   // Jest does not transform by default because it lives under node_modules.
   // Extend the react-native preset's ignore pattern so these packages are

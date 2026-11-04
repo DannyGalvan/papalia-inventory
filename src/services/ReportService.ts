@@ -2,6 +2,7 @@ import { Equal, LessThanOrEqual } from 'typeorm';
 import { ALL_IN_OUT_ENUM } from '../config/constants';
 import { LogDetailRepository } from '../database/repository/LogDetailRepository';
 import { LogHeaderRepository } from '../database/repository/LogHeaderRepository';
+import { activeMovementsWhere } from '../database/utils/movementFilters';
 import { ProductRepository } from '../database/repository/ProductRepository';
 
 // --- Interfaces ---
@@ -94,6 +95,9 @@ export async function getCriticalReportData(
     const mostMovedRaw = await LogDetailRepository.createQueryBuilder(
       'log_detail',
     )
+      // Cancelled movements do not count as product movement.
+      .innerJoin('log_detail.logHeader', 'log_header')
+      .where('log_header.isCancelled = 0')
       .select('log_detail.productCode', 'code')
       .addSelect('log_detail.name', 'name')
       .addSelect('SUM(log_detail.quantity)', 'totalQuantity')
@@ -209,6 +213,7 @@ export async function getSummaryReportData(
 export async function getMovementReportData(): Promise<MovementReportData> {
   try {
     const logHeaders = await LogHeaderRepository.find({
+      where: activeMovementsWhere(),
       relations: ['logDetails'],
     });
 
