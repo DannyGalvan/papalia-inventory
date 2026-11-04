@@ -1,138 +1,16 @@
-import {
-  DocumentDirectoryPath,
-  PicturesDirectoryPath,
-  copyFile,
-  exists,
-  mkdir,
-  unlink,
-} from '@dr.pogodin/react-native-fs';
-import { pick, types } from '@react-native-documents/picker';
 import { useContext } from 'react';
-import { Alert, Platform } from 'react-native';
-import uuid from 'react-native-uuid';
 import { ProductContext } from '../context/ProductContext';
-import { logService } from '../services/LogService';
-import { resolveImageUri, toFsPath } from '../utils/filePaths';
-import { useStoragePermissions } from './useStoragePermissions';
-import { UpdateFormField } from './useForm';
-import { getErrorMessage, getErrorName } from '../utils/getErrorMessage';
 
 /**
- * Resolves the base directory for storing product images.
- * - Android: PicturesDirectoryPath (shared Pictures folder, visible in Gallery)
- * - iOS: DocumentDirectoryPath (app sandbox, visible in Files app)
+ * Image-folder configuration (Configuración screen).
+ * Taking / picking photos lives in {@link useProductImage}.
  */
-const getImageBaseDir = (): string =>
-  Platform.OS === 'android' ? PicturesDirectoryPath : DocumentDirectoryPath;
-
 export const useImages = () => {
-  const { checkStoragePermissions } = useStoragePermissions();
-  const { dirImages, changeDirImages, isLoading, setIsLoading } =
-    useContext(ProductContext);
-
-  const uploadImage = async ({
-    updateForm,
-    nameImage,
-    afterImage,
-  }: {
-    updateForm: UpdateFormField;
-    nameImage: string;
-    afterImage: string;
-  }) => {
-    try {
-      setIsLoading(true);
-
-      if (nameImage === '') {
-        Alert.alert(
-          'Error',
-          'El producto debe contar con un código para subir imagen',
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      // Android: check runtime permissions before opening the picker.
-      // iOS: the system document picker handles its own permissions.
-      if (Platform.OS === 'android') {
-        const granted = await checkStoragePermissions();
-        if (!granted) {
-          Alert.alert(
-            'Permisos requeridos',
-            'No se otorgaron los permisos necesarios para acceder a las imágenes. Habilítalos desde Configuración del dispositivo.',
-          );
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      const res = await pick({ type: [types.images] });
-      // Plain, percent-decoded path (iOS returns encoded file:// URIs).
-      const pickedUri = toFsPath(res[0].uri);
-
-      const baseDir = getImageBaseDir();
-      const saveDir = `${baseDir}/${dirImages}`;
-
-      const dirExists = await exists(saveDir);
-      if (!dirExists) {
-        await mkdir(saveDir, {
-          NSURLIsExcludedFromBackupKey: true,
-          NSFileProtectionKey: 'NSFileProtectionNone',
-        });
-      }
-
-      // Infer extension from MIME type, fall back to 'jpg'.
-      const extension = res[0].type?.split('/')[1] || 'jpg';
-      const destPath = `${saveDir}/${nameImage}_${uuid.v4()}.${extension}`;
-
-      // Remove the previous image for this product if it exists.
-      if (afterImage) {
-        // Rebase onto the current container (iOS sandbox path changes on update).
-        const previousPath = toFsPath(resolveImageUri(afterImage));
-        const previousExists = await exists(previousPath);
-        if (previousExists) {
-          await unlink(previousPath);
-        }
-      }
-
-      // copyFile needs a plain path on iOS; content:// URIs are handled on Android.
-      await copyFile(pickedUri, destPath);
-
-      // Store absolute path with the file:// scheme so RN <Image> can render it.
-      updateForm(`file://${destPath}`, 'image');
-
-      setIsLoading(false);
-      Alert.alert('Éxito', 'Imagen guardada correctamente');
-    } catch (error: unknown) {
-      // User dismissed the picker — silently return without an error dialog.
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        error.code === 'OPERATION_CANCELED'
-      ) {
-        setIsLoading(false);
-        return;
-      }
-
-      logService.logError({
-        errorType: getErrorName(error, 'ImageUploadError'),
-        source: 'useImages',
-        operation: 'uploadImage',
-        message: getErrorMessage(error, 'Error al subir imagen'),
-      });
-
-      Alert.alert(
-        'Error al subir la imagen',
-        'No se pudo guardar la imagen. Verifica los permisos e intenta de nuevo.',
-      );
-      setIsLoading(false);
-    }
-  };
+  const { dirImages, changeDirImages, isLoading } = useContext(ProductContext);
 
   return {
     dirImages,
     changeDirImages,
     isLoading,
-    uploadImage,
   };
 };

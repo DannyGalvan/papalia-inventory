@@ -86,6 +86,7 @@ import { Product } from '../../../src/database/models/Product';
 import {
   excelService,
   INPUTS_SHEET_NAME,
+  LOG_COLUMNS,
   OUTPUTS_SHEET_NAME,
   PRODUCT_COLUMNS,
   PRODUCTS_SHEET_NAME,
@@ -441,6 +442,59 @@ describe('Feature: app-modernization, Property 5: Excel export/import round-trip
         expectEquivalentProducts(products, imported);
       }),
       { numRuns: 100 },
+    );
+  });
+});
+
+describe('ExcelService — movement status columns', () => {
+  it('flags cancelled movements and their reason', async () => {
+    mockFsStore.clear();
+    const active = new LogHeader();
+    active.id = 1;
+    active.type = 1;
+    active.comments = 'ok';
+    active.createdAt = new Date('2026-01-01T00:00:00.000Z');
+    active.isInput = false;
+    active.isCancelled = false;
+    active.cancelReason = '';
+
+    const cancelled = new LogHeader();
+    cancelled.id = 2;
+    cancelled.type = 1;
+    cancelled.comments = 'dup';
+    cancelled.createdAt = new Date('2026-01-02T00:00:00.000Z');
+    cancelled.isInput = false;
+    cancelled.isCancelled = true;
+    cancelled.cancelReason = 'Venta duplicada';
+
+    const detail = (id: number, headerId: number) => {
+      const d = new LogDetail();
+      d.id = id;
+      d.productCode = 'A';
+      d.logHeaderId = headerId;
+      d.name = 'Café';
+      d.quantity = 1;
+      d.price = 10;
+      d.total = 10;
+      return d;
+    };
+
+    const path = await excelService.exportLogs(
+      [active, cancelled],
+      [detail(1, 1), detail(2, 2)],
+      false,
+    );
+    const sheet = (await loadWorkbookFromStore(path)).getWorksheet(
+      OUTPUTS_SHEET_NAME,
+    ) as ExcelJS.Worksheet;
+
+    const headers = (sheet.getRow(1).values as unknown[]).slice(1);
+    expect(headers).toEqual([...LOG_COLUMNS]);
+    const col = (key: string) => LOG_COLUMNS.indexOf(key as never) + 1;
+    expect(sheet.getRow(2).getCell(col('estado')).value).toBe('Activa');
+    expect(sheet.getRow(3).getCell(col('estado')).value).toBe('Cancelada');
+    expect(sheet.getRow(3).getCell(col('motivoCancelacion')).value).toBe(
+      'Venta duplicada',
     );
   });
 });

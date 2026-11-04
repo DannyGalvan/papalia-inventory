@@ -25,6 +25,7 @@ export const LogItems = ({ logHeader, navigation, typeCatalog }: Props) => {
   const badgeColor = isInput ? theme.colors.success : theme.colors.error;
   const badgeIcon = isInput ? 'arrow-down-circle' : 'arrow-up-circle';
   const badgeLabel = isInput ? 'Entrada' : 'Salida';
+  const isCancelled = logHeader.isCancelled === true;
 
   return (
     <TouchableOpacity
@@ -35,12 +36,13 @@ export const LogItems = ({ logHeader, navigation, typeCatalog }: Props) => {
           borderRadius: theme.borderRadius.md,
         },
         theme.elevation.low,
+        isCancelled && styles.cancelled,
       ]}
       onPress={() => navigation(logHeader.id)}
       accessibilityRole="button"
-      accessibilityLabel={`${badgeLabel}: ${typeLabel}. ${
-        logHeader.comments || 'sin comentarios'
-      }`}
+      accessibilityLabel={`${badgeLabel}${
+        isCancelled ? ' cancelada' : ''
+      }: ${typeLabel}. ${logHeader.comments || 'sin comentarios'}`}
       accessibilityHint="Toca para ver el detalle completo del movimiento"
     >
       {/* Top row: badge + type + chevron */}
@@ -63,11 +65,27 @@ export const LogItems = ({ logHeader, navigation, typeCatalog }: Props) => {
               color: theme.colors.text,
               fontSize: theme.typography.body.fontSize,
             },
+            isCancelled && styles.struck,
           ]}
           numberOfLines={1}
         >
           {typeLabel}
         </Text>
+        {isCancelled && (
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: theme.colors.error + '22',
+                borderColor: theme.colors.error,
+              },
+            ]}
+          >
+            <Text style={[styles.badgeText, { color: theme.colors.error }]}>
+              Cancelada
+            </Text>
+          </View>
+        )}
         <Icon
           name="chevron-forward"
           size={16}
@@ -148,4 +166,6 @@ const styles = StyleSheet.create({
   comment: {
     fontStyle: 'italic',
   },
+  cancelled: { opacity: 0.7 },
+  struck: { textDecorationLine: 'line-through' },
 });

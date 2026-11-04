@@ -40,6 +40,7 @@ const ProductItemInner = ({
   const marginPct =
     safeCost > 0 ? calculateMarginPct(safePrice, safeCost) : null;
   const nonExistentProduct = safeStock === 0;
+  const isInactive = product.isActive === false;
   const statusColor = nonExistentProduct
     ? theme.colors.stockDepleted
     : theme.colors.stockAvailable;
@@ -68,6 +69,7 @@ const ProductItemInner = ({
           borderLeftColor: statusColor,
         },
         theme.elevation.low,
+        isInactive && styles.inactive,
       ]}
       activeOpacity={0.7}
       onPress={onPress}
@@ -77,7 +79,9 @@ const ProductItemInner = ({
         product.code
       }, precio ${currencySymbol}${safePrice.toFixed(
         2,
-      )}, ${safeStock} ${unitAbbrev} en inventario`}
+      )}, ${safeStock} ${unitAbbrev} en inventario${
+        isInactive ? ', inactivo' : ''
+      }`}
       accessibilityHint={
         nonExistentProduct
           ? 'Sin stock. Toca para editar.'
@@ -96,6 +100,23 @@ const ProductItemInner = ({
           <Text style={[styles.code, { color: theme.colors.textSecondary }]}>
             Código: {product.code}
           </Text>
+          {isInactive && (
+            <View
+              style={[
+                styles.inactiveTag,
+                { borderColor: theme.colors.textSecondary },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.inactiveTagText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Inactivo
+              </Text>
+            </View>
+          )}
         </View>
         <View style={[styles.badge, { backgroundColor: statusColor }]}>
           <Text style={styles.badgeText}>{safeStock}</Text>
@@ -213,6 +234,16 @@ const ProductItemInner = ({
 
 const styles = StyleSheet.create({
   costLabel: { fontSize: 12, marginLeft: 8 },
+  inactive: { opacity: 0.6 },
+  inactiveTag: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    marginTop: 4,
+  },
+  inactiveTagText: { fontSize: 11, fontWeight: '700' },
   container: {
     marginHorizontal: 4,
     marginVertical: 6,

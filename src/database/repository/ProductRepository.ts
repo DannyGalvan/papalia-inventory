@@ -2,6 +2,8 @@ import { Like } from 'typeorm';
 import { dataSource } from '../connection/DataSource';
 import { Product } from '../models/Product';
 import { Response } from '../models/response/Response';
+import { isNitroNull, toBool } from '../utils/nitroValues';
+import { ProductStatusFilter, buildProductStatusWhere } from './productStatus';
 
 export const ProductRepository = dataSource.getRepository(Product);
 
@@ -13,14 +15,6 @@ const PRODUCT_RELATIONS = ['category', 'unitOfMeasure', 'supplier'];
 // for NULL columns — and on Android can also return it for falsy integer/boolean values (0).
 // TypeORM hydrates partial relation objects with all fields as this marker.
 // We must normalize all fields before rendering.
-function isNitroNull(v: unknown): boolean {
-  return (
-    v !== null &&
-    typeof v === 'object' &&
-    Object.prototype.hasOwnProperty.call(v, 'isNitroSQLiteNull')
-  );
-}
-
 function normalizeProduct(p: Product): Product {
   // Direct columns: coerce nitro-null or wrong types to safe defaults
   if (isNitroNull(p.stock) || typeof p.stock !== 'number') {
@@ -41,6 +35,9 @@ function normalizeProduct(p: Product): Product {
   if (isNitroNull(p.image) || typeof p.image !== 'string') {
     p.image = '';
   }
+  // NOT NULL DEFAULT 1: a missing value means the default (active).
+  p.isActive =
+    p.isActive == null || isNitroNull(p.isActive) ? true : toBool(p.isActive);
   // Relations: partial hydrated objects with nitro-null fields → set to null
   if (isNitroNull(p.category)) {
     p.category = null;
@@ -79,8 +76,13 @@ export const getFullProducts = async () => {
   }
 };
 
-export const getProductsPaged = async (skip: number, take: number) => {
+export const getProductsPaged = async (
+  skip: number,
+  take: number,
+  status: ProductStatusFilter = 'all',
+) => {
   const products = await ProductRepository.find({
+    where: buildProductStatusWhere(status),
     skip: Math.max(0, skip),
     take: Math.max(0, take),
     relations: PRODUCT_RELATIONS,
@@ -105,24 +107,61 @@ export const getProductById = async (id: string) => {
   }
 };
 
-export const getTotalProducts = async () => {
+export const getTotalProducts = async (status: ProductStatusFilter = 'all') => {
   try {
-    return await ProductRepository.count();
+    return await ProductRepository.count({
+      where: buildProductStatusWhere(status),
+    });
   } catch (error) {
     console.log(error);
     return 0;
   }
 };
 
-export const searchProductsByCodeOrName = async (search: string) => {
+export const searchProductsByCodeOrName = async (
+  search: string,
+  status: ProductStatusFilter = 'all',
+) => {
   try {
-    return await ProductRepository.find({
-      where: [{ code: Like(`%${search}%`) }, { name: Like(`%${search}%`) }],
+    const statusWhere = buildProductStatusWhere(status);
+    const products = await ProductRepository.find({
+      where: [
+        { code: Like(`%${search}%`), ...statusWhere },
+        { name: Like(`%${search}%`), ...statusWhere },
+      ],
     });
+    return products.map(normalizeProduct);
   } catch (error) {
     console.log(error);
     return [];
   }
+};
+
+/** Product search for inputs/outputs: inactive products are never offered. */
+export const searchActiveProductsByCodeOrName = (search: string) =>
+  searchProductsByCodeOrName(search, 'active');
+
+/** Enable or disable a product without touching any other column. */
+export const setProductActive = async (
+  code: string,
+  isActive: boolean,
+): Promise<Response<null>> => {
+  const response = new Response<null>();
+  try {
+    // Integer literal binding: nitro-sqlite on Android binds JS booleans as
+    // the string 'true', which SQLite would store as text.
+    await dataSource.query(
+      'UPDATE "product" SET "isActive" = ? WHERE "code" = ?',
+      [isActive ? 1 : 0, code],
+    );
+    response.success = true;
+    response.message = isActive ? 'Producto activado' : 'Producto desactivado';
+  } catch (error) {
+    response.message = `Error al cambiar el estado del producto ${
+      (error as Error).message
+    }`;
+  }
+  return response;
 };
 
 // Helper: build SET clause for a nullable FK column without sending null as a parameter.
@@ -159,6 +198,7 @@ export const createProduct = async (product: Product) => {
       '"cost"',
       '"stock"',
       '"image"',
+      '"isActive"',
     ];
     const vals: SqlParam[] = [
       product.code,
@@ -168,6 +208,7 @@ export const createProduct = async (product: Product) => {
       Number(product.cost) || 0,
       product.stock,
       product.image ?? '',
+      product.isActive === false ? 0 : 1,
     ];
     if (product.categoryId != null) {
       cols.push('"categoryId"');
@@ -239,12 +280,17 @@ export const updateProduct = async (product: Product) => {
     }
 
     // Update nullable FK columns using SQL literal NULL when null to avoid
-    // the nitro-sqlite null-parameter crash on Android.
+    // the nitro-sqlite null-parameter crash on Android. `isActive` is bound as
+    // an integer here for the same driver reason.
     const fkSets: string[] = [];
     const fkParams: SqlParam[] = [];
     appendNullableFk('categoryId', product.categoryId, fkSets, fkParams);
     appendNullableFk('supplierId', product.supplierId, fkSets, fkParams);
     appendNullableFk('unitId', product.unitId, fkSets, fkParams);
+    if (typeof product.isActive === 'boolean') {
+      fkSets.push('"isActive" = ?');
+      fkParams.push(product.isActive ? 1 : 0);
+    }
     if (fkSets.length > 0) {
       fkParams.push(product.code);
       await dataSource.query(

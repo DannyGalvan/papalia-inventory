@@ -22,7 +22,7 @@ import { Response } from '../../database/models/response/Response';
 import { LogDetailRepository } from '../../database/repository/LogDetailRepository';
 import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { getMovementTypes } from '../../database/repository/MovementTypeRepository';
-import { searchProductsByCodeOrName } from '../../database/repository/ProductRepository';
+import { searchActiveProductsByCodeOrName } from '../../database/repository/ProductRepository';
 import { useForm } from '../../hooks/useForm';
 import { useLogDetails } from '../../hooks/useLogDetails';
 import { useTheme } from '../../hooks/useTheme';
@@ -96,7 +96,7 @@ export const LogForm = ({
   }, []);
 
   const handleSearch = async (text: string) => {
-    const data = await searchProductsByCodeOrName(text);
+    const data = await searchActiveProductsByCodeOrName(text);
     setProducts(data);
   };
 

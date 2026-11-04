@@ -20,6 +20,8 @@ export class Product {
   @Column('decimal', { default: 0 }) cost: number;
   @Column('integer') stock: number;
   @Column('varchar', { nullable: false, default: '' }) image: string;
+  /** Inactive products are hidden from the input/output product search. */
+  @Column('boolean', { default: true }) isActive: boolean;
 
   @Column('integer', { nullable: true, default: null }) categoryId:
     | number

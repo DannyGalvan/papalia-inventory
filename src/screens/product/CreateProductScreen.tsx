@@ -21,6 +21,7 @@ const initialForm = ProductRepository.create({
   cost: 0,
   stock: 0,
   image: '',
+  isActive: true,
 });
 
 export const CreateProductScreen = ({

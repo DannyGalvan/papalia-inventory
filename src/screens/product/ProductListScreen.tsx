@@ -17,6 +17,7 @@ import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
 import { Toast } from '../../components/feedback/Toast';
 import { InputSearch } from '../../components/input/InputSearch';
 import { ProductItem } from '../../components/product/ProductItem';
+import { ProductStatusFilterBar } from '../../components/product/ProductStatusFilterBar';
 import { Product } from '../../database/models/Product';
 import { getConfigurationByKey } from '../../database/repository/ConfigurationRepository';
 import { getFullProducts } from '../../database/repository/ProductRepository';
@@ -51,6 +52,8 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
     searchProducts,
     error,
     clearError,
+    statusFilter,
+    setStatusFilter,
   } = useProducts();
   const [isLoadingDownload, setIsLoadingDownload] = useState(false);
   const [currencySymbol, setCurrencySymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
@@ -160,6 +163,16 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
     if (isLoading) {
       return null;
     }
+    if (statusFilter !== 'all') {
+      const label = statusFilter === 'active' ? 'activos' : 'inactivos';
+      return (
+        <EmptyState
+          title={`Sin productos ${label}`}
+          description={`No se encontraron productos ${label}. Cambia el filtro para ver los demás.`}
+          icon="filter-outline"
+        />
+      );
+    }
     return (
       <EmptyState
         title="Sin productos"
@@ -167,7 +180,7 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
         icon="cube-outline"
       />
     );
-  }, [isLoading]);
+  }, [isLoading, statusFilter]);
 
   return (
     <View
@@ -228,6 +241,7 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
         />
       </TouchableOpacity>
       <InputSearch updateFn={searchProducts} />
+      <ProductStatusFilterBar value={statusFilter} onChange={setStatusFilter} />
       {showReports && (
         <View
           style={[

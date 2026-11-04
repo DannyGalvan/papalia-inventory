@@ -35,6 +35,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Papalia Inventory necesita acceso a la cámara para tomar fotos de los productos al registrarlos.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Papalia Inventory necesita acceso a la carpeta de documentos para exportar e importar archivos Excel.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

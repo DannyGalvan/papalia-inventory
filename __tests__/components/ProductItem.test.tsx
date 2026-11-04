@@ -164,3 +164,41 @@ describe('Feature: app-modernization, Property 3: Zero-stock products carry acce
     );
   });
 });
+
+describe('ProductItem active status', () => {
+  const build = (isActive: boolean | undefined) => {
+    const product = new Product();
+    product.code = 'A1';
+    product.name = 'Café';
+    product.description = '';
+    product.price = 10;
+    product.cost = 0;
+    product.stock = 3;
+    product.image = '';
+    product.isActive = isActive as boolean;
+    return product;
+  };
+
+  const texts = (renderer: ReactTestRenderer.ReactTestRenderer) =>
+    renderer.root
+      .findAll(node => typeof node.props.children === 'string')
+      .map(node => node.props.children);
+
+  it('tags inactive products and announces it', () => {
+    const renderer = render(<ProductItem product={build(false)} />);
+    expect(texts(renderer)).toContain('Inactivo');
+    const button = renderer.root.findAll(
+      node => node.props.accessibilityRole === 'button',
+    )[0];
+    expect(button.props.accessibilityLabel).toMatch(/inactivo$/);
+  });
+
+  it('shows no tag for active or legacy (undefined) products', () => {
+    expect(texts(render(<ProductItem product={build(true)} />))).not.toContain(
+      'Inactivo',
+    );
+    expect(
+      texts(render(<ProductItem product={build(undefined)} />)),
+    ).not.toContain('Inactivo');
+  });
+});

@@ -13,7 +13,7 @@
  *  - `exportLogs` writes a single sheet named **"Entradas"** (inputs) or
  *    **"Salidas"** (outputs) with the joined header/detail columns
  *    `id, Codigo, tipo, creado, observaciones, cantidad, esEntrada, nombre,
- *    precio, total`, to `Ingresos_<uuid>.xlsx` (inputs) or
+ *    precio, total, estado, motivoCancelacion`, to `Ingresos_<uuid>.xlsx` (inputs) or
  *    `Salidas_<uuid>.xlsx` (outputs) — matching the legacy file naming.
  *  - `importProducts` reads the first worksheet of a workbook and maps each row
  *    back into a `Product` using the same field mapping
@@ -152,6 +152,8 @@ export const LOG_COLUMNS = [
   'nombre',
   'precio',
   'total',
+  'estado',
+  'motivoCancelacion',
 ] as const;
 
 /** Contract for Excel import/export operations. */
@@ -411,6 +413,9 @@ export class ExcelServiceImpl implements ExcelService {
         nombre: detail.name,
         precio: detail.price,
         total: detail.total,
+        // Cancelled movements are exported for audit, clearly flagged.
+        estado: header.isCancelled ? 'Cancelada' : 'Activa',
+        motivoCancelacion: header.isCancelled ? header.cancelReason ?? '' : '',
       });
     }
 
