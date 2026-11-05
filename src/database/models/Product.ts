@@ -13,7 +13,10 @@ import { UnitOfMeasure } from './UnitOfMeasure';
 
 @Entity('product')
 export class Product {
+  /** Internal code, auto-generated on creation (e.g. PRD-000001). */
   @PrimaryColumn('varchar') code: string;
+  /** Optional supplier code; '' when not set. Unique (case-insensitive). */
+  @Column('varchar', { nullable: false, default: '' }) sku: string;
   @Column('varchar') name: string;
   @Column('varchar') description: string;
   @Column('decimal') price: number;

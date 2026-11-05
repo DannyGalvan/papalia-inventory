@@ -35,6 +35,9 @@ function normalizeProduct(p: Product): Product {
   if (isNitroNull(p.image) || typeof p.image !== 'string') {
     p.image = '';
   }
+  if (isNitroNull(p.sku) || typeof p.sku !== 'string') {
+    p.sku = '';
+  }
   // NOT NULL DEFAULT 1: a missing value means the default (active).
   p.isActive =
     p.isActive == null || isNitroNull(p.isActive) ? true : toBool(p.isActive);
@@ -118,6 +121,7 @@ export const getTotalProducts = async (status: ProductStatusFilter = 'all') => {
   }
 };
 
+/** Matches the code, name or supplier SKU (case-insensitive LIKE). */
 export const searchProductsByCodeOrName = async (
   search: string,
   status: ProductStatusFilter = 'all',
@@ -128,6 +132,7 @@ export const searchProductsByCodeOrName = async (
       where: [
         { code: Like(`%${search}%`), ...statusWhere },
         { name: Like(`%${search}%`), ...statusWhere },
+        { sku: Like(`%${search}%`), ...statusWhere },
       ],
     });
     return products.map(normalizeProduct);
@@ -184,63 +189,6 @@ function appendNullableFk(
   }
 }
 
-export const createProduct = async (product: Product) => {
-  const response = new Response<Product>();
-  try {
-    // Build a dynamic INSERT that excludes null FK columns entirely.
-    // Omitting them lets SQLite apply the column default (NULL), avoiding the
-    // null-parameter crash in nitro-sqlite on Android.
-    const cols: string[] = [
-      '"code"',
-      '"name"',
-      '"description"',
-      '"price"',
-      '"cost"',
-      '"stock"',
-      '"image"',
-      '"isActive"',
-    ];
-    const vals: SqlParam[] = [
-      product.code,
-      product.name,
-      product.description,
-      product.price,
-      Number(product.cost) || 0,
-      product.stock,
-      product.image ?? '',
-      product.isActive === false ? 0 : 1,
-    ];
-    if (product.categoryId != null) {
-      cols.push('"categoryId"');
-      vals.push(product.categoryId);
-    }
-    if (product.supplierId != null) {
-      cols.push('"supplierId"');
-      vals.push(product.supplierId);
-    }
-    if (product.unitId != null) {
-      cols.push('"unitId"');
-      vals.push(product.unitId);
-    }
-
-    await dataSource.query(
-      `INSERT INTO "product" (${cols.join(',')}) VALUES (${cols
-        .map(() => '?')
-        .join(',')})`,
-      vals,
-    );
-
-    response.success = true;
-    response.message = 'Producto creado';
-    response.data = product;
-  } catch (error) {
-    response.message = `Error al crear el producto ${(error as Error).message}`;
-    response.data = null;
-    response.success = false;
-  }
-  return response;
-};
-
 export const updateProduct = async (product: Product) => {
   const response = new Response<Product>();
   try {
@@ -274,6 +222,9 @@ export const updateProduct = async (product: Product) => {
     }
     if (product.image != null) {
       base.image = product.image;
+    }
+    if (product.sku != null) {
+      base.sku = product.sku;
     }
     if (Object.keys(base).length > 0) {
       await ProductRepository.update(product.code, base);

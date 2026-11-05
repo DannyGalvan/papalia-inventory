@@ -4,6 +4,7 @@ import { NAME_BD } from '../../config/constants';
 import { AddCostAndProfit1700000000005 } from '../migrations/AddCostAndProfit1700000000005';
 import { AddMovementCancellation1700000000007 } from '../migrations/AddMovementCancellation1700000000007';
 import { AddProductIsActive1700000000006 } from '../migrations/AddProductIsActive1700000000006';
+import { AddProductSku1700000000008 } from '../migrations/AddProductSku1700000000008';
 import { AddDomainEntities1700000000003 } from '../migrations/AddDomainEntities1700000000003';
 import { AddTimezonesCatalog1700000000004 } from '../migrations/AddTimezonesCatalog1700000000004';
 import { AddMovementTypeCatalog1700000000002 } from '../migrations/AddMovementTypeCatalog1700000000002';
@@ -46,6 +47,7 @@ export const dataSource = new DataSource({
     AddCostAndProfit1700000000005,
     AddProductIsActive1700000000006,
     AddMovementCancellation1700000000007,
+    AddProductSku1700000000008,
   ],
 });
 

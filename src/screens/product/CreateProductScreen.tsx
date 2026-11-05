@@ -1,28 +1,30 @@
 import { pick, types } from '@react-native-documents/picker';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
 import { Fab } from '../../components/button/Fab';
 import { ProductForm } from '../../components/form/ProductForm';
 import { Product } from '../../database/models/Product';
-import {
-  ProductRepository,
-  createProduct,
-} from '../../database/repository/ProductRepository';
+import { ProductRepository } from '../../database/repository/ProductRepository';
+import { useProductCodePreview } from '../../hooks/useProductCodePreview';
 import { useTheme } from '../../hooks/useTheme';
 import { ProductCreateScreenProps } from '../../interfaces/IProductNavigation';
 import { excelService } from '../../services/ExcelService';
+import { productCreationService } from '../../services/product/defaultProductServices';
+import { toProductResponse } from '../../services/product/toProductResponse';
 import { appColors } from '../../styles/globalStyles';
 
-const initialForm = ProductRepository.create({
-  code: '',
-  name: '',
-  description: '',
-  price: 0.0,
-  cost: 0,
-  stock: 0,
-  image: '',
-  isActive: true,
-});
+const emptyForm = (code: string) =>
+  ProductRepository.create({
+    code,
+    sku: '',
+    name: '',
+    description: '',
+    price: 0.0,
+    cost: 0,
+    stock: 0,
+    image: '',
+    isActive: true,
+  });
 
 export const CreateProductScreen = ({
   navigation,
@@ -30,9 +32,17 @@ export const CreateProductScreen = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
   const { theme } = useTheme();
+  const codePreview = useProductCodePreview(productCreationService);
+  const initialForm = useMemo(
+    () => emptyForm(codePreview.code),
+    [codePreview.code],
+  );
 
   const onSubmit = async (product: Product) => {
-    const response = await createProduct(product);
+    // The previewed code is display-only: the service reserves the real one.
+    const response = toProductResponse(
+      await productCreationService.create(product),
+    );
 
     if (response.success) {
       navigation.navigate('ListProduct');
@@ -92,18 +102,25 @@ export const CreateProductScreen = ({
       }
 
       for (const product of data) {
-        const result = await createProduct(product);
+        // Imported rows keep their code; blank codes are auto-generated.
+        const result = toProductResponse(
+          await productCreationService.create(product, {
+            allowProvidedCode: true,
+          }),
+        );
         if (!result.success) {
           Alert.alert(
             'Error al importar',
             `No se pudo guardar el producto "${product.name}": ${result.message}`,
           );
           setIsLoading(false);
+          codePreview.refresh();
           return;
         }
       }
 
       setIsLoading(false);
+      codePreview.refresh();
       Alert.alert(
         'Importación exitosa',
         `Se importaron ${data.length} producto${
@@ -137,7 +154,9 @@ export const CreateProductScreen = ({
       >
         Crear Nuevo Producto
       </Text>
-      <ProductForm initialForm={initialForm} onSubmit={onSubmit} />
+      {!codePreview.isLoading && (
+        <ProductForm initialForm={initialForm} onSubmit={onSubmit} />
+      )}
       <Fab
         style={styles.fabTemplate}
         iconName="download-outline"

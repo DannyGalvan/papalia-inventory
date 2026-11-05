@@ -8,7 +8,7 @@
  * equivalent (Requirements 5.2, 5.3, 5.5):
  *
  *  - `exportProducts` writes a single sheet named **"Productos"** with the
- *    columns `code, name, description, price, cost, stock, image` (the `Product`
+ *    columns `code, sku, name, description, price, cost, stock, image` (the `Product`
  *    model fields, in model order), to `Productos_<uuid>.xlsx`.
  *  - `exportLogs` writes a single sheet named **"Entradas"** (inputs) or
  *    **"Salidas"** (outputs) with the joined header/detail columns
@@ -17,7 +17,7 @@
  *    `Salidas_<uuid>.xlsx` (outputs) — matching the legacy file naming.
  *  - `importProducts` reads the first worksheet of a workbook and maps each row
  *    back into a `Product` using the same field mapping
- *    (`code, name, description, price, cost, stock, image`).
+ *    (`code, sku, name, description, price, cost, stock, image`).
  *
  * Path resolution and file writing are delegated to {@link fileService} so the
  * platform-appropriate downloads directory is used and the written file is
@@ -55,6 +55,7 @@ export const OUTPUTS_SHEET_NAME = 'Salidas';
  */
 export const PRODUCT_COLUMNS = [
   'code',
+  'sku',
   'name',
   'description',
   'price',
@@ -83,11 +84,18 @@ const TEMPLATE_COLUMN_HELP: Record<
   { required: boolean; description: string; example: string; width: number }
 > = {
   code: {
-    required: true,
+    required: false,
     description:
-      'Código único del producto. No debe repetirse ni existir ya en la app.',
-    example: 'P-0001',
+      'Déjalo vacío para que la app genere el código automáticamente (PRD-000001, PRD-000002…). Si lo llenas, no debe repetirse ni existir ya en la app.',
+    example: '',
     width: 14,
+  },
+  sku: {
+    required: false,
+    description:
+      'Código del producto según el proveedor (SKU). Opcional; si se llena no debe repetirse.',
+    example: 'ABC-123',
+    width: 16,
   },
   name: {
     required: true,
@@ -182,7 +190,7 @@ export interface ExcelService {
   ): Promise<string>;
   /**
    * Parse the first worksheet of the XLSX file at `filePath` into `Product`
-   * records using the `code, name, description, price, cost, stock, image` mapping.
+   * records using the `code, sku, name, description, price, cost, stock, image` mapping.
    */
   importProducts(filePath: string): Promise<Product[]>;
 }
@@ -279,6 +287,7 @@ export class ExcelServiceImpl implements ExcelService {
     for (const product of products) {
       sheet.addRow({
         code: product.code,
+        sku: product.sku ?? '',
         name: product.name,
         description: product.description,
         price: product.price,
@@ -498,11 +507,13 @@ export class ExcelServiceImpl implements ExcelService {
 
   /**
    * Map a parsed spreadsheet row to a `Product`, preserving the legacy field
-   * mapping (`code, name, description, price, cost, stock, image`).
+   * mapping (`code, sku, name, description, price, cost, stock, image`).
    */
   private recordToProduct(record: Record<string, unknown>): Product {
     const product = new Product();
     product.code = this.toStringValue(record.code);
+    // Files exported before SKU support have no `sku` column → ''.
+    product.sku = this.toStringValue(record.sku);
     product.name = this.toStringValue(record.name);
     product.description = this.toStringValue(record.description);
     product.price = this.toNumberValue(record.price);

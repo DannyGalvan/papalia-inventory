@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { ProductForm } from '../../components/form/ProductForm';
 import { Product } from '../../database/models/Product';
-import {
-  getProductById,
-  updateProduct,
-} from '../../database/repository/ProductRepository';
+import { getProductById } from '../../database/repository/ProductRepository';
 import { useTheme } from '../../hooks/useTheme';
 import { ProductEditScreenProps } from '../../interfaces/IProductNavigation';
+import { productUpdateService } from '../../services/product/defaultProductServices';
 
 export const UpdateProductScreen = ({
   navigation,
@@ -27,7 +25,7 @@ export const UpdateProductScreen = ({
   }, [id]);
 
   const onSubmit = async (product: Product) => {
-    const response = await updateProduct(product);
+    const response = await productUpdateService.update(product);
 
     if (response.success) {
       navigation.navigate('ListProduct');

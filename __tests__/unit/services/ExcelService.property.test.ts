@@ -138,6 +138,7 @@ const stockArbitrary: fc.Arbitrary<number> = fc.integer({
 const productArbitrary: fc.Arbitrary<Product> = fc
   .record({
     code: requiredString(24),
+    sku: safeString(0, 20),
     name: requiredString(40),
     description: safeString(0, 60),
     price: priceArbitrary,
@@ -148,6 +149,7 @@ const productArbitrary: fc.Arbitrary<Product> = fc
   .map(fields => {
     const product = new Product();
     product.code = fields.code;
+    product.sku = fields.sku;
     product.name = fields.name;
     product.description = fields.description;
     product.price = fields.price;
@@ -183,6 +185,7 @@ function expectEquivalentProducts(
   original.forEach((expected, index) => {
     const actual = imported[index];
     expect(actual.code).toBe(expected.code);
+    expect(actual.sku).toBe(expected.sku ?? '');
     expect(actual.name).toBe(expected.name);
     expect(actual.description).toBe(expected.description);
     expect(actual.image).toBe(expected.image);
@@ -302,6 +305,7 @@ describe('ExcelService — round-trip examples', () => {
     // Column keys are not persisted in the file; add the row by position.
     workbook.worksheets[0].addRow([
       'T-1',
+      'SKU-77',
       'Desde plantilla',
       'Prueba',
       45.5,
@@ -316,6 +320,7 @@ describe('ExcelService — round-trip examples', () => {
 
     expect(imported).toHaveLength(1);
     expect(imported[0].code).toBe('T-1');
+    expect(imported[0].sku).toBe('SKU-77');
     expect(imported[0].price).toBeCloseTo(45.5, 2);
     expect(imported[0].cost).toBeCloseTo(30, 2);
     expect(imported[0].stock).toBe(20);
@@ -349,6 +354,49 @@ describe('ExcelService — round-trip examples', () => {
     expect(imported).toHaveLength(1);
     expect(imported[0].price).toBeCloseTo(12, 2);
     expect(imported[0].cost).toBe(0);
+    // Files exported before SKU support import without SKU.
+    expect(imported[0].sku).toBe('');
+  });
+
+  it('imports template rows with a blank code so the app generates it', async () => {
+    const filePath = await excelService.exportProductTemplate();
+    const workbook = await loadWorkbookFromStore(filePath);
+    workbook.worksheets[0].addRow([
+      null,
+      null,
+      'Sin código',
+      'x',
+      10,
+      1,
+      2,
+      '',
+    ]);
+    const buffer = await workbook.xlsx.writeBuffer();
+    mockFsStore.set(filePath, Buffer.from(buffer).toString('base64'));
+
+    const imported = await excelService.importProducts(filePath);
+
+    expect(imported).toHaveLength(1);
+    expect(imported[0].code).toBe('');
+    expect(imported[0].sku).toBe('');
+    expect(imported[0].name).toBe('Sin código');
+  });
+
+  it('documents code and sku as optional in the template', async () => {
+    const filePath = await excelService.exportProductTemplate();
+    const workbook = await loadWorkbookFromStore(filePath);
+    const help = workbook.getWorksheet('Instrucciones');
+    const requiredByColumn: Record<string, string> = {};
+    help?.eachRow((row, n) => {
+      if (n > 1 && row.getCell(1).value !== '•') {
+        requiredByColumn[String(row.getCell(1).value)] = String(
+          row.getCell(2).value,
+        );
+      }
+    });
+    expect(requiredByColumn.code).toBe('No');
+    expect(requiredByColumn.sku).toBe('No');
+    expect(requiredByColumn.name).toBe('Sí');
   });
 
   it('writes a workbook containing the "Productos" sheet with model columns', async () => {
