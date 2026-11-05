@@ -546,3 +546,62 @@ describe('ExcelService — movement status columns', () => {
     );
   });
 });
+
+describe('ExcelService — movement date column', () => {
+  it('exports registration and sale dates separately', async () => {
+    mockFsStore.clear();
+    const registeredAt = new Date('2026-11-05T15:00:00.000Z');
+    const soldAt = new Date('2026-11-01T12:00:00.000Z');
+
+    const sale = new LogHeader();
+    sale.id = 1;
+    sale.type = 1;
+    sale.comments = 'venta atrasada';
+    sale.createdAt = registeredAt;
+    sale.movementDate = soldAt;
+    sale.isInput = false;
+    sale.isCancelled = false;
+
+    const legacy = new LogHeader();
+    legacy.id = 2;
+    legacy.type = 1;
+    legacy.comments = 'legacy';
+    legacy.createdAt = registeredAt;
+    legacy.isInput = false;
+    legacy.isCancelled = false;
+
+    const detail = (id: number, headerId: number) => {
+      const d = new LogDetail();
+      d.id = id;
+      d.productCode = 'A';
+      d.logHeaderId = headerId;
+      d.name = 'Café';
+      d.quantity = 1;
+      d.price = 10;
+      d.total = 10;
+      return d;
+    };
+
+    const path = await excelService.exportLogs(
+      [sale, legacy],
+      [detail(1, 1), detail(2, 2)],
+      false,
+    );
+    const sheet = (await loadWorkbookFromStore(path)).getWorksheet(
+      OUTPUTS_SHEET_NAME,
+    ) as ExcelJS.Worksheet;
+    const col = (key: string) => LOG_COLUMNS.indexOf(key as never) + 1;
+
+    expect(LOG_COLUMNS.indexOf('fechaMovimiento')).toBe(
+      LOG_COLUMNS.indexOf('creado') + 1,
+    );
+    expect(sheet.getRow(2).getCell(col('creado')).value).toEqual(registeredAt);
+    expect(sheet.getRow(2).getCell(col('fechaMovimiento')).value).toEqual(
+      soldAt,
+    );
+    // Legacy rows without movement date fall back to the registration date.
+    expect(sheet.getRow(3).getCell(col('fechaMovimiento')).value).toEqual(
+      registeredAt,
+    );
+  });
+});

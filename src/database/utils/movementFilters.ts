@@ -1,4 +1,4 @@
-import { FindOperator } from 'typeorm';
+import { Between, FindOperator } from 'typeorm';
 import { sqliteBoolean } from './sqliteBoolean';
 
 /**
@@ -11,3 +11,20 @@ export const activeMovementsWhere = (): {
 } => ({
   isCancelled: sqliteBoolean(false),
 });
+
+/**
+ * WHERE fragment for movements whose business date (sale/receipt date) falls
+ * within [from, to]. Single place deciding which date drives date filters.
+ */
+export const movementDateBetween = (
+  from: Date,
+  to: Date,
+): { movementDate: FindOperator<Date> } => ({
+  movementDate: Between(from, to),
+});
+
+/** Newest business date first; id breaks ties deterministically. */
+export const MOVEMENT_DATE_ORDER = {
+  movementDate: 'DESC',
+  id: 'DESC',
+} as const;

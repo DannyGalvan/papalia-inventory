@@ -32,6 +32,7 @@ import { resolveImageUri } from '../../utils/filePaths';
 import { DetailsItem } from '../DetailsItem';
 import { TouchableButton } from '../button/TouchableButton';
 import { InputForm } from '../input/InputForm';
+import { MovementDateField } from '../input/MovementDateField';
 import { KeyboardAwareScrollView } from '../layout/KeyboardAwareScrollView';
 
 interface Props {
@@ -234,6 +235,13 @@ export const LogForm = ({
           </View>
         )}
       </View>
+      <MovementDateField
+        value={isReadonly ? initialForm.movementDate : form.movementDate}
+        isInput={initialForm.isInput}
+        onChange={date => handleChange(date, 'movementDate')}
+        error={errors.movementDate}
+        readonly={isReadonly}
+      />
       <InputForm
         label="Comentarios"
         placeholder="Ingresa una descripción"

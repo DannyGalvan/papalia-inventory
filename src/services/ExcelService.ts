@@ -12,8 +12,9 @@
  *    model fields, in model order), to `Productos_<uuid>.xlsx`.
  *  - `exportLogs` writes a single sheet named **"Entradas"** (inputs) or
  *    **"Salidas"** (outputs) with the joined header/detail columns
- *    `id, Codigo, tipo, creado, observaciones, cantidad, esEntrada, nombre,
- *    precio, total, estado, motivoCancelacion`, to `Ingresos_<uuid>.xlsx` (inputs) or
+ *    `id, Codigo, tipo, creado, fechaMovimiento, observaciones, cantidad,
+ *    esEntrada, nombre, precio, total, estado, motivoCancelacion`
+ *    (`creado` = registration date, `fechaMovimiento` = sale/receipt date), to `Ingresos_<uuid>.xlsx` (inputs) or
  *    `Salidas_<uuid>.xlsx` (outputs) — matching the legacy file naming.
  *  - `importProducts` reads the first worksheet of a workbook and maps each row
  *    back into a `Product` using the same field mapping
@@ -39,6 +40,7 @@ import { LogDetail } from '../database/models/LogDetail';
 import { LogHeader } from '../database/models/LogHeader';
 import { Product } from '../database/models/Product';
 import { fileService } from './FileService';
+import { effectiveMovementDate } from './movement/movementDate';
 import { logService } from './LogService';
 
 /** Sheet name used for the products export (preserved from the xlsx version). */
@@ -154,6 +156,7 @@ export const LOG_COLUMNS = [
   'Codigo',
   'tipo',
   'creado',
+  'fechaMovimiento',
   'observaciones',
   'cantidad',
   'esEntrada',
@@ -416,6 +419,7 @@ export class ExcelServiceImpl implements ExcelService {
         Codigo: detail.productCode,
         tipo: typeEnum[header.type],
         creado: header.createdAt,
+        fechaMovimiento: effectiveMovementDate(header),
         observaciones: header.comments,
         cantidad: detail.quantity,
         esEntrada: header.isInput,

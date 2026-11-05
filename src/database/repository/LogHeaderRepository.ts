@@ -1,4 +1,3 @@
-import { Between } from 'typeorm';
 import {
   ALL_IN_OUT_ENUM,
   ALL_IN_OUT_TYPES,
@@ -13,8 +12,15 @@ import { LogDetailRepository } from './LogDetailRepository';
 import { getAllMovementTypes } from './MovementTypeRepository';
 import { getProductById, updateProduct } from './ProductRepository';
 import { sqliteBoolean } from '../utils/sqliteBoolean';
-import { activeMovementsWhere } from '../utils/movementFilters';
+import {
+  activeMovementsWhere,
+  MOVEMENT_DATE_ORDER,
+  movementDateBetween,
+} from '../utils/movementFilters';
 import { isNitroNull, toBool } from '../utils/nitroValues';
+import { dateNowCreate } from '../../utils/dateTime';
+import { effectiveMovementDate } from '../../services/movement/movementDate';
+import { stampMovementDates } from '../../services/movement/stampMovementDates';
 
 function normalizeLogHeader(h: LogHeader): LogHeader {
   if (isNitroNull(h.comments) || typeof h.comments !== 'string') {
@@ -32,6 +38,11 @@ function normalizeLogHeader(h: LogHeader): LogHeader {
   }
   if (isNitroNull(h.cancelledAt) || !(h.cancelledAt instanceof Date)) {
     h.cancelledAt = null;
+  }
+  // Legacy/null-marker rows fall back to the registration date.
+  const movementDate = effectiveMovementDate(h);
+  if (movementDate) {
+    h.movementDate = movementDate;
   }
   return h;
 }
@@ -59,10 +70,10 @@ export const getAllLogsByDate = async (
 ) => {
   const rows = await LogHeaderRepository.find({
     where: {
-      createdAt: Between(initialDate, finalDate),
+      ...movementDateBetween(initialDate, finalDate),
       isInput: sqliteBoolean(isInput),
     },
-    order: { id: 'DESC' },
+    order: MOVEMENT_DATE_ORDER,
   });
   return rows.map(normalizeLogHeader);
 };
@@ -77,7 +88,7 @@ export const getDashboardInputs = async (
         isInput: sqliteBoolean(true),
         ...activeMovementsWhere(),
         ...(initialDate && finalDate
-          ? { createdAt: Between(initialDate, finalDate) }
+          ? movementDateBetween(initialDate, finalDate)
           : {}),
       },
       order: { id: 'DESC' },
@@ -129,6 +140,7 @@ export const getAllInputLogs = async () => {
         Codigo: d.productCode,
         tipo: INPUT_ENUM[log.type],
         creado: log.createdAt,
+        fechaMovimiento: effectiveMovementDate(log) ?? log.createdAt,
         observaciones: log.comments,
         cantidad: d.quantity,
         esEntrada: log.isInput,
@@ -154,7 +166,7 @@ export const getDashboardOutputs = async (
         isInput: sqliteBoolean(false),
         ...activeMovementsWhere(),
         ...(initialDate && finalDate
-          ? { createdAt: Between(initialDate, finalDate) }
+          ? movementDateBetween(initialDate, finalDate)
           : {}),
       },
       order: { id: 'DESC' },
@@ -206,6 +218,7 @@ export const getAllOutputLogs = async () => {
         Codigo: d.productCode,
         tipo: ALL_IN_OUT_ENUM[log.type],
         creado: log.createdAt,
+        fechaMovimiento: effectiveMovementDate(log) ?? log.createdAt,
         observaciones: log.comments,
         cantidad: d.quantity,
         esEntrada: log.isInput,
@@ -236,6 +249,7 @@ export const getLogById = async (id: number) => {
     log.id = 0;
     log.logDetails = [];
     log.createdAt = new Date();
+    log.movementDate = log.createdAt;
     log.comments = 'No se encontraron datos';
     log.type = ALL_IN_OUT_TYPES.no_seleccionado;
     log.isInput = false;
@@ -249,6 +263,7 @@ export const getLogById = async (id: number) => {
 export const createLog = async (log: LogHeader) => {
   const response = new Response<LogHeader>();
   try {
+    stampMovementDates(log, dateNowCreate);
     const logHeader = LogHeaderRepository.create(log);
 
     const logCreated = await LogHeaderRepository.save(logHeader);

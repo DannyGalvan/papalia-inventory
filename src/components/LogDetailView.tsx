@@ -18,6 +18,11 @@ import { MovementType } from '../database/models/MovementType';
 import { getConfigurationByKey } from '../database/repository/ConfigurationRepository';
 import { getAllMovementTypes } from '../database/repository/MovementTypeRepository';
 import { useTheme } from '../hooks/useTheme';
+import { effectiveMovementDate } from '../services/movement/movementDate';
+import {
+  movementDateLabel,
+  REGISTRATION_DATE_LABEL,
+} from '../services/movement/movementDateLabel';
 import { formatCurrency } from '../utils/formatCurrency';
 import { resolveImageUri } from '../utils/filePaths';
 
@@ -118,7 +123,23 @@ export const LogDetailView = ({ log, banner, footer }: Props) => {
           <Text
             style={[styles.infoLabel, { color: theme.colors.textSecondary }]}
           >
-            Fecha
+            {movementDateLabel(isInput)}
+          </Text>
+          <Text style={[styles.infoValue, { color: theme.colors.text }]}>
+            {formatDateTime(effectiveMovementDate(log))}
+          </Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Icon
+            name="time-outline"
+            size={16}
+            color={theme.colors.textSecondary}
+          />
+          <Text
+            style={[styles.infoLabel, { color: theme.colors.textSecondary }]}
+          >
+            {REGISTRATION_DATE_LABEL}
           </Text>
           <Text style={[styles.infoValue, { color: theme.colors.text }]}>
             {formatDateTime(log.createdAt)}

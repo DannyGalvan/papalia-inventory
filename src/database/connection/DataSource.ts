@@ -5,6 +5,7 @@ import { AddCostAndProfit1700000000005 } from '../migrations/AddCostAndProfit170
 import { AddMovementCancellation1700000000007 } from '../migrations/AddMovementCancellation1700000000007';
 import { AddProductIsActive1700000000006 } from '../migrations/AddProductIsActive1700000000006';
 import { AddProductSku1700000000008 } from '../migrations/AddProductSku1700000000008';
+import { AddMovementDate1700000000009 } from '../migrations/AddMovementDate1700000000009';
 import { AddDomainEntities1700000000003 } from '../migrations/AddDomainEntities1700000000003';
 import { AddTimezonesCatalog1700000000004 } from '../migrations/AddTimezonesCatalog1700000000004';
 import { AddMovementTypeCatalog1700000000002 } from '../migrations/AddMovementTypeCatalog1700000000002';
@@ -48,6 +49,7 @@ export const dataSource = new DataSource({
     AddProductIsActive1700000000006,
     AddMovementCancellation1700000000007,
     AddProductSku1700000000008,
+    AddMovementDate1700000000009,
   ],
 });
 

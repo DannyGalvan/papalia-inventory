@@ -6,6 +6,7 @@ import { useTimezone } from '../context/TimezoneContext';
 import { LogHeader } from '../database/models/LogHeader';
 import { MovementType } from '../database/models/MovementType';
 import { useTheme } from '../hooks/useTheme';
+import { effectiveMovementDate } from '../services/movement/movementDate';
 
 interface Props {
   logHeader: LogHeader;
@@ -101,7 +102,7 @@ export const LogItems = ({ logHeader, navigation, typeCatalog }: Props) => {
           color={theme.colors.textSecondary}
         />
         <Text style={[styles.metaText, { color: theme.colors.textSecondary }]}>
-          {formatDateTime(logHeader.createdAt)}
+          {formatDateTime(effectiveMovementDate(logHeader))}
         </Text>
       </View>
 

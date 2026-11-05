@@ -14,6 +14,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { InputListScreenProps } from '../../interfaces/IInputNavigation';
 import { excelService } from '../../services/ExcelService';
 import { sqliteBoolean } from '../../database/utils/sqliteBoolean';
+import { MOVEMENT_DATE_ORDER } from '../../database/utils/movementFilters';
 
 export const InputListScreen = ({ navigation }: InputListScreenProps) => {
   const { theme } = useTheme();
@@ -48,7 +49,7 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
       setIsLoadingDownload(true);
       const logs = await LogHeaderRepository.find({
         where: { isInput: sqliteBoolean(true) },
-        order: { id: 'DESC' },
+        order: MOVEMENT_DATE_ORDER,
         relations: ['logDetails'],
       });
       const details = logs.flatMap(log => log.logDetails);
