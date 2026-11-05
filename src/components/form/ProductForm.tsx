@@ -10,7 +10,7 @@ import { UnitOfMeasure } from '../../database/models/UnitOfMeasure';
 import { getActiveCategories } from '../../database/repository/CategoryRepository';
 import { getActiveSuppliers } from '../../database/repository/SupplierRepository';
 import { getActiveUnits } from '../../database/repository/UnitOfMeasureRepository';
-import { FormErrors, useForm } from '../../hooks/useForm';
+import { useForm } from '../../hooks/useForm';
 import { useProductImage } from '../../hooks/useProductImage';
 import { useTheme } from '../../hooks/useTheme';
 import { TouchableButton } from '../button/TouchableButton';
@@ -21,6 +21,7 @@ import {
   formatPct,
   LOW_MARGIN_THRESHOLD_PCT,
 } from '../../utils/profit';
+import { validateProductForm } from '../../utils/validateProductForm';
 import { KeyboardAwareScrollView } from '../layout/KeyboardAwareScrollView';
 import { ProductActiveSwitch } from '../product/ProductActiveSwitch';
 import { ProductImagePicker } from '../product/ProductImagePicker';
@@ -36,32 +37,6 @@ type NullableItem = { id: number | null; label: string };
 const NO_CATEGORY: NullableItem = { id: null, label: 'Sin categoría' };
 const NO_SUPPLIER: NullableItem = { id: null, label: 'Sin proveedor' };
 const NO_UNIT: NullableItem = { id: null, label: 'Unidades (uds)' };
-
-const validateForm = (form: Product) => {
-  const errors: FormErrors = {};
-  if (!form.code) {
-    errors.code = 'El codigo es requerido';
-  }
-  if (!form.name) {
-    errors.name = 'El nombre es requerido';
-  }
-  if (!form.description) {
-    errors.description = 'La descripcion es requerida';
-  }
-  if (!form.price) {
-    errors.price = 'El precio es requerido';
-  }
-  const costText = String(form.cost ?? '').trim();
-  if (costText === '') {
-    errors.cost = 'El costo es requerido';
-  } else if (!Number.isFinite(Number(costText)) || Number(costText) < 0) {
-    errors.cost = 'El costo debe ser un número mayor o igual a 0';
-  }
-  if (form.stock === undefined || form.stock === null) {
-    errors.stock = 'El stock es requerido';
-  }
-  return errors;
-};
 
 export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
   const { theme } = useTheme();
@@ -112,7 +87,7 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
 
   const { form, errors, handleChange, handleSubmit, response } = useForm(
     initialForm,
-    validateForm,
+    validateProductForm,
     submit,
   );
 
@@ -157,16 +132,38 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
     >
       <View style={styles.container}>
         <InputForm
-          label="Codigo"
-          placeholder="Ingresa un codigo"
+          label="Código"
+          placeholder="Se genera automáticamente"
           placeholderTextColor={theme.colors.disabled}
           value={form.code}
-          errors={errors.code}
-          onChangeText={text => handleChange(text, 'code')}
           secureTextEntry={false}
           style={inputStyle}
           colorText={{ color: theme.colors.text }}
-          readonly={update}
+          readonly
+          accessibilityHint={
+            update
+              ? 'El código del producto no se puede modificar'
+              : 'Código generado automáticamente al guardar'
+          }
+        />
+        {!update && (
+          <Text
+            style={[styles.codeHint, { color: theme.colors.textSecondary }]}
+          >
+            Se asigna automáticamente al guardar.
+          </Text>
+        )}
+        <InputForm
+          label="SKU del proveedor (opcional)"
+          placeholder="Ej.: ABC-123"
+          placeholderTextColor={theme.colors.disabled}
+          value={form.sku ?? ''}
+          errors={errors.sku}
+          onChangeText={text => handleChange(text, 'sku')}
+          secureTextEntry={false}
+          style={inputStyle}
+          colorText={{ color: theme.colors.text }}
+          accessibilityHint="Código con el que el proveedor identifica el producto"
         />
         <InputForm
           label="Nombre"
@@ -470,6 +467,7 @@ export const ProductForm = ({ initialForm, onSubmit, update }: Props) => {
 
 const styles = StyleSheet.create({
   marginHint: { fontSize: 12, marginTop: -2, marginBottom: 6 },
+  codeHint: { fontSize: 12, marginTop: -2, marginBottom: 6 },
   dropdownButtonText: { fontSize: 14, textAlign: 'left' },
   selectedRowText: { fontWeight: '600' },
   searchInput: { borderWidth: 1, borderRadius: 8 },

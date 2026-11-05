@@ -5,6 +5,8 @@ export const KEY_CURRENCY_SYMBOL = 'currency_symbol';
 export const KEY_LOW_STOCK_THRESHOLD = 'low_stock_threshold';
 export const KEY_COMPANY_NAME = 'company_name';
 export const KEY_TIMEZONE = 'timezone';
+/** Last auto-generated product code sequence (never reused). */
+export const KEY_PRODUCT_CODE_SEQUENCE = 'product_code_sequence';
 
 export const DEFAULT_CURRENCY_SYMBOL = 'Q';
 export const DEFAULT_LOW_STOCK_THRESHOLD = 5;

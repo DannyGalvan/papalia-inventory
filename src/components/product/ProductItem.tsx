@@ -41,6 +41,7 @@ const ProductItemInner = ({
     safeCost > 0 ? calculateMarginPct(safePrice, safeCost) : null;
   const nonExistentProduct = safeStock === 0;
   const isInactive = product.isActive === false;
+  const safeSku = typeof product.sku === 'string' ? product.sku : '';
   const statusColor = nonExistentProduct
     ? theme.colors.stockDepleted
     : theme.colors.stockAvailable;
@@ -75,8 +76,8 @@ const ProductItemInner = ({
       onPress={onPress}
       accessible
       accessibilityRole="button"
-      accessibilityLabel={`Producto ${product.name}, código ${
-        product.code
+      accessibilityLabel={`Producto ${product.name}, código ${product.code}${
+        safeSku ? `, SKU ${safeSku}` : ''
       }, precio ${currencySymbol}${safePrice.toFixed(
         2,
       )}, ${safeStock} ${unitAbbrev} en inventario${
@@ -100,6 +101,14 @@ const ProductItemInner = ({
           <Text style={[styles.code, { color: theme.colors.textSecondary }]}>
             Código: {product.code}
           </Text>
+          {!!safeSku && (
+            <Text
+              style={[styles.code, { color: theme.colors.textSecondary }]}
+              numberOfLines={1}
+            >
+              SKU: {safeSku}
+            </Text>
+          )}
           {isInactive && (
             <View
               style={[
