@@ -1,8 +1,10 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerParamList } from './IDrawerNavigation';
 
 export type AppStackParamList = {
   Permissions: undefined;
-  Home: undefined;
+  Home: NavigatorScreenParams<DrawerParamList> | undefined;
   Configuration: undefined;
   MovementTypeCatalog: undefined;
   CategoryCatalog: undefined;

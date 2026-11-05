@@ -6,11 +6,9 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   ViewToken,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { Fab } from '../../components/button/Fab';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { SkeletonLoader } from '../../components/feedback/SkeletonLoader';
@@ -65,7 +63,6 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
       }
     });
   }, []);
-  const [showReports, setShowReports] = useState(false);
   const [toast, setToast] = useState<ToastState>({
     visible: false,
     message: '',
@@ -187,20 +184,6 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
       style={[styles.screen, { backgroundColor: theme.colors.background }]}
       accessible={false}
     >
-      <Text
-        style={[
-          styles.title,
-          {
-            color: theme.colors.text,
-            fontSize: theme.typography.h2.fontSize,
-            fontWeight: theme.typography.h2.fontWeight,
-            lineHeight: theme.typography.h2.lineHeight,
-          },
-        ]}
-        accessibilityRole="header"
-      >
-        Lista de productos
-      </Text>
       <View>
         <Text
           style={[
@@ -215,134 +198,8 @@ export const ProductListScreen = ({ navigation }: ProductListScreenProps) => {
           Total de productos: {total}
         </Text>
       </View>
-      <TouchableOpacity
-        style={[
-          styles.reportsToggle,
-          {
-            backgroundColor: theme.colors.surface,
-            borderRadius: theme.borderRadius.sm,
-          },
-        ]}
-        onPress={() => setShowReports(prev => !prev)}
-        accessibilityRole="button"
-        accessibilityLabel="Reportes"
-        accessibilityHint="Muestra las opciones de reportes de inventario"
-      >
-        <Icon name="bar-chart-outline" size={18} color={theme.colors.primary} />
-        <Text
-          style={[styles.reportsToggleText, { color: theme.colors.primary }]}
-        >
-          Reportes
-        </Text>
-        <Icon
-          name={showReports ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={theme.colors.primary}
-        />
-      </TouchableOpacity>
       <InputSearch updateFn={searchProducts} />
       <ProductStatusFilterBar value={statusFilter} onChange={setStatusFilter} />
-      {showReports && (
-        <View
-          style={[
-            styles.reportsContainer,
-            {
-              backgroundColor: theme.colors.surface,
-              borderRadius: theme.borderRadius.md,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={[
-              styles.reportButton,
-              { borderBottomColor: theme.colors.border },
-            ]}
-            onPress={() => navigation.navigate('CriticalReport')}
-            accessibilityRole="button"
-            accessibilityLabel="Reporte Crítico"
-          >
-            <Icon name="warning-outline" size={20} color={theme.colors.error} />
-            <Text
-              style={[styles.reportButtonText, { color: theme.colors.text }]}
-            >
-              Reporte Crítico
-            </Text>
-            <Icon
-              name="chevron-forward"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.reportButton,
-              { borderBottomColor: theme.colors.border },
-            ]}
-            onPress={() => navigation.navigate('SummaryReport')}
-            accessibilityRole="button"
-            accessibilityLabel="Resumen General"
-          >
-            <Icon
-              name="stats-chart-outline"
-              size={20}
-              color={theme.colors.primary}
-            />
-            <Text
-              style={[styles.reportButtonText, { color: theme.colors.text }]}
-            >
-              Resumen General
-            </Text>
-            <Icon
-              name="chevron-forward"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.reportButton,
-              { borderBottomColor: theme.colors.border },
-            ]}
-            onPress={() => navigation.navigate('MovementReport')}
-            accessibilityRole="button"
-            accessibilityLabel="Reporte de Movimientos"
-          >
-            <Icon
-              name="swap-horizontal-outline"
-              size={20}
-              color={theme.colors.success}
-            />
-            <Text
-              style={[styles.reportButtonText, { color: theme.colors.text }]}
-            >
-              Reporte de Movimientos
-            </Text>
-            <Icon
-              name="chevron-forward"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.reportButton}
-            onPress={() => navigation.navigate('ProfitReport')}
-            accessibilityRole="button"
-            accessibilityLabel="Reporte de Ganancias"
-          >
-            <Icon name="cash-outline" size={20} color={theme.colors.success} />
-            <Text
-              style={[styles.reportButtonText, { color: theme.colors.text }]}
-            >
-              Reporte de Ganancias
-            </Text>
-            <Icon
-              name="chevron-forward"
-              size={20}
-              color={theme.colors.textSecondary}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
       {isInitialLoad ? (
         <SkeletonLoader layout="product-list" />
       ) : (
@@ -401,45 +258,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
-  title: {
-    paddingVertical: 10,
-    fontStyle: 'italic',
-    textAlign: 'center',
-  },
   totalText: {
     textAlign: 'center',
-  },
-  reportsToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginHorizontal: 10,
-    marginTop: 8,
-    gap: 6,
-  },
-  reportsToggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  reportsContainer: {
-    marginHorizontal: 10,
-    marginTop: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  reportButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: 10,
-  },
-  reportButtonText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
+    paddingTop: 8,
   },
   list: {
     padding: 10,

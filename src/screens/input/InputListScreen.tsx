@@ -86,19 +86,6 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
         visible={toastVisible}
         onDismiss={() => setToastVisible(false)}
       />
-      <Text
-        style={[
-          styles.title,
-          {
-            color: theme.colors.text,
-            fontSize: theme.typography.h2.fontSize,
-            fontWeight: theme.typography.h2.fontWeight,
-          },
-        ]}
-        accessibilityRole="header"
-      >
-        Lista de entradas
-      </Text>
       <InputDate
         date={initialDate}
         setDate={setInitialDate}
@@ -150,13 +137,6 @@ export const InputListScreen = ({ navigation }: InputListScreenProps) => {
         accessibilityHint="Abre el formulario para crear una nueva entrada de inventario"
       />
       <Fab
-        style={[styles.fabDash, { backgroundColor: theme.colors.warning }]}
-        iconName="grid-outline"
-        onPress={() => navigation.navigate('DashboarInput')}
-        accessibilityLabel="Ver dashboard de entradas"
-        accessibilityHint="Abre el resumen de entradas por tipo"
-      />
-      <Fab
         style={[styles.fabL, { backgroundColor: theme.colors.success }]}
         iconName="download"
         onPress={downloadFile}
@@ -172,11 +152,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
-  title: {
-    fontStyle: 'italic',
-    paddingVertical: 10,
-    textAlign: 'center',
-  },
   resultText: {
     textAlign: 'center',
   },
@@ -187,11 +162,6 @@ const styles = StyleSheet.create({
   },
   fabL: {
     bottom: 20,
-    left: 20,
-    position: 'absolute' as const,
-  },
-  fabDash: {
-    bottom: 80,
     left: 20,
     position: 'absolute' as const,
   },

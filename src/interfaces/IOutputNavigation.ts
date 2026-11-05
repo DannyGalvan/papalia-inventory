@@ -4,7 +4,6 @@ export type OutputStackParamList = {
   OutputList: undefined;
   CreateOutput: undefined;
   ReadOutput: { id: number };
-  DashboardOutput: undefined;
 };
 
 export type OutputListScreenProps = NativeStackScreenProps<
@@ -20,9 +19,4 @@ export type CreateOutputScreenProps = NativeStackScreenProps<
 export type ReadOutputScreenProps = NativeStackScreenProps<
   OutputStackParamList,
   'ReadOutput'
->;
-
-export type DashboardOutputScreenProps = NativeStackScreenProps<
-  OutputStackParamList,
-  'DashboardOutput'
 >;

@@ -3,7 +3,6 @@ import React from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { OutputStackParamList } from '../interfaces/IOutputNavigation';
 import { CreateOutputScreen } from '../screens/output/CreateOutputScreen';
-import { DashboardOutputScreen } from '../screens/output/DashboardOutputScreen';
 import { OutputListScreen } from '../screens/output/OutputListScreen';
 import { ReadOutputScreen } from '../screens/output/ReadOutputScreen';
 import { appColors } from '../styles/globalStyles';
@@ -31,7 +30,6 @@ function OutputStack() {
       />
       <Stack.Screen name="CreateOutput" component={CreateOutputScreen} />
       <Stack.Screen name="ReadOutput" component={ReadOutputScreen} />
-      <Stack.Screen name="DashboardOutput" component={DashboardOutputScreen} />
     </Stack.Navigator>
   );
 }

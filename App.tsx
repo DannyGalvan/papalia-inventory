@@ -7,6 +7,8 @@
  *  3. ThemeProvider reads persisted preference from DB (now safe)
  *  4. NavigationContainer + app screens render
  *
+ * GestureHandlerRootView wraps the tree so the drawer gestures work.
+ *
  * @format
  */
 
@@ -19,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ErrorBoundary } from './src/components/feedback/ErrorBoundary';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { TimezoneProvider } from './src/context/TimezoneContext';
@@ -117,13 +120,15 @@ function App(): React.JSX.Element {
 
   // DB ready — now safe to render ThemeProvider (it reads from DB)
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <TimezoneProvider>
-          <AppContent />
-        </TimezoneProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <GestureHandlerRootView style={styles.flex}>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <TimezoneProvider>
+            <AppContent />
+          </TimezoneProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
   );
 }
 

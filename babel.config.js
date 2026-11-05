@@ -11,5 +11,7 @@ module.exports = {
       },
     ],
     ['@babel/plugin-proposal-decorators', { legacy: true }],
+    // Must be listed last (required by react-native-reanimated 4).
+    'react-native-worklets/plugin',
   ],
 };

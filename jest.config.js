@@ -1,5 +1,6 @@
 module.exports = {
   preset: 'react-native',
+  setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
   // Shared test utilities live in __tests__/helpers and are not suites.
   testPathIgnorePatterns: ['/node_modules/', '/__tests__/helpers/'],
   // exceljs (and its nested `uuid` dependency) ships ES module syntax that

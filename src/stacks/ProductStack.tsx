@@ -5,10 +5,6 @@ import { ProductStackParamList } from '../interfaces/IProductNavigation';
 import { CreateProductScreen } from '../screens/product/CreateProductScreen';
 import { ProductListScreen } from '../screens/product/ProductListScreen';
 import { UpdateProductScreen } from '../screens/product/UpdateProductScreen';
-import { CriticalReportScreen } from '../screens/reports/CriticalReportScreen';
-import { MovementReportScreen } from '../screens/reports/MovementReportScreen';
-import { ProfitReportScreen } from '../screens/reports/ProfitReportScreen';
-import { SummaryReportScreen } from '../screens/reports/SummaryReportScreen';
 import { appColors } from '../styles/globalStyles';
 
 const Stack = createNativeStackNavigator<ProductStackParamList>();
@@ -34,10 +30,6 @@ function ProductStack() {
       />
       <Stack.Screen name="CreateProduct" component={CreateProductScreen} />
       <Stack.Screen name="EditProduct" component={UpdateProductScreen} />
-      <Stack.Screen name="CriticalReport" component={CriticalReportScreen} />
-      <Stack.Screen name="SummaryReport" component={SummaryReportScreen} />
-      <Stack.Screen name="MovementReport" component={MovementReportScreen} />
-      <Stack.Screen name="ProfitReport" component={ProfitReportScreen} />
     </Stack.Navigator>
   );
 }
