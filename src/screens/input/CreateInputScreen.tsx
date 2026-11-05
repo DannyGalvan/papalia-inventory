@@ -10,12 +10,10 @@ import {
 } from '../../database/repository/LogHeaderRepository';
 import { useTheme } from '../../hooks/useTheme';
 import { CreateInputScreenProps } from '../../interfaces/IInputNavigation';
-import { dateNowCreate } from '../../utils/dateTime';
 
 const initialForm = LogHeaderRepository.create({
   comments: '',
   type: INPUT_TYPES.no_seleccionado,
-  createdAt: dateNowCreate(),
   isInput: true,
   logDetails: [],
 });

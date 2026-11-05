@@ -346,3 +346,47 @@ describe('dateRanges', () => {
     });
   });
 });
+
+describe('computeProfitReport — movement (sale) date', () => {
+  const withMovementDate = (h: LogHeader, movementDate: unknown): LogHeader =>
+    ({ ...h, movementDate } as unknown as LogHeader);
+
+  it('counts a sale on its sale date, not on its registration date', () => {
+    // Registered in December (outside RANGE) but sold on 2026-11-10 local.
+    const sale = withMovementDate(
+      header(at('2026-12-03T15:00:00Z'), SALE, false, [
+        { code: 'A', quantity: 2, price: 10, unitCost: 6 },
+      ]),
+      at('2026-11-10T15:00:00Z'),
+    );
+    const report = computeProfitReport([sale], RANGE, ctx());
+    expect(report.revenue).toBe(20);
+    expect(report.salesCount).toBe(1);
+    expect(report.timeline).toHaveLength(1);
+    expect(report.timeline[0].key).toBe(
+      bucketFor(at('2026-11-10T15:00:00Z'), report.granularity, TZ).key,
+    );
+  });
+
+  it('moves a sale registered in range but sold earlier to the previous period', () => {
+    const sale = withMovementDate(
+      header(at('2026-11-02T15:00:00Z'), SALE, false, [
+        { code: 'A', quantity: 1, price: 10, unitCost: 6 },
+      ]),
+      at('2026-10-25T15:00:00Z'),
+    );
+    const report = computeProfitReport([sale], RANGE, ctx());
+    expect(report.revenue).toBe(0);
+    expect(report.previous.revenue).toBe(10);
+  });
+
+  it('falls back to createdAt for legacy rows without movement date', () => {
+    const legacy = withMovementDate(
+      header(at('2026-11-10T15:00:00Z'), SALE, false, [
+        { code: 'A', quantity: 1, price: 10, unitCost: 6 },
+      ]),
+      { isNitroSQLiteNull: true },
+    );
+    expect(computeProfitReport([legacy], RANGE, ctx()).revenue).toBe(10);
+  });
+});

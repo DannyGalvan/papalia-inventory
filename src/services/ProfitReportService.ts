@@ -1,8 +1,11 @@
-import { Between } from 'typeorm';
 import { ALL_IN_OUT_ENUM } from '../config/constants';
 import { LogHeader } from '../database/models/LogHeader';
 import { LogHeaderRepository } from '../database/repository/LogHeaderRepository';
-import { activeMovementsWhere } from '../database/utils/movementFilters';
+import {
+  activeMovementsWhere,
+  movementDateBetween,
+} from '../database/utils/movementFilters';
+import { effectiveMovementDate } from './movement/movementDate';
 import {
   getAllMovementTypes,
   toBool,
@@ -102,17 +105,6 @@ const snapshotCost = (v: unknown): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-const toDate = (v: unknown): Date | null => {
-  if (v instanceof Date) {
-    return Number.isNaN(v.getTime()) ? null : v;
-  }
-  if (typeof v === 'string' || typeof v === 'number') {
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
-  return null;
-};
-
 const inRange = (d: Date, range: DateRange) =>
   d.getTime() >= range.from.getTime() && d.getTime() <= range.to.getTime();
 
@@ -151,12 +143,13 @@ export function computeProfitReport(
   let detailsWithoutHistoricalCost = 0;
 
   for (const header of headers) {
-    const createdAt = toDate(header.createdAt);
-    if (!createdAt) {
+    // Business date (sale/receipt), not the registration date.
+    const occurredAt = effectiveMovementDate(header);
+    if (!occurredAt) {
       continue;
     }
-    const isCurrent = inRange(createdAt, range);
-    if (!isCurrent && !inRange(createdAt, prevRange)) {
+    const isCurrent = inRange(occurredAt, range);
+    if (!isCurrent && !inRange(occurredAt, prevRange)) {
       continue;
     }
     const summary = isCurrent ? current : previous;
@@ -230,7 +223,7 @@ export function computeProfitReport(
     }
 
     if (isCurrent && !isInput) {
-      const bucket = bucketFor(createdAt, granularity, ctx.timezone);
+      const bucket = bucketFor(occurredAt, granularity, ctx.timezone);
       const point = timeline.get(bucket.key) ?? {
         key: bucket.key,
         label: bucket.label,
@@ -306,7 +299,7 @@ export async function getProfitReportData(
   const [headers, movementTypes, products] = await Promise.all([
     LogHeaderRepository.find({
       where: {
-        createdAt: Between(prev.from, range.to),
+        ...movementDateBetween(prev.from, range.to),
         ...activeMovementsWhere(),
       },
       relations: ['logDetails'],

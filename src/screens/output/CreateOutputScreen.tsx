@@ -10,13 +10,11 @@ import {
 } from '../../database/repository/LogHeaderRepository';
 import { getProductById } from '../../database/repository/ProductRepository';
 import { useTheme } from '../../hooks/useTheme';
-import { dateNowCreate } from '../../utils/dateTime';
 import { validateStockForOutput } from '../../utils/stockValidator';
 
 const initialForm = LogHeaderRepository.create({
   comments: '',
   type: OUTPUT_TYPES.no_seleccionado,
-  createdAt: dateNowCreate(),
   isInput: false,
   logDetails: [],
 });

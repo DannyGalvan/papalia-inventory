@@ -15,6 +15,7 @@
  */
 
 import { LogHeader } from '../database/models/LogHeader';
+import { validateMovementDate } from '../services/movement/movementDate';
 import { isValidPrice } from './salePrice';
 
 /** Value representing the unselected ("no seleccionado") type option. */
@@ -34,6 +35,7 @@ export type LogFormErrors = {
   comments?: string;
   type?: string;
   details?: string;
+  movementDate?: string;
 };
 
 /**
@@ -47,10 +49,17 @@ export type LogFormErrors = {
  * other field, so an unselected type always yields a `type` error regardless of
  * the comments or product details supplied (Requirement 7.6 / Property 7).
  *
+ * The movement (sale/receipt) date is optional: when absent it defaults to
+ * the registration moment on save. When present it must not be in the future.
+ *
  * @param form The current LogForm state.
+ * @param now Reference "current" time (injectable for tests).
  * @returns A {@link LogFormErrors} object (empty when the form is valid).
  */
-export const validateLogForm = (form: LogHeader): LogFormErrors => {
+export const validateLogForm = (
+  form: LogHeader,
+  now: Date = new Date(),
+): LogFormErrors => {
   const errors: LogFormErrors = {};
 
   if (!form.comments) {
@@ -65,6 +74,13 @@ export const validateLogForm = (form: LogHeader): LogFormErrors => {
     errors.details = LOG_FORM_MESSAGES.details;
   } else if (form.logDetails.some(d => !isValidPrice(d.price))) {
     errors.details = LOG_FORM_MESSAGES.price;
+  }
+
+  if (form.movementDate != null) {
+    const movementDateError = validateMovementDate(form.movementDate, now);
+    if (movementDateError) {
+      errors.movementDate = movementDateError;
+    }
   }
 
   return errors;
