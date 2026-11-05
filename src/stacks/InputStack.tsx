@@ -3,7 +3,6 @@ import React from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { InputStackParamList } from '../interfaces/IInputNavigation';
 import { CreateInputScreen } from '../screens/input/CreateInputScreen';
-import { DashboardInputScreen } from '../screens/input/DashboardInputScreen';
 import { InputListScreen } from '../screens/input/InputListScreen';
 import { ReadInputScreen } from '../screens/input/ReadInputScreen';
 import { appColors } from '../styles/globalStyles';
@@ -31,7 +30,6 @@ function InputStack() {
       />
       <Stack.Screen name="CreateInput" component={CreateInputScreen} />
       <Stack.Screen name="ReadInput" component={ReadInputScreen} />
-      <Stack.Screen name="DashboarInput" component={DashboardInputScreen} />
     </Stack.Navigator>
   );
 }

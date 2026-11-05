@@ -4,7 +4,6 @@ export type InputStackParamList = {
   InputList: undefined;
   CreateInput: undefined;
   ReadInput: { id: number };
-  DashboarInput: undefined;
 };
 
 export type InputListScreenProps = NativeStackScreenProps<
@@ -20,9 +19,4 @@ export type CreateInputScreenProps = NativeStackScreenProps<
 export type ReadInputScreenProps = NativeStackScreenProps<
   InputStackParamList,
   'ReadInput'
->;
-
-export type DashboarInputScreenProps = NativeStackScreenProps<
-  InputStackParamList,
-  'DashboarInput'
 >;

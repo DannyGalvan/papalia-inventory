@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { HeaderLeft } from '../components/navigation/HeaderLeft';
-import { HeaderRight } from '../components/navigation/HeaderRight';
 import { ProductProvider } from '../context/ProductContext';
 import { useTheme } from '../hooks/useTheme';
 import { AppStackParamList } from '../interfaces/IAppStartNavigation';
@@ -13,7 +11,7 @@ import { UnitOfMeasureCatalogScreen } from '../screens/catalog/UnitOfMeasureCata
 import { ConfigurationScreen } from '../screens/configuration/ConfigurationScreen';
 import { PermissionsScreen } from '../screens/permissions/PermissionsScreen';
 import { appColors } from '../styles/globalStyles';
-import PrincipalStack from './PrincipalStack';
+import MainDrawer from './MainDrawer';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -37,12 +35,8 @@ const AppStartStack = () => {
         />
         <Stack.Screen
           name="Home"
-          component={PrincipalStack}
-          options={{
-            headerTitle: '',
-            headerRight: HeaderRight,
-            headerLeft: HeaderLeft,
-          }}
+          component={MainDrawer}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Configuration"
